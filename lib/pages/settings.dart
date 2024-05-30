@@ -98,7 +98,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ListTile(
                   title: const Text("Default theme"),
                   subtitle: const Text("Restart app to apply"),
-                  leading: Icon(Icons.color_lens),
+                  leading: const Icon(Icons.color_lens),
                   trailing: DropdownButton(
                     value: dropdownValue,
                     onChanged: (String? value) {
