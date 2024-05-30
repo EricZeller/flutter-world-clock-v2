@@ -1,16 +1,27 @@
-# world_clock_v2
+# World Clock v2
 
-A new Flutter project.
+World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience.
 
-## Getting Started
+## Features
 
-This project is a starting point for a Flutter application.
+- Displays the current time for selected cities.
+- Shows the current weather (temperature, weather conditions) for selected cities.
+- Customizable Material You theme.
 
-A few resources to get you started if this is your first Flutter project:
+## Screenshots
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+<!-- Add screenshots of your app here -->
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Installation
+
+Head to the releases for installation candidates.
+
+To install and run the app locally, follow these steps:
+
+1. **Install Flutter**:
+   Ensure that Flutter is installed on your system. Follow the [official guide](https://flutter.dev/docs/get-started/install) to install Flutter.
+
+2. **Clone the repository**:
+   ```bash
+   git clone https://github.com/EricZeller/flutter-world-clock-v2.git
+   cd flutter-world-clock-v2
