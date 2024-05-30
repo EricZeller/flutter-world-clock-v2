@@ -22,7 +22,6 @@ class _LocationPageState extends State<LocationPage> {
       primarySwatch: Colors.blue, brightness: Brightness.dark);
 
   String? _selectedOption = "Berlin";
-  late ScrollController _scrollController;
 
   Future<void> getSelectedOption() async {
     final prefs = await SharedPreferences.getInstance();
@@ -73,7 +72,6 @@ class _LocationPageState extends State<LocationPage> {
             ),
           ),
           body: ListView(
-            controller: _scrollController,
             children: cities.map((city) {
               return RadioListTile(
                 value: city.name,
