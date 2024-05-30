@@ -1,10 +1,7 @@
-import 'dart:js_interop';
-
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:intl/intl_standalone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -20,7 +17,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +30,9 @@ class MyApp extends StatelessWidget {
         darkColorScheme = darkDynamic.harmonized();
       } else {
         lightColorScheme =
-            ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+            ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
         darkColorScheme = ColorScheme.fromSeed(
-                seedColor: Colors.blue, brightness: Brightness.dark)
+                seedColor: Colors.indigo, brightness: Brightness.dark)
             .harmonized();
       }
 
@@ -63,10 +60,10 @@ class MyApp extends StatelessWidget {
         themeMode: themeModePreference,
         initialRoute: '/home',
         routes: {
-          '/home': (context) => MyHomePage(title: "World clock v2"),
-          '/about': (context) => AboutPage(title: "About this app"),
-          '/settings': (context) => SettingsPage(title: "Settings"),
-          '/location': (context) => LocationPage(title: "Choose city"),
+          '/home': (context) => const MyHomePage(title: "World clock v2"),
+          '/about': (context) => const AboutPage(title: "About this app"),
+          '/settings': (context) => const SettingsPage(title: "Settings"),
+          '/location': (context) => const LocationPage(title: "Choose city"),
         },
       );
     });
@@ -105,11 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
       try {
         String cityNameToFind = cityName.toString();
         City city = cities.firstWhere((city) => city.name == cityNameToFind);
-        print(
-            'Gefundene Stadt: ${city.name}, Zeitzone: ${city.timeZone}, Bild: ${city.image}');
         timeZone = city.timeZone;
+      // ignore: empty_catches
       } catch (e) {
-        print('Stadt nicht gefunden');
       }
     });
   }
@@ -128,7 +123,7 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     getThemeModePreference();
     getCity();
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
     });
     getTimeZone();
@@ -148,9 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String getLocalTime() {
     var now = DateTime.now();
-    var nowPlusTwoHours = now.add(Duration(hours: 2));
-    var formatter = DateFormat('Hms');
-    return "Local time:${formatter.format(nowPlusTwoHours)}";
+    var formatter = DateFormat('Hm');
+    return "Local time: ${formatter.format(now)}";
   }
 
   Future<void> getWeather(weatherZone) async {
@@ -195,7 +189,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   break;
               }
             },
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'settings',
@@ -216,7 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         title: Text(
           widget.title,
-          style: TextStyle(fontFamily: "Red Hat Display"),
+          style: const TextStyle(fontFamily: "Red Hat Display"),
         ),
         centerTitle: true,
       ),
@@ -224,7 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            SizedBox(height: 40.0),
+            const SizedBox(height: 40.0),
             Text(
               cityName!,
               style: TextStyle(
@@ -232,7 +226,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontFamily: "Pacifico",
                   color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             Text(
               getTimeInTimeZone(timeZone!),
               style: TextStyle(
@@ -240,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontFamily: "Red Hat Display",
                   color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             Text(
               _weather,
               style: TextStyle(
@@ -267,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             TextButton.icon(
               onPressed: () async {
                 final result = await Navigator.pushNamed(context, '/location');
@@ -277,13 +271,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       String cityNameToFind = result.toString();
                       City city = cities
                           .firstWhere((city) => city.name == cityNameToFind);
-                      print(
-                          'Gefundene Stadt: ${city.name}, Zeitzone: ${city.timeZone}, Bild: ${city.image}');
                       cityName = city.name;
                       getWeather(city.weatherZone);
                       timeZone = city.timeZone;
+                    // ignore: empty_catches
                     } catch (e) {
-                      print('Stadt nicht gefunden');
                     }
                     //print(result);
                   });

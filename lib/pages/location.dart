@@ -1,8 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:world_clock_v2/main.dart';
 import 'package:world_clock_v2/data/data.dart';
 
 class LocationPage extends StatefulWidget {
@@ -47,9 +45,9 @@ class _LocationPageState extends State<LocationPage> {
         darkColorScheme = darkDynamic.harmonized();
       } else {
         lightColorScheme =
-            ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+            ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
         darkColorScheme = ColorScheme.fromSeed(
-                seedColor: Colors.blue, brightness: Brightness.dark)
+                seedColor: Colors.indigo, brightness: Brightness.dark)
             .harmonized();
       }
 
@@ -81,7 +79,7 @@ class _LocationPageState extends State<LocationPage> {
             title: Text(widget.title),
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () {
                 //print(_selectedOption);
                 Navigator.pop(context, _selectedOption);
@@ -102,7 +100,7 @@ class _LocationPageState extends State<LocationPage> {
                 tileColor: Theme.of(context).colorScheme.secondaryContainer,
                 title: Text(
                   '${city.name}, ${city.country}',
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontFamily: 'Red Hat Display',
                       fontWeight: FontWeight.bold,
                       fontSize: 20),
@@ -119,9 +117,9 @@ class _LocationPageState extends State<LocationPage> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => Navigator.pop(context, _selectedOption),
-            child: Icon(Icons.check),
             backgroundColor: Theme.of(context).colorScheme.secondary,
             foregroundColor: Theme.of(context).colorScheme.onSecondary,
+            child: const Icon(Icons.check),
           ),
         ),
       );

@@ -2,7 +2,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/data/data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:world_clock_v2/main.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.title});
@@ -49,9 +48,9 @@ class _SettingsPageState extends State<SettingsPage> {
           darkColorScheme = darkDynamic.harmonized();
         } else {
           lightColorScheme =
-              ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+              ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
           darkColorScheme = ColorScheme.fromSeed(
-                  seedColor: Colors.blue, brightness: Brightness.dark)
+                  seedColor: Colors.indigo, brightness: Brightness.dark)
               .harmonized();
         }
 
@@ -95,7 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
             body: ListTile(
-              title: Text("Default theme (restart to apply)"),
+              title: const Text("Default theme (restart to apply)"),
               trailing: DropdownButton(
                 value: dropdownValue,
                 onChanged: (String? value) {
@@ -117,7 +116,7 @@ class _SettingsPageState extends State<SettingsPage> {
               backgroundColor: Theme.of(context).colorScheme.secondary,
               foregroundColor: Theme.of(context).colorScheme.onSecondary,
               onPressed: () => Navigator.pop(context),
-              child: Icon(Icons.check),
+              child: const Icon(Icons.check),
             ),
           ),
         );

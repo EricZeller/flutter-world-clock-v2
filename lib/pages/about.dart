@@ -18,9 +18,9 @@ class AboutPage extends StatelessWidget {
         darkColorScheme = darkDynamic.harmonized();
       } else {
         lightColorScheme =
-            ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+            ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
         darkColorScheme = ColorScheme.fromSeed(
-                seedColor: Colors.blue, brightness: Brightness.dark)
+                seedColor: Colors.indigo, brightness: Brightness.dark)
             .harmonized();
       }
 
@@ -52,11 +52,11 @@ class AboutPage extends StatelessWidget {
             title: Text(title),
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          body: Placeholder(),
+          body: const Placeholder(),
         ),
       );
     });

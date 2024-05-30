@@ -1,5 +1,4 @@
 import 'package:world_clock_v2/pages/location.dart';
-import 'package:flutter/material.dart';
 
 final List<City> cities = [
   // Europa
@@ -53,7 +52,7 @@ final List<City> cities = [
   City(name: 'Melbourne', timeZone: 'Australia/Melbourne', weatherZone: 'Melbourne', country: 'Australia', image: 'au.png'),
 ];
 
-String? spThemeMode = "Follow system";
+String? spThemeMode = "System";
 const List<String> themeList = <String>["System", "Dark", "Light"];
 
 String spLanguage = "English";
