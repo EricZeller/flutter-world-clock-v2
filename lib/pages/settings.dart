@@ -93,24 +93,37 @@ class _SettingsPageState extends State<SettingsPage> {
                 onPressed: () => Navigator.pop(context),
               ),
             ),
-            body: ListTile(
-              title: const Text("Default theme (restart to apply)"),
-              trailing: DropdownButton(
-                value: dropdownValue,
-                onChanged: (String? value) {
-                  setState(() {
-                    dropdownValue = value!;
-                    spThemeMode = dropdownValue;
-                    _saveStringValue('themeMode', spThemeMode!);
-                  });
-                },
-                items: themeList.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
+            body: Column(
+              children: [
+                ListTile(
+                  title: const Text("Default theme"),
+                  subtitle: const Text("Restart app to apply"),
+                  leading: Icon(Icons.color_lens),
+                  trailing: DropdownButton(
+                    value: dropdownValue,
+                    onChanged: (String? value) {
+                      setState(() {
+                        dropdownValue = value!;
+                        spThemeMode = dropdownValue;
+                        _saveStringValue('themeMode', spThemeMode!);
+                      });
+                    },
+                    items:
+                        themeList.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ),
+                ListTile(
+                  title: const Text("Language"),
+                  subtitle: const Text("In progress"),
+                  leading: const Icon(Icons.language),
+                  trailing: Text(spLanguage),
+                )
+              ],
             ),
             floatingActionButton: FloatingActionButton(
               backgroundColor: Theme.of(context).colorScheme.secondary,
