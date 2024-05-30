@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:world_clock_v2/pages/settings.dart';
@@ -64,16 +65,27 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Timer _timer;
   String _weather = "Loading...";
+  String? cityName = "Berlin";
+
+  Future<void> getCity() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      cityName = prefs.getString('selectedOption');
+      cityName ??= 'Berlin';
+      getWeather(cityName);
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    getCity();
   }
 
-  Future<void> getWeather(city) async {
+  Future<void> getWeather(weatherZone) async {
     try {
-      var response =
-          await http.get(Uri.parse('https://wttr.in/$city?format=%c+%C+%t'));
+      var response = await http
+          .get(Uri.parse('https://wttr.in/$weatherZone?format=%c+%C+%t'));
       if (response.statusCode == 200) {
         setState(() {
           _weather = response.body;
@@ -139,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             SizedBox(height: 40.0),
             Text(
-              "Berlin",
+              cityName!,
               style: TextStyle(
                   fontSize: 50.0,
                   fontFamily: "Pacifico",
@@ -183,8 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(height: 20),
             TextButton.icon(
               onPressed: () async {
-                final result =
-                    await Navigator.pushNamed(context, '/location');
+                final result = await Navigator.pushNamed(context, '/location');
                 if (result != null) {
                   setState(() {
                     try {
@@ -193,11 +204,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           .firstWhere((city) => city.name == cityNameToFind);
                       print(
                           'Gefundene Stadt: ${city.name}, Zeitzone: ${city.timeZone}, Bild: ${city.image}');
+                      cityName = city.name;
+                      getWeather(city.weatherZone);
                     } catch (e) {
                       print('Stadt nicht gefunden');
                     }
-                    print(result);
-                    getWeather(result);
+                    //print(result);
                   });
                 }
               },
