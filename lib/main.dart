@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -10,7 +12,7 @@ import 'package:world_clock_v2/pages/settings.dart';
 import 'package:world_clock_v2/pages/location.dart';
 import 'package:world_clock_v2/pages/about.dart';
 import 'package:http/http.dart' as http;
-import 'package:world_clock_v2/data/cities.dart';
+import 'package:world_clock_v2/data/data.dart';
 
 void main() {
   tz.initializeTimeZones();
@@ -23,7 +25,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
-
       ColorScheme lightColorScheme;
       ColorScheme darkColorScheme;
 
@@ -31,8 +32,21 @@ class MyApp extends StatelessWidget {
         lightColorScheme = lightDynamic.harmonized();
         darkColorScheme = darkDynamic.harmonized();
       } else {
-        lightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
-        darkColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark).harmonized();
+        lightColorScheme =
+            ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+        darkColorScheme = ColorScheme.fromSeed(
+                seedColor: Colors.blue, brightness: Brightness.dark)
+            .harmonized();
+      }
+
+      ThemeMode? themeModePreference;
+
+      if (spThemeMode == themeList[0]) {
+        themeModePreference = ThemeMode.system;
+      } else if (spThemeMode == themeList[1]) {
+        themeModePreference = ThemeMode.dark;
+      } else if (spThemeMode == themeList[2]) {
+        themeModePreference = ThemeMode.light;
       }
 
       return MaterialApp(
@@ -46,7 +60,7 @@ class MyApp extends StatelessWidget {
           colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.system, //TODO settings for system, light and dark
+        themeMode: themeModePreference,
         initialRoute: '/home',
         routes: {
           '/home': (context) => MyHomePage(title: "World clock v2"),
@@ -60,7 +74,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  const MyHomePage({super.key, required this.title});
 
   final String title;
 
@@ -72,6 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late Timer _timer;
   String _weather = "Loading...";
   String? cityName = "Berlin";
+  String? timeZone = "Europe/Berlin";
 
   Future<void> getCity() async {
     final prefs = await SharedPreferences.getInstance();
@@ -82,10 +97,60 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Future<void> getTimeZone() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      cityName = prefs.getString('selectedOption');
+      cityName ??= 'Berlin';
+      try {
+        String cityNameToFind = cityName.toString();
+        City city = cities.firstWhere((city) => city.name == cityNameToFind);
+        print(
+            'Gefundene Stadt: ${city.name}, Zeitzone: ${city.timeZone}, Bild: ${city.image}');
+        timeZone = city.timeZone;
+      } catch (e) {
+        print('Stadt nicht gefunden');
+      }
+    });
+  }
+
+  Future<void> getThemeModePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      if (prefs.getString('themeMode') != null) {
+        spThemeMode = prefs.getString('themeMode');
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getThemeModePreference();
     getCity();
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {});
+    });
+    getTimeZone();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String getTimeInTimeZone(String timeZone) {
+    var now = tz.TZDateTime.now(tz.getLocation(timeZone));
+    var formatter = DateFormat('Hms');
+    return formatter.format(now);
+  }
+
+  String getLocalTime() {
+    var now = DateTime.now();
+    var nowPlusTwoHours = now.add(Duration(hours: 2));
+    var formatter = DateFormat('Hms');
+    return "Local time:${formatter.format(nowPlusTwoHours)}";
   }
 
   Future<void> getWeather(weatherZone) async {
@@ -113,10 +178,14 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: (String result) {
+            onSelected: (String result) async {
               switch (result) {
                 case 'settings':
-                  Navigator.pushNamed(context, '/settings');
+                  await Navigator.pushNamed(
+                    context,
+                    '/settings',
+                  );
+                  setState(() {});
                   break;
                 case 'about':
                   Navigator.pushNamed(context, '/about');
@@ -165,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             SizedBox(height: 20.0),
             Text(
-              "18:10:43",
+              getTimeInTimeZone(timeZone!),
               style: TextStyle(
                   fontSize: 80.0,
                   fontFamily: "Red Hat Display",
@@ -190,7 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "Local time: 19:10:43",
+                  getLocalTime(),
                   style: TextStyle(
                       fontSize: 30.0,
                       fontFamily: "Red Hat Display",
@@ -212,6 +281,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           'Gefundene Stadt: ${city.name}, Zeitzone: ${city.timeZone}, Bild: ${city.image}');
                       cityName = city.name;
                       getWeather(city.weatherZone);
+                      timeZone = city.timeZone;
                     } catch (e) {
                       print('Stadt nicht gefunden');
                     }

@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:world_clock_v2/data/data.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key, required this.title});
@@ -8,8 +9,7 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-   return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
-
+    return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
       ColorScheme lightColorScheme;
       ColorScheme darkColorScheme;
 
@@ -17,9 +17,23 @@ class AboutPage extends StatelessWidget {
         lightColorScheme = lightDynamic.harmonized();
         darkColorScheme = darkDynamic.harmonized();
       } else {
-        lightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
-        darkColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark).harmonized();
+        lightColorScheme =
+            ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+        darkColorScheme = ColorScheme.fromSeed(
+                seedColor: Colors.blue, brightness: Brightness.dark)
+            .harmonized();
       }
+
+      ThemeMode? themeModePreference;
+
+      if (spThemeMode == themeList[0]) {
+        themeModePreference = ThemeMode.system;
+      } else if (spThemeMode == themeList[1]) {
+        themeModePreference = ThemeMode.dark;
+      } else if (spThemeMode == themeList[2]) {
+        themeModePreference = ThemeMode.light;
+      }
+
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'World clock',
@@ -31,7 +45,7 @@ class AboutPage extends StatelessWidget {
           colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.system,
+        themeMode: themeModePreference,
         home: Scaffold(
           appBar: AppBar(
             centerTitle: true,

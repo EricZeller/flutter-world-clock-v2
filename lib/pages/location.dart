@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/main.dart';
-import 'package:world_clock_v2/data/cities.dart';
+import 'package:world_clock_v2/data/data.dart';
 
 class LocationPage extends StatefulWidget {
   const LocationPage({super.key, required this.title});
@@ -15,7 +15,6 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
-  
   String? _selectedOption = "Berlin";
 
   Future<void> getSelectedOption() async {
@@ -29,7 +28,6 @@ class _LocationPageState extends State<LocationPage> {
   Future<void> _saveStringValue(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
-    print(key + value);
   }
 
   @override
@@ -41,7 +39,6 @@ class _LocationPageState extends State<LocationPage> {
   @override
   Widget build(BuildContext context) {
     return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
-
       ColorScheme lightColorScheme;
       ColorScheme darkColorScheme;
 
@@ -49,9 +46,23 @@ class _LocationPageState extends State<LocationPage> {
         lightColorScheme = lightDynamic.harmonized();
         darkColorScheme = darkDynamic.harmonized();
       } else {
-        lightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
-        darkColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark).harmonized();
+        lightColorScheme =
+            ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+        darkColorScheme = ColorScheme.fromSeed(
+                seedColor: Colors.blue, brightness: Brightness.dark)
+            .harmonized();
       }
+
+      ThemeMode? themeModePreference;
+
+      if (spThemeMode == themeList[0]) {
+        themeModePreference = ThemeMode.system;
+      } else if (spThemeMode == themeList[1]) {
+        themeModePreference = ThemeMode.dark;
+      } else if (spThemeMode == themeList[2]) {
+        themeModePreference = ThemeMode.light;
+      }
+
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'World clock',
@@ -63,7 +74,7 @@ class _LocationPageState extends State<LocationPage> {
           colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.system,
+        themeMode: themeModePreference,
         home: Scaffold(
           appBar: AppBar(
             centerTitle: true,
@@ -89,7 +100,13 @@ class _LocationPageState extends State<LocationPage> {
                   });
                 },
                 tileColor: Theme.of(context).colorScheme.secondaryContainer,
-                title: Text('${city.name}, ${city.country}', style: TextStyle(fontFamily: 'Red Hat Display', fontWeight: FontWeight.bold, fontSize: 20),),
+                title: Text(
+                  '${city.name}, ${city.country}',
+                  style: TextStyle(
+                      fontFamily: 'Red Hat Display',
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20),
+                ),
                 subtitle: Text(city.timeZone),
                 secondary: ClipRRect(
                   child: Image.asset(
@@ -103,6 +120,8 @@ class _LocationPageState extends State<LocationPage> {
           floatingActionButton: FloatingActionButton(
             onPressed: () => Navigator.pop(context, _selectedOption),
             child: Icon(Icons.check),
+            backgroundColor: Theme.of(context).colorScheme.secondary,
+            foregroundColor: Theme.of(context).colorScheme.onSecondary,
           ),
         ),
       );
@@ -117,5 +136,10 @@ class City {
   final String weatherZone;
   final String country;
 
-  City({required this.name, required this.timeZone, required this.image, required this.weatherZone, required this.country});
+  City(
+      {required this.name,
+      required this.timeZone,
+      required this.image,
+      required this.weatherZone,
+      required this.country});
 }
