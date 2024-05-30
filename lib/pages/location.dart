@@ -15,12 +15,7 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
-  static final _defaultLightColorScheme =
-      ColorScheme.fromSwatch(primarySwatch: Colors.blue);
-
-  static final _defaultDarkColorScheme = ColorScheme.fromSwatch(
-      primarySwatch: Colors.blue, brightness: Brightness.dark);
-
+  
   String? _selectedOption = "Berlin";
 
   Future<void> getSelectedOption() async {
@@ -45,16 +40,27 @@ class _LocationPageState extends State<LocationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(builder: (lightColorScheme, darkColorScheme) {
+    return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
+
+      ColorScheme lightColorScheme;
+      ColorScheme darkColorScheme;
+
+      if (lightDynamic != null && darkDynamic != null) {
+        lightColorScheme = lightDynamic.harmonized();
+        darkColorScheme = darkDynamic.harmonized();
+      } else {
+        lightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue).harmonized();
+        darkColorScheme = ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark).harmonized();
+      }
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'World clock',
         theme: ThemeData(
-          colorScheme: lightColorScheme ?? _defaultLightColorScheme,
+          colorScheme: lightColorScheme,
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
-          colorScheme: darkColorScheme ?? _defaultDarkColorScheme,
+          colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
         themeMode: ThemeMode.system,
@@ -83,7 +89,7 @@ class _LocationPageState extends State<LocationPage> {
                   });
                 },
                 tileColor: Theme.of(context).colorScheme.secondaryContainer,
-                title: Text('${city.name}, ${city.country}'),
+                title: Text('${city.name}, ${city.country}', style: TextStyle(fontFamily: 'Red Hat Display', fontWeight: FontWeight.bold, fontSize: 20),),
                 subtitle: Text(city.timeZone),
                 secondary: ClipRRect(
                   child: Image.asset(
