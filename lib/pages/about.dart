@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:world_clock_v2/data/data.dart';
 
 class AboutPage extends StatelessWidget {
@@ -25,6 +26,14 @@ class AboutPage extends StatelessWidget {
       }
 
       ThemeMode? themeModePreference;
+      TextStyle heading = TextStyle(
+          fontFamily: "Pacifico",
+          fontSize: 24,
+          color: Theme.of(context).colorScheme.onSecondaryContainer);
+      TextStyle body = TextStyle(
+          fontFamily: "Red Hat Display",
+          fontSize: 18,
+          color: Theme.of(context).colorScheme.onSecondaryContainer);
 
       if (spThemeMode == themeList[0]) {
         themeModePreference = ThemeMode.system;
@@ -47,17 +56,55 @@ class AboutPage extends StatelessWidget {
         ),
         themeMode: themeModePreference,
         home: Scaffold(
-          appBar: AppBar(
-            centerTitle: true,
-            title: Text(title),
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context),
+            backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+            appBar: AppBar(
+              centerTitle: true,
+              title: Text(title,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Red Hat Display",
+                      fontSize: 24,
+                      color:
+                          Theme.of(context).colorScheme.onSecondaryContainer)),
+              backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-          ),
-          body: const Placeholder(),
-        ),
+            body: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("World Clock v2", style: heading),
+                  SizedBox(height: 20),
+                  Text(
+                      style: body,
+                      "World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience."),
+                  Divider(
+                    height: 60.0,
+                    thickness: 2,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  Text("License", style: heading),
+                  SizedBox(height: 10),
+                  Text(
+                      style: body,
+                      "This app is licensed under the GNU GPL 3.0. For more details, see the LICENSE file in the repository."),
+                  Divider(
+                    height: 60.0,
+                    thickness: 2,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  Text("Contact", style: heading),
+                  SizedBox(height: 10),
+                  Text(
+                      style: body,
+                      "If you have any questions or suggestions, feel free to contact me over GitHub.")
+                ],
+              ),
+            )),
       );
     });
   }
