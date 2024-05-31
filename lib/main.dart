@@ -10,6 +10,7 @@ import 'package:world_clock_v2/pages/location.dart';
 import 'package:world_clock_v2/pages/about.dart';
 import 'package:http/http.dart' as http;
 import 'package:world_clock_v2/data/data.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   tz.initializeTimeZones();
@@ -85,6 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? cityName = "Berlin";
   String? timeZone = "Europe/Berlin";
 
+  final Uri _url = Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2');
+
   Future<void> getCity() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -103,9 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
         String cityNameToFind = cityName.toString();
         City city = cities.firstWhere((city) => city.name == cityNameToFind);
         timeZone = city.timeZone;
-      // ignore: empty_catches
-      } catch (e) {
-      }
+        // ignore: empty_catches
+      } catch (e) {}
     });
   }
 
@@ -172,20 +174,19 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: (String result) async {
+            onSelected: (String result) {
               switch (result) {
                 case 'settings':
-                  await Navigator.pushNamed(
+                  Navigator.pushNamed(
                     context,
                     '/settings',
                   );
-                  setState(() {});
                   break;
                 case 'about':
                   Navigator.pushNamed(context, '/about');
                   break;
                 case 'source_code':
-                  //link to github
+                  _launchUrl();
                   break;
               }
             },
@@ -193,15 +194,24 @@ class _MyHomePageState extends State<MyHomePage> {
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
                 value: 'settings',
-                child: Text('Settings'),
+                child: ListTile(
+                  title: Text('Settings'),
+                  leading: Icon(Icons.settings),
+                ),
               ),
               const PopupMenuItem<String>(
                 value: 'about',
-                child: Text('About'),
+                child: ListTile(
+                  title: Text('About'),
+                  leading: Icon(Icons.info),
+                ),
               ),
               const PopupMenuItem<String>(
                 value: 'source_code',
-                child: Text('Source Code'),
+                child: ListTile(
+                  title: Text('Source Code'),
+                  leading: Icon(Icons.code),
+                ),
               ),
             ],
           )
@@ -274,9 +284,8 @@ class _MyHomePageState extends State<MyHomePage> {
                       cityName = city.name;
                       getWeather(city.weatherZone);
                       timeZone = city.timeZone;
-                    // ignore: empty_catches
-                    } catch (e) {
-                    }
+                      // ignore: empty_catches
+                    } catch (e) {}
                     //print(result);
                   });
                 }
@@ -302,5 +311,11 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.refresh),
       ),
     );
+  }
+
+  Future<void> _launchUrl() async {
+    if (!await launchUrl(_url)) {
+      throw Exception('Could not launch $_url');
+    }
   }
 }
