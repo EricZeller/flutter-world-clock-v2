@@ -56,9 +56,19 @@ dev_dependencies:
 
 flutter_launcher_icons:
   linux: true
-  android: true
   ios: true
   image_path: "assets/IconKitchen-Output/android/play_store_512.png"
+  windows:
+    generate: true
+    image_path: "assets/IconKitchen-Output/android/play_store_512.png"
+  macos:
+    generate: true
+    image_path: "assets/IconKitchen-Output/android/play_store_512.png"
+  web:
+    generate: true
+    image_path: "assets/IconKitchen-Output/android/play_store_512.png"
+    background_color: "#336699"
+    theme_color: "#336699"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
