@@ -86,7 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String? cityName = "Berlin";
   String? timeZone = "Europe/Berlin";
 
-  final Uri _url = Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2');
+  final Uri _githubUrl =
+      Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2');
+  final Uri _issueUrl =
+      Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2/issues');
 
   Future<void> getCity() async {
     final prefs = await SharedPreferences.getInstance();
@@ -186,7 +189,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   Navigator.pushNamed(context, '/about');
                   break;
                 case 'source_code':
-                  _launchUrl();
+                  _launchUrl(_githubUrl);
+                  break;
+                case 'bug_report':
+                  _launchUrl(_issueUrl);
                   break;
               }
             },
@@ -211,6 +217,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ListTile(
                   title: Text('Source Code'),
                   leading: Icon(Icons.code),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'bug_report',
+                child: ListTile(
+                  title: Text('Report a bug'),
+                  leading: Icon(Icons.bug_report),
                 ),
               ),
             ],
@@ -313,9 +326,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _launchUrl() async {
-    if (!await launchUrl(_url)) {
-      throw Exception('Could not launch $_url');
+  Future<void> _launchUrl(url) async {
+    if (!await launchUrl(url)) {
+      throw Exception('Could not launch $url');
     }
   }
 }

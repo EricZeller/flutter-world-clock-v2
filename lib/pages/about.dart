@@ -14,7 +14,7 @@ class AboutPage extends StatelessWidget {
       future: PackageInfo.fromPlatform(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
         final packageInfo = snapshot.data!;
         final version = packageInfo.version;
