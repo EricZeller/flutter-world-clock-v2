@@ -69,20 +69,23 @@ flutter_launcher_icons:
     image_path: "assets/IconKitchen-Output/android/play_store_512.png"
   web:
     generate: true
-    image_path: "assets/IconKitchen-Output/android/play_store_512.png"
+    image_path: "assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher.png"
     background_color: "#336699"
     theme_color: "#336699"
 
 flutter_native_splash:
-  color: "#2f6184"
-  image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png
+  color: "#042c4d"
+  branding: assets/branding.png
+  image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png  
   background_image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_background.png
   android: true
   ios: true
   web: true
   android_12:
     image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png
-    icon_background_color: "#3c0069"
+    branding: assets/branding2.png
+    color: "#0aaea6"
+    color_dark: "#07497e"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
