@@ -43,6 +43,7 @@ dependencies:
   url_launcher: ^6.2.6
   package_info_plus: ^8.0.0
   yaml: ^3.1.2
+  flutter_native_splash: ^2.4.0
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +73,17 @@ flutter_launcher_icons:
     background_color: "#336699"
     theme_color: "#336699"
 
+flutter_native_splash:
+  color: "#2f6184"
+  image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_monochrome.png
+  background_image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_background.png
+  android: true
+  ios: true
+  web: true
+  android_12:
+    image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png
+    icon_background_color: "#3c0069"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -87,6 +99,7 @@ flutter:
     - pubspec.yaml
     - assets/
     - assets/flags/
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -113,9 +126,6 @@ flutter:
         - asset: fonts/Pacifico/Pacifico-Regular.ttf
     #       - asset: fonts/TrajanPro_Bold.ttf
     #         weight: 700
-    - family: Sofia
-      fonts:
-        - asset: fonts/Sofia/Sofia-Regular.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:
