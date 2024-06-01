@@ -1,7 +1,17 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/data/data.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'package:yaml/yaml.dart';
+
+Future<String> getAppVersion() async {
+  final pubspec = await rootBundle.loadString('pubspec.yaml');
+  final yamlMap = loadYaml(pubspec);
+  final version = yamlMap['version'] as String;
+  final pureVersion = version.split('+').first; // Entfernt die Build-Nummer
+  return pureVersion;
+}
+
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key, required this.title});
@@ -10,14 +20,13 @@ class AboutPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<PackageInfo>(
-      future: PackageInfo.fromPlatform(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        final packageInfo = snapshot.data!;
-        final version = packageInfo.version;
+    return FutureBuilder<String>(
+    future: getAppVersion(),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      final version = snapshot.data!;
 
         return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
           ColorScheme lightColorScheme;

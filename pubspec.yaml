@@ -42,6 +42,7 @@ dependencies:
   provider: ^6.1.2
   url_launcher: ^6.2.6
   package_info_plus: ^8.0.0
+  yaml: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -83,6 +84,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - pubspec.yaml
     - assets/
     - assets/flags/
   #   - images/a_dot_ham.jpeg
