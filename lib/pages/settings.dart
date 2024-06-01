@@ -82,7 +82,9 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text(
                 widget.title,
                 style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontFamily: "Pacifico",
+                    fontSize: 24),
               ),
               backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               leading: IconButton(

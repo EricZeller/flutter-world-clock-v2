@@ -76,7 +76,11 @@ class _LocationPageState extends State<LocationPage> {
         home: Scaffold(
           appBar: AppBar(
             centerTitle: true,
-            title: Text(widget.title),
+            title: Text(widget.title,
+                style: TextStyle(
+                    fontFamily: "Pacifico",
+                    fontSize: 24,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
