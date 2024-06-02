@@ -166,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       }
     } catch (e) {
-      _weather = "Connection error";
+      _weather = "🛜 Connection error";
     }
   }
 
