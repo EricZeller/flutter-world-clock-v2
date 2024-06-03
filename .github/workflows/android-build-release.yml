@@ -40,6 +40,7 @@ jobs:
         name: app-release.apk
         path: build/app/outputs/flutter-apk/app-release.apk
 
+        
   create_tag:
     runs-on: ubuntu-latest
     needs: build
@@ -50,7 +51,7 @@ jobs:
     - name: Get latest tag
       id: get_tag
       run: |
-        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` || echo "v0.0.0")
         echo "latest_tag=$latest_tag" >> $GITHUB_ENV
 
     - name: Create new tag
