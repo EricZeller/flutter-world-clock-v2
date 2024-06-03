@@ -48,26 +48,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Get latest tag
-      id: get_tag
+    - name: Create or update tag
       run: |
-        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` || echo "v0.0.0")
-        echo "latest_tag=$latest_tag" >> $GITHUB_ENV
-
-    - name: Create new tag
-      id: tag
-      run: |
-        IFS='.' read -r -a parts <<< "${{ env.latest_tag }}"
-        major=${parts[0]:1}
-        minor=${parts[1]}
-        patch=${parts[2]}
-        new_patch=$((patch + 1))
-        new_tag="v${major}.${minor}.${new_patch}"
-        echo "new_tag=$new_tag" >> $GITHUB_ENV
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
-        git tag $new_tag
-        git push origin $new_tag
+        git tag -f latest-release
+        git push origin -f latest-release
 
   release:
     runs-on: ubuntu-latest
@@ -87,8 +73,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.new_tag }}
-        release_name: Release ${{ env.new_tag }}
+        tag_name: latest-release
+        release_name: Release latest-release
         draft: false
         prerelease: false
 
