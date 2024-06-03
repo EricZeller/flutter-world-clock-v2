@@ -14,7 +14,7 @@ World Clock is a Flutter app that displays the current time and weather for vari
 <img src="assets/screenshot_dark_lightmode.png" alt="Screenshot dark/light mode" width="200"/>
 <img src="assets/screenshot_purple.png" alt="Screenshot dark/light mode" width="200"/>
 </p>
-<!-- Add screenshots of your app here -->
+
 
 ## Installation
 
@@ -31,3 +31,8 @@ To install and run the app locally, follow these steps:
    cd flutter-world-clock-v2
    flutter pub get
    flutter run
+
+## Sources
+All icons and fonts from [fonts.google.com](https://fonts.google.com)
+Flag icons from [flagpedia.net](https://flagpedia.net/download)
+Libraries/packages from pub.dev
