@@ -316,13 +316,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.secondary,
-        foregroundColor: Theme.of(context).colorScheme.onSecondary,
-        onPressed: () {},
-        tooltip: 'Reload',
-        child: const Icon(Icons.refresh),
-      ),
     );
   }
 
