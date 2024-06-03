@@ -36,3 +36,4 @@ To install and run the app locally, follow these steps:
 All icons and fonts from [fonts.google.com](https://fonts.google.com)
 Flag icons from [flagpedia.net](https://flagpedia.net/download)
 Libraries/packages from pub.dev
+Used (keyless) weather API: [wttr.in](https://github.com/chubin/wttr.in)
