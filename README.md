@@ -29,5 +29,5 @@ To install and run the app locally, follow these steps:
    ```bash
    git clone https://github.com/EricZeller/flutter-world-clock-v2.git
    cd flutter-world-clock-v2
-flutter pub get
-flutter run
+   flutter pub get
+   flutter run
