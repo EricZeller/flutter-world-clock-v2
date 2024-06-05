@@ -1,4 +1,6 @@
-# eazy Material World Clock v2
+# Material World Clock v2
+
+<a href="https://apt.izzysoft.de/fdroid/index/apk/de.ericz.worldclockv2/"><img src="assets/IzzyOnDroidButton_nofont.svg" height="50px"></a>
 
 World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience.
 
@@ -35,7 +37,7 @@ To install and run the app locally, follow these steps:
 1. **Install Flutter**:
    Ensure that Flutter is installed on your system. Follow the [official guide](https://flutter.dev/docs/get-started/install) to install Flutter.
 
-3. **Clone the repository**:
+2. **Clone the repository**:
    ```bash
    git clone https://github.com/EricZeller/flutter-world-clock-v2.git
    cd flutter-world-clock-v2
