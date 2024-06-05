@@ -1,5 +1,5 @@
 import 'package:world_clock_v2/pages/location.dart';
-
+/*
 final List<City> cities = [
   // Europa
   City(name: 'Berlin', timeZone: 'Europe/Berlin', weatherZone: 'Berlin', country: 'Germany', image: 'de.png'),
@@ -51,7 +51,7 @@ final List<City> cities = [
   City(name: 'Sydney', timeZone: 'Australia/Sydney', weatherZone: 'Sydney', country: 'Australia', image: 'au.png'),
   City(name: 'Melbourne', timeZone: 'Australia/Melbourne', weatherZone: 'Melbourne', country: 'Australia', image: 'au.png'),
 ];
-
+*/
 String? spThemeMode = "System";
 const List<String> themeList = <String>["System", "Dark", "Light"];
 

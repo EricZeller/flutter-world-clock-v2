@@ -59,7 +59,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: themeModePreference,
-        initialRoute: '/home',
+        initialRoute: '/location',
         routes: {
           '/home': (context) => const MyHomePage(title: "World clock v2"),
           '/about': (context) => const AboutPage(title: "About this app"),
@@ -107,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
       cityName ??= 'Berlin';
       try {
         String cityNameToFind = cityName.toString();
+        var cities;
         City city = cities.firstWhere((city) => city.name == cityNameToFind);
         timeZone = city.timeZone;
         // ignore: empty_catches
@@ -292,6 +293,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   setState(() {
                     try {
                       String cityNameToFind = result.toString();
+                      var cities;
                       City city = cities
                           .firstWhere((city) => city.name == cityNameToFind);
                       cityName = city.name;
