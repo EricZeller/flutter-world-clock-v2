@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -59,7 +61,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
         ),
         themeMode: themeModePreference,
-        initialRoute: '/location',
+        initialRoute: '/home',
         routes: {
           '/home': (context) => const MyHomePage(title: "World clock v2"),
           '/about': (context) => const AboutPage(title: "About this app"),
@@ -91,29 +93,24 @@ class _MyHomePageState extends State<MyHomePage> {
   final Uri _issueUrl =
       Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2/issues');
 
-  Future<void> getCity() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      cityName = prefs.getString('selectedOption');
-      cityName ??= 'Berlin';
-      getWeather(cityName);
-    });
-  }
 
   Future<void> getTimeZone() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      cityName = prefs.getString('selectedOption');
-      cityName ??= 'Berlin';
-      try {
-        String cityNameToFind = cityName.toString();
-        var cities;
-        City city = cities.firstWhere((city) => city.name == cityNameToFind);
-        timeZone = city.timeZone;
-        // ignore: empty_catches
-      } catch (e) {}
-    });
-  }
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
+    cityName = prefs.getString('selectedOption');
+    cityName ??= 'Berlin';
+    try {
+      var cityJson = jsonDecode(cityName!);
+      City city = City.fromJson(cityJson);
+      cityName = city.name;
+      timeZone = city.timeZone;
+      getWeather(cityName);
+    } catch (e) {
+      // Fehlerbehandlung, wenn JSON nicht erfolgreich dekodiert werden kann
+    }
+  });
+}
+
 
   Future<void> getThemeModePreference() async {
     final prefs = await SharedPreferences.getInstance();
@@ -128,11 +125,11 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     getThemeModePreference();
-    getCity();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {});
     });
     getTimeZone();
+    getWeather(cityName);
   }
 
   @override
@@ -288,22 +285,8 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 20),
             TextButton.icon(
               onPressed: () async {
-                final result = await Navigator.pushNamed(context, '/location');
-                if (result != null) {
-                  setState(() {
-                    try {
-                      String cityNameToFind = result.toString();
-                      var cities;
-                      City city = cities
-                          .firstWhere((city) => city.name == cityNameToFind);
-                      cityName = city.name;
-                      getWeather(city.weatherZone);
-                      timeZone = city.timeZone;
-                      // ignore: empty_catches
-                    } catch (e) {}
-                    //print(result);
-                  });
-                }
+                await Navigator.pushNamed(context, '/location');
+                getTimeZone();
               },
               label: Text(
                 "Change city",
