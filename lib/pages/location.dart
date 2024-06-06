@@ -63,13 +63,14 @@ class LocationPage extends StatefulWidget {
 class _LocationPageState extends State<LocationPage> {
   List<City> _cities = [];
   List<City> _filteredCities = [];
-  late City _selectedOption;
+  late City _selectedOption; 
 
   Future<void> getSelectedOption() async {
-    _selectedOption = _cities.first;
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      if (prefs.getString('selectedOption') != null) {
+      if (prefs.getString('selectedOption') == null) {
+        _selectedOption = _cities.first;
+      } else {
         var cityJson = jsonDecode(prefs.getString('selectedOption')!);
         _selectedOption = City.fromJson(cityJson);
       }
@@ -100,10 +101,11 @@ class _LocationPageState extends State<LocationPage> {
   void initState() {
     super.initState();
     loadCities().then((cities) {
-      setState(() {
+      setState(() async {
         _cities = cities;
         _filteredCities = cities;
-        getSelectedOption();
+        await getSelectedOption();
+        print(_selectedOption.name);
       });
     });
   }
@@ -186,7 +188,13 @@ class _LocationPageState extends State<LocationPage> {
                       title: Text(_filteredCities[index].name),
                       subtitle: Text(
                           "${_filteredCities[index].country}, UTC${_filteredCities[index].utc}"),
-                    );
+                        secondary: ClipRRect(
+                          child: Image.asset(
+                            "assets/flags/${_filteredCities[index].flag}",
+                            width: 40,
+                          ),
+                        ),
+                          );
                   },
 
                   /*children: cities.map((city) {
