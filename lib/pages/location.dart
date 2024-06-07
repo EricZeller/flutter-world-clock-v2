@@ -87,15 +87,20 @@ class _LocationPageState extends State<LocationPage> {
     prefs.setString(key, jsonEncode(city.toJson()));
   }
 
-  void _searchCities(String query) {
-    final filtered = _cities.where((city) {
-      return city.name.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+void _searchCities(String query) {
+  final filtered = _cities.where((city) {
+    final cityName = city.name.toLowerCase();
+    final cityCountry = city.country.toLowerCase();
+    final searchQuery = query.toLowerCase();
 
-    setState(() {
-      _filteredCities = filtered;
-    });
-  }
+    return cityName.contains(searchQuery) || cityCountry.contains(searchQuery);
+  }).toList();
+
+  setState(() {
+    _filteredCities = filtered;
+  });
+}
+
 
   @override
   void initState() {
