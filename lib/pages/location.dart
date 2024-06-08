@@ -114,6 +114,10 @@ class _LocationPageState extends State<LocationPage> {
         case "sortByUtc":
           _filteredCities.sort((a, b) => compareUtc(a.utc, b.utc));
           break;
+        case "sortByContinent":
+          //_filteredCities.sort((a, b) => a.name.compareTo(b.name));
+          _filteredCities.sort((a, b) => a.timeZone.compareTo(b.timeZone));
+          break;
       }
     });
   }
@@ -217,6 +221,7 @@ class _LocationPageState extends State<LocationPage> {
           appBar: AppBar(
             actions: [
               PopupMenuButton<String>(
+                tooltip: "Sort the list",
                 onSelected: (sorting) {
                   // Hier kannst du die entsprechende Sortierlogik basierend auf dem ausgewählten Wert implementieren
                   sortCities(sorting);
@@ -233,6 +238,10 @@ class _LocationPageState extends State<LocationPage> {
                   const PopupMenuItem<String>(
                     value: 'sortByUtc',
                     child: Text('Sort by UTC timezone'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'sortByContinent',
+                    child: Text('Sort by continent/region'),
                   ),
                   // Füge weitere Sortieroptionen hinzu, falls nötig
                 ],
@@ -271,6 +280,7 @@ class _LocationPageState extends State<LocationPage> {
                   itemCount: _filteredCities.length,
                   itemBuilder: (context, index) {
                     return RadioListTile(
+                      isThreeLine: true,
                       value: _filteredCities[index],
                       groupValue: _selectedOption,
                       onChanged: (value) {
@@ -282,11 +292,15 @@ class _LocationPageState extends State<LocationPage> {
                       },
                       title: Text(_filteredCities[index].name),
                       subtitle: Text(
-                          "${_filteredCities[index].country}, UTC${_filteredCities[index].utc}"),
-                      secondary: ClipRRect(
-                        child: Image.asset(
-                          "assets/flags/${_filteredCities[index].flag}",
-                          width: 40,
+                          "${_filteredCities[index].country}, UTC${_filteredCities[index].utc} \n${_filteredCities[index].timeZone}"),
+                      secondary: SizedBox(
+                        width: 40,
+                        child: ClipRRect(
+                          child: Center(
+                            child: Image.asset(
+                              "assets/flags/${_filteredCities[index].flag}",
+                            ),
+                          ),
                         ),
                       ),
                     );
