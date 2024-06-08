@@ -68,19 +68,13 @@ class _LocationPageState extends State<LocationPage> {
   Future<City> getSelectedOption() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString('selectedOption') == null) {
-      print(_cities.first);
       return _cities.first;
     } else {
       var cityJson = jsonDecode(prefs.getString('selectedOption')!);
-      print(City.fromJson(cityJson));
       return City.fromJson(cityJson);
     }
   }
 
-  Future<void> _saveStringValue(String key, String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(key, value);
-  }
 
   void _saveSelectedCity(String key, City city) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -129,7 +123,7 @@ class _LocationPageState extends State<LocationPage> {
     final match2 = regex.firstMatch(utc2);
 
     if (match1 == null || match2 == null) {
-      throw FormatException('Invalid UTC format');
+      throw const FormatException('Invalid UTC format');
     }
 
     final sign1 = match1.group(1)!;
@@ -171,7 +165,6 @@ class _LocationPageState extends State<LocationPage> {
     final selectedOption = await getSelectedOption();
     setState(() {
       _selectedOption = selectedOption;
-      print(_selectedOption.name);
     });
     setState(() {
       sortCities("sortByCity");
@@ -287,7 +280,6 @@ class _LocationPageState extends State<LocationPage> {
                         setState(() {
                           _selectedOption = value!;
                           _saveSelectedCity('selectedOption', value);
-                          print("New selected option: ${_selectedOption.name}");
                         });
                       },
                       title: Text(_filteredCities[index].name),
