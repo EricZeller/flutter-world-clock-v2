@@ -63,18 +63,18 @@ class LocationPage extends StatefulWidget {
 class _LocationPageState extends State<LocationPage> {
   List<City> _cities = [];
   List<City> _filteredCities = [];
-  late City _selectedOption; 
+  late City _selectedOption;
 
-  Future<void> getSelectedOption() async {
+  Future<City> getSelectedOption() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      if (prefs.getString('selectedOption') == null) {
-        _selectedOption = _cities.first;
-      } else {
-        var cityJson = jsonDecode(prefs.getString('selectedOption')!);
-        _selectedOption = City.fromJson(cityJson);
-      }
-    });
+    if (prefs.getString('selectedOption') == null) {
+      print(_cities.first);
+      return _cities.first;
+    } else {
+      var cityJson = jsonDecode(prefs.getString('selectedOption')!);
+      print(City.fromJson(cityJson));
+      return City.fromJson(cityJson);
+    }
   }
 
   Future<void> _saveStringValue(String key, String value) async {
@@ -87,31 +87,90 @@ class _LocationPageState extends State<LocationPage> {
     prefs.setString(key, jsonEncode(city.toJson()));
   }
 
-void _searchCities(String query) {
-  final filtered = _cities.where((city) {
-    final cityName = city.name.toLowerCase();
-    final cityCountry = city.country.toLowerCase();
-    final searchQuery = query.toLowerCase();
+  void _searchCities(String query) {
+    final filtered = _cities.where((city) {
+      final cityName = city.name.toLowerCase();
+      final cityCountry = city.country.toLowerCase();
+      final searchQuery = query.toLowerCase();
 
-    return cityName.contains(searchQuery) || cityCountry.contains(searchQuery);
-  }).toList();
+      return cityName.contains(searchQuery) ||
+          cityCountry.contains(searchQuery);
+    }).toList();
 
-  setState(() {
-    _filteredCities = filtered;
-  });
-}
+    setState(() {
+      _filteredCities = filtered;
+    });
+  }
 
+  void sortCities(sorting) {
+    setState(() {
+      switch (sorting) {
+        case "sortByCity":
+          _filteredCities.sort((a, b) => a.name.compareTo(b.name));
+          break;
+        case "sortByCountry":
+          _filteredCities.sort((a, b) => a.country.compareTo(b.country));
+          break;
+        case "sortByUtc":
+          _filteredCities.sort((a, b) => compareUtc(a.utc, b.utc));
+          break;
+      }
+    });
+  }
+
+  int compareUtc(String utc1, String utc2) {
+    final regex = RegExp(r'([+-])(\d{2}):(\d{2})');
+
+    final match1 = regex.firstMatch(utc1);
+    final match2 = regex.firstMatch(utc2);
+
+    if (match1 == null || match2 == null) {
+      throw FormatException('Invalid UTC format');
+    }
+
+    final sign1 = match1.group(1)!;
+    final sign2 = match2.group(1)!;
+
+    final hours1 = int.parse(match1.group(2)!);
+    final minutes1 = int.parse(match1.group(3)!);
+    final totalMinutes1 = hours1 * 60 + minutes1;
+
+    final hours2 = int.parse(match2.group(2)!);
+    final minutes2 = int.parse(match2.group(3)!);
+    final totalMinutes2 = hours2 * 60 + minutes2;
+
+    if (sign1 == '-' && sign2 == '-') {
+      return totalMinutes2
+          .compareTo(totalMinutes1); // Reverse order for negative times
+    } else if (sign1 == '+' && sign2 == '+') {
+      return totalMinutes1
+          .compareTo(totalMinutes2); // Normal order for positive times
+    } else {
+      // '-' should come before '+'
+      return sign1 == '-' ? -1 : 1;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    loadCities().then((cities) {
-      setState(() async {
-        _cities = cities;
-        _filteredCities = cities;
-        await getSelectedOption();
-        print(_selectedOption.name);
-      });
+    _initializeCitiesAndSelection();
+  }
+
+  Future<void> _initializeCitiesAndSelection() async {
+    final cities = await loadCities();
+    setState(() {
+      _cities = cities;
+      _filteredCities = cities;
+    });
+
+    final selectedOption = await getSelectedOption();
+    setState(() {
+      _selectedOption = selectedOption;
+      print(_selectedOption.name);
+    });
+    setState(() {
+      sortCities("sortByCity");
     });
   }
 
@@ -156,6 +215,30 @@ void _searchCities(String query) {
         themeMode: themeModePreference,
         home: Scaffold(
           appBar: AppBar(
+            actions: [
+              PopupMenuButton<String>(
+                onSelected: (sorting) {
+                  // Hier kannst du die entsprechende Sortierlogik basierend auf dem ausgewählten Wert implementieren
+                  sortCities(sorting);
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  const PopupMenuItem<String>(
+                    value: 'sortByCity',
+                    child: Text('Sort by city'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'sortByCountry',
+                    child: Text('Sort by country'),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'sortByUtc',
+                    child: Text('Sort by UTC timezone'),
+                  ),
+                  // Füge weitere Sortieroptionen hinzu, falls nötig
+                ],
+                icon: const Icon(Icons.sort),
+              ),
+            ],
             centerTitle: true,
             title: Text(widget.title,
                 style: TextStyle(
@@ -173,9 +256,15 @@ void _searchCities(String query) {
           ),
           body: Column(
             children: [
-              TextField(
-                onChanged: (query) => _searchCities(query),
-                decoration: InputDecoration(hintText: 'Search for a city'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                child: TextField(
+                  onChanged: (query) => _searchCities(query),
+                  decoration: const InputDecoration(
+                    hintText: 'Search city or country',
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
               ),
               Expanded(
                 child: ListView.builder(
@@ -188,18 +277,19 @@ void _searchCities(String query) {
                         setState(() {
                           _selectedOption = value!;
                           _saveSelectedCity('selectedOption', value);
+                          print("New selected option: ${_selectedOption.name}");
                         });
                       },
                       title: Text(_filteredCities[index].name),
                       subtitle: Text(
                           "${_filteredCities[index].country}, UTC${_filteredCities[index].utc}"),
-                        secondary: ClipRRect(
-                          child: Image.asset(
-                            "assets/flags/${_filteredCities[index].flag}",
-                            width: 40,
-                          ),
+                      secondary: ClipRRect(
+                        child: Image.asset(
+                          "assets/flags/${_filteredCities[index].flag}",
+                          width: 40,
                         ),
-                          );
+                      ),
+                    );
                   },
 
                   /*children: cities.map((city) {
