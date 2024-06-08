@@ -44,6 +44,7 @@ dependencies:
   package_info_plus: ^8.0.0
   yaml: ^3.1.2
   flutter_native_splash: ^2.4.0
+  sqflite: ^2.3.3+1
 
 dev_dependencies:
   flutter_test:
@@ -101,6 +102,7 @@ flutter:
   assets:
     - pubspec.yaml
     - assets/flags/
+    - assets/data/cities.json
 
   #   - images/a_dot_ham.jpeg
 
