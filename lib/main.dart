@@ -133,6 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (prefs.getBool('showSecondsLocal') != null) {
         showSecondsLocal = prefs.getBool('showSecondsLocal')!;
       }
+      if (prefs.getString('wttrServer') != null) {
+        wttrServer = prefs.getString('wttrServer')!;
+      }
     });
   }
 
@@ -184,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _weather = "🛰️ Loading...";
     try {
       var response = await http
-          .get(Uri.parse('https://wttr.in/$weatherZone?format=%c+%C+%t'));
+          .get(Uri.parse('$wttrServer/$weatherZone?format=%c+%C+%t'));
       if (response.statusCode == 200) {
         setState(() {
           _weather = response.body;

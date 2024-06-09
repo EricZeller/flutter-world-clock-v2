@@ -34,11 +34,24 @@ class _SettingsPageState extends State<SettingsPage> {
     });
   }
 
+  final TextEditingController _urlController = TextEditingController();
+
+  void _saveUrl() {
+    final enteredUrl = _urlController.text;
+    _saveStringValue('wttrServer', enteredUrl);
+  }
+
   @override
   void initState() {
     super.initState();
     getThemeModePreference();
     dropdownValue = spThemeMode!;
+  }
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    super.dispose();
   }
 
   @override
@@ -197,6 +210,24 @@ class _SettingsPageState extends State<SettingsPage> {
                       });
                       _saveBoolValue("use24hr", sp24hr);
                     },
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.link),
+                  title: Text('Set own wttr.in server'),
+                  subtitle: TextField(
+                    controller: _urlController,
+                    keyboardType: TextInputType.url,
+                    decoration: InputDecoration(
+                      hintText: 'https://wttr.in',
+                    ),
+                    onSubmitted: (value) {
+                      _saveUrl();
+                    },
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.save),
+                    onPressed: _saveUrl,
                   ),
                 ),
                 ListTile(
