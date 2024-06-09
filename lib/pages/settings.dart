@@ -20,6 +20,11 @@ class _SettingsPageState extends State<SettingsPage> {
     await prefs.setString(key, value);
   }
 
+  Future<void> _saveBoolValue(String key, bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, value);
+  }
+
   Future<void> getThemeModePreference() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -38,6 +43,36 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final WidgetStateProperty<Icon?> thumbIconLocal =
+        WidgetStateProperty.resolveWith<Icon?>(
+      (Set<WidgetState> states) {
+        if (states.contains(WidgetState.selected)) {
+          return const Icon(Icons.location_on);
+        }
+        return const Icon(Icons.location_off);
+      },
+    );
+
+    final WidgetStateProperty<Icon?> thumbIconGlobal =
+        WidgetStateProperty.resolveWith<Icon?>(
+      (Set<WidgetState> states) {
+        if (states.contains(WidgetState.selected)) {
+          return const Icon(Icons.public);
+        }
+        return const Icon(Icons.public_off);
+      },
+    );
+
+    final WidgetStateProperty<Icon?> thumbIcon =
+        WidgetStateProperty.resolveWith<Icon?>(
+      (Set<WidgetState> states) {
+        if (states.contains(WidgetState.selected)) {
+          return const Icon(Icons.check);
+        }
+        return const Icon(Icons.close);
+      },
+    );
+
     return DynamicColorBuilder(
       builder: (lightDynamic, darkDynamic) {
         ColorScheme lightColorScheme;
@@ -120,11 +155,56 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 ListTile(
+                  title: const Text("Show seconds"),
+                  leading: const Icon(Icons.schedule),
+                  subtitle: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("World clock"),
+                      Switch(
+                        thumbIcon: thumbIconGlobal,
+                        value: showSeconds,
+                        onChanged: (bool value) {
+                          setState(() {
+                            showSeconds = value;
+                          });
+                          _saveBoolValue("showSeconds", showSeconds);
+                        },
+                      ),
+                      const Text("Local"),
+                      Switch(
+                        thumbIcon: thumbIconLocal,
+                        value: showSecondsLocal,
+                        onChanged: (bool value) {
+                          setState(() {
+                            showSecondsLocal = value;
+                          });
+                          _saveBoolValue("showSecondsLocal", showSecondsLocal);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.travel_explore),
+                  title: const Text("Use 24hr format"),
+                  trailing: Switch(
+                    thumbIcon: thumbIcon,
+                    value: sp24hr,
+                    onChanged: (bool value) {
+                      setState(() {
+                        sp24hr = value;
+                      });
+                      _saveBoolValue("use24hr", sp24hr);
+                    },
+                  ),
+                ),
+                ListTile(
                   title: const Text("Language"),
                   subtitle: const Text("In progress"),
                   leading: const Icon(Icons.language),
                   trailing: Text(spLanguage),
-                )
+                ),
               ],
             ),
             floatingActionButton: FloatingActionButton(

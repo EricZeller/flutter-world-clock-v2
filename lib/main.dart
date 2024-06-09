@@ -53,10 +53,12 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'World clock',
         theme: ThemeData(
+          fontFamily: "Red Hat Display",
           colorScheme: lightColorScheme,
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
+          fontFamily: "Red Hat Display",
           colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
@@ -93,30 +95,44 @@ class _MyHomePageState extends State<MyHomePage> {
   final Uri _issueUrl =
       Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2/issues');
 
-
   Future<void> getTimeZone() async {
-  final prefs = await SharedPreferences.getInstance();
-  setState(() {
-    cityName = prefs.getString('selectedOption');
-    cityName ??= 'Berlin';
-    try {
-      var cityJson = jsonDecode(cityName!);
-      City city = City.fromJson(cityJson);
-      cityName = city.name;
-      timeZone = city.timeZone;
-      getWeather(cityName);
-    } catch (e) {
-      // Fehlerbehandlung, wenn JSON nicht erfolgreich dekodiert werden kann
-    }
-  });
-}
-
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      cityName = prefs.getString('selectedOption');
+      cityName ??= 'Berlin';
+      try {
+        var cityJson = jsonDecode(cityName!);
+        City city = City.fromJson(cityJson);
+        cityName = city.name;
+        timeZone = city.timeZone;
+        getWeather(cityName);
+      } catch (e) {
+        // Fehlerbehandlung, wenn JSON nicht erfolgreich dekodiert werden kann
+      }
+    });
+  }
 
   Future<void> getThemeModePreference() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       if (prefs.getString('themeMode') != null) {
         spThemeMode = prefs.getString('themeMode');
+      }
+    });
+  }
+
+  Future<void> getPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      if (prefs.getBool('use24hr') != null) {
+        sp24hr = prefs.getBool('use24hr')!;
+      }
+      if (prefs.getBool('showSeconds') != null) {
+        showSeconds = prefs.getBool('showSeconds')!;
+      }
+      if (prefs.getBool('showSecondsLocal') != null) {
+        print(prefs.getBool('showSecondsLocal'));
+        showSecondsLocal = prefs.getBool('showSecondsLocal')!;
       }
     });
   }
@@ -130,6 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     getTimeZone();
     getWeather(cityName);
+    getPreferences();
   }
 
   @override
@@ -140,17 +157,32 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String getTimeInTimeZone(String timeZone) {
     var now = tz.TZDateTime.now(tz.getLocation(timeZone));
-    var formatter = DateFormat('Hms');
+    DateFormat formatter;
+
+    if (showSeconds) {
+      formatter = sp24hr ? DateFormat('Hms') : DateFormat('hh:mm:ss a');
+    } else {
+      formatter = sp24hr ? DateFormat('Hm') : DateFormat('hh:mm a');
+    }
+
     return formatter.format(now);
   }
 
   String getLocalTime() {
     var now = DateTime.now();
-    var formatter = DateFormat('Hm');
+    DateFormat formatter;
+
+    if (showSecondsLocal) {
+      formatter = sp24hr ? DateFormat('Hms') : DateFormat('hh:mm:ss a');
+    } else {
+      formatter = sp24hr ? DateFormat('Hm') : DateFormat('hh:mm a');
+    }
+
     return "Local time: ${formatter.format(now)}";
   }
 
   Future<void> getWeather(weatherZone) async {
+    _weather = "🛰️ Loading...";
     try {
       var response = await http
           .get(Uri.parse('https://wttr.in/$weatherZone?format=%c+%C+%t'));
@@ -248,12 +280,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
             const SizedBox(height: 20.0),
-            Text(
-              getTimeInTimeZone(timeZone!),
-              style: TextStyle(
-                  fontSize: 80.0,
-                  fontFamily: "Red Hat Display",
-                  color: Theme.of(context).colorScheme.onPrimaryContainer),
+            SizedBox(
+              height: 120,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  getTimeInTimeZone(timeZone!),
+                  style: TextStyle(
+                    fontSize:
+                        100.0, // Hier kann eine große Zahl stehen, um die maximale Schriftgröße festzulegen
+                    fontFamily: "Red Hat Display",
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 20.0),
             Text(

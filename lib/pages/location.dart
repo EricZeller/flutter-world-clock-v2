@@ -63,7 +63,13 @@ class LocationPage extends StatefulWidget {
 class _LocationPageState extends State<LocationPage> {
   List<City> _cities = [];
   List<City> _filteredCities = [];
-  late City _selectedOption;
+  City _selectedOption = City(
+      name: "Berlin",
+      country: "Germany",
+      timeZone: "Europe/Berlin",
+      flag: "de.png",
+      utc: "+02:00",
+      weatherZone: "Berlin");
 
   Future<City> getSelectedOption() async {
     final prefs = await SharedPreferences.getInstance();
@@ -75,7 +81,6 @@ class _LocationPageState extends State<LocationPage> {
     }
   }
 
-
   void _saveSelectedCity(String key, City city) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, jsonEncode(city.toJson()));
@@ -85,10 +90,14 @@ class _LocationPageState extends State<LocationPage> {
     final filtered = _cities.where((city) {
       final cityName = city.name.toLowerCase();
       final cityCountry = city.country.toLowerCase();
+      final cityTimeZone = city.timeZone.toLowerCase();
+      final cityUtc = city.utc.toLowerCase();
       final searchQuery = query.toLowerCase();
 
       return cityName.contains(searchQuery) ||
-          cityCountry.contains(searchQuery);
+          cityCountry.contains(searchQuery) ||
+          cityTimeZone.contains(searchQuery) ||
+          cityUtc.contains(searchQuery);
     }).toList();
 
     setState(() {
@@ -173,6 +182,8 @@ class _LocationPageState extends State<LocationPage> {
 
   @override
   Widget build(BuildContext context) {
+    int filteredCitiesCount = _filteredCities.length;
+
     return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
       ColorScheme lightColorScheme;
       ColorScheme darkColorScheme;
@@ -202,10 +213,12 @@ class _LocationPageState extends State<LocationPage> {
         debugShowCheckedModeBanner: false,
         title: 'World clock',
         theme: ThemeData(
+          fontFamily: 'Red Hat Display',
           colorScheme: lightColorScheme,
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
+          fontFamily: 'Red Hat Display',
           colorScheme: darkColorScheme,
           useMaterial3: true,
         ),
@@ -222,19 +235,43 @@ class _LocationPageState extends State<LocationPage> {
                 itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
                   const PopupMenuItem<String>(
                     value: 'sortByCity',
-                    child: Text('Sort by city'),
+                    child: ListTile(
+                      leading: Icon(Icons.location_city_rounded),
+                      title: Text(
+                        'Sort by city',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   const PopupMenuItem<String>(
                     value: 'sortByCountry',
-                    child: Text('Sort by country'),
+                    child: ListTile(
+                      leading: Icon(Icons.flag_rounded),
+                      title: Text(
+                        'Sort by country',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   const PopupMenuItem<String>(
                     value: 'sortByUtc',
-                    child: Text('Sort by UTC timezone'),
+                    child: ListTile(
+                      leading: Icon(Icons.access_time_filled),
+                      title: Text(
+                        'Sort by UTC timezone',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   const PopupMenuItem<String>(
                     value: 'sortByContinent',
-                    child: Text('Sort by continent/region'),
+                    child: ListTile(
+                      leading: Icon(Icons.public),
+                      title: Text(
+                        'Sort by continent/region',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                   // Füge weitere Sortieroptionen hinzu, falls nötig
                 ],
@@ -249,7 +286,7 @@ class _LocationPageState extends State<LocationPage> {
                     color: Theme.of(context).colorScheme.onPrimaryContainer)),
             backgroundColor: Theme.of(context).colorScheme.primaryContainer,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back_ios_new),
               onPressed: () {
                 //print(_selectedOption);
                 Navigator.pop(context, _selectedOption);
@@ -262,9 +299,11 @@ class _LocationPageState extends State<LocationPage> {
                 padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
                 child: TextField(
                   onChanged: (query) => _searchCities(query),
-                  decoration: const InputDecoration(
-                    hintText: 'Search city or country',
-                    suffixIcon: Icon(Icons.search),
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText:
+                        'Search city or country ($filteredCitiesCount found)',
+                    prefixIcon: const Icon(Icons.search),
                   ),
                 ),
               ),
@@ -282,7 +321,11 @@ class _LocationPageState extends State<LocationPage> {
                           _saveSelectedCity('selectedOption', value);
                         });
                       },
-                      title: Text(_filteredCities[index].name),
+                      title: Text(
+                        _filteredCities[index].name,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
                       subtitle: Text(
                           "${_filteredCities[index].country}, UTC${_filteredCities[index].utc} \n${_filteredCities[index].timeZone}"),
                       secondary: SizedBox(
@@ -297,35 +340,6 @@ class _LocationPageState extends State<LocationPage> {
                       ),
                     );
                   },
-
-                  /*children: cities.map((city) {
-                    return RadioListTile(
-                      value: city.name,
-                      groupValue: _selectedOption,
-                      onChanged: (String? value) {
-                        setState(() {
-                          _selectedOption = value!;
-                          _saveStringValue('selectedOption', _selectedOption!);
-                        });
-                      },
-                      tileColor:
-                          Theme.of(context).colorScheme.secondaryContainer,
-                      title: Text(
-                        '${city.name}, ${city.country}',
-                        style: const TextStyle(
-                            fontFamily: 'Red Hat Display',
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                      ),
-                      subtitle: Text(city.timeZone),
-                      secondary: ClipRRect(
-                        child: Image.asset(
-                          "assets/flags/${city.flag}",
-                          width: 40,
-                        ),
-                      ),
-                    );
-                  }).toList(),*/
                 ),
               ),
             ],
