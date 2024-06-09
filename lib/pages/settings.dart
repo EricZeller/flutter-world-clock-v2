@@ -200,6 +200,19 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 ListTile(
+                  leading: const Icon(Icons.link),
+                  title: const Text('Set own wttr.in server'),
+                  subtitle: TextField(
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(
+                      labelText: "Coming soon",
+                      hintText: 'https://wttr.in',
+                    ),
+                    onSubmitted: (value) {},
+                  ),
+                  trailing: const Icon(Icons.save),
+                ),
+                ListTile(
                   title: const Text("Language"),
                   subtitle: const Text("In progress"),
                   leading: const Icon(Icons.language),
