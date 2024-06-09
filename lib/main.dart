@@ -131,7 +131,6 @@ class _MyHomePageState extends State<MyHomePage> {
         showSeconds = prefs.getBool('showSeconds')!;
       }
       if (prefs.getBool('showSecondsLocal') != null) {
-        print(prefs.getBool('showSecondsLocal'));
         showSecondsLocal = prefs.getBool('showSecondsLocal')!;
       }
     });
