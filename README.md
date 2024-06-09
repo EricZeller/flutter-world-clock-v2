@@ -13,8 +13,10 @@ World Clock is a Flutter app that displays the current time and weather for vari
 ## Screenshots
 
 <p align="center">
-<img src="assets/screenshot_dark_lightmode.png" alt="Screenshot dark/light mode" width="200"/>
-<img src="assets/screenshot_purple.png" alt="Screenshot dark/light mode" width="200"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_01_dark_lightmode.png" alt="Screenshot dark/light mode" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_02_city_search.png" alt="Screenshot city search" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_03_settings.png" alt="Screenshot settings" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_04_purple.png" alt="Screenshot purple" height="350"/>
 </p>
 
 ## Sources
