@@ -136,10 +136,12 @@ class _SettingsPageState extends State<SettingsPage> {
           debugShowCheckedModeBanner: false,
           title: 'World clock',
           theme: ThemeData(
+            fontFamily: 'Red Hat Display',
             colorScheme: lightColorScheme,
             useMaterial3: true,
           ),
           darkTheme: ThemeData(
+            fontFamily: 'Red Hat Display',
             colorScheme: darkColorScheme,
             useMaterial3: true,
           ),
@@ -284,18 +286,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       onPressed: _saveUrl,
                     ),
                   ),
-
-                  title: const Text('Set own wttr.in server'),
-                  subtitle: TextField(
-                    keyboardType: TextInputType.url,
-                    decoration: const InputDecoration(
-                      labelText: "Coming soon",
-                      hintText: 'https://wttr.in',
-                    ),
-                    onSubmitted: (value) {},
-                  ),
-                  trailing: const Icon(Icons.save),
-
                 ),
                 ListTile(
                   title: const Text("Language"),
