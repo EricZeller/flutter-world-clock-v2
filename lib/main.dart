@@ -89,6 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _weather = "Loading...";
   String? cityName = "Berlin";
   String? timeZone = "Europe/Berlin";
+  String cityWeatherZone = "Berlin";
 
   final Uri _githubUrl =
       Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2');
@@ -104,6 +105,7 @@ class _MyHomePageState extends State<MyHomePage> {
         var cityJson = jsonDecode(cityName!);
         City city = City.fromJson(cityJson);
         cityName = city.name;
+        cityWeatherZone = city.weatherZone;
         timeZone = city.timeZone;
         getWeather(cityName);
       } catch (e) {
@@ -133,9 +135,6 @@ class _MyHomePageState extends State<MyHomePage> {
       if (prefs.getBool('showSecondsLocal') != null) {
         showSecondsLocal = prefs.getBool('showSecondsLocal')!;
       }
-      if (prefs.getString('wttrServer') != null) {
-        wttrServer = prefs.getString('wttrServer')!;
-      }
     });
   }
 
@@ -147,8 +146,8 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {});
     });
     getTimeZone();
-    getWeather(cityName);
     getPreferences();
+    getWeather(cityWeatherZone);
   }
 
   @override
@@ -185,16 +184,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> getWeather(weatherZone) async {
     _weather = "🛰️ Loading...";
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getString('wttrServer') != null) {
+      wttrServer = prefs.getString('wttrServer')!;
+    }
     try {
-      var response = await http
-          .get(Uri.parse('$wttrServer/$weatherZone?format=%c+%C+%t'));
+      var response =
+          await http.get(Uri.parse('$wttrServer/$weatherZone?format=%c+%C+%t'));
       if (response.statusCode == 200) {
         setState(() {
           _weather = response.body;
         });
       } else {
         setState(() {
-          _weather = "No weather data";
+          _weather = "🛜 Couldn't connect to API";
         });
       }
     } catch (e) {
@@ -209,13 +212,14 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         actions: <Widget>[
           PopupMenuButton<String>(
-            onSelected: (String result) {
+            onSelected: (String result) async {
               switch (result) {
                 case 'settings':
-                  Navigator.pushNamed(
+                  await Navigator.pushNamed(
                     context,
                     '/settings',
                   );
+                  getWeather(cityWeatherZone);
                   break;
                 case 'about':
                   Navigator.pushNamed(context, '/about');

@@ -36,9 +36,29 @@ class _SettingsPageState extends State<SettingsPage> {
 
   final TextEditingController _urlController = TextEditingController();
 
+  bool _isValidUrl = true;
+  bool _cameFromFAB = false;
+
   void _saveUrl() {
     final enteredUrl = _urlController.text;
-    _saveStringValue('wttrServer', enteredUrl);
+    if (_isValid(enteredUrl)) {
+      setState(() {
+        wttrServer = enteredUrl;
+      });
+      _saveStringValue('wttrServer', enteredUrl);
+      showAlertDialog(context);
+      if (_cameFromFAB) Navigator.popAndPushNamed(context, '/home');
+      _cameFromFAB = false;
+    } else {
+      setState(() {
+        _isValidUrl = false;
+      });
+    }
+  }
+
+  bool _isValid(String url) {
+    final regExp = RegExp(r'^(https?:\/\/)([a-zA-Z0-9\-]+\.)+[a-zA-Z0-9\-]+$');
+    return regExp.hasMatch(url) && !url.endsWith('/');
   }
 
   @override
@@ -213,21 +233,56 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.link),
-                  title: Text('Set own wttr.in server'),
-                  subtitle: TextField(
+                  leading: const Icon(Icons.link),
+                  title: TextField(
                     controller: _urlController,
                     keyboardType: TextInputType.url,
                     decoration: InputDecoration(
-                      hintText: 'https://wttr.in',
+                      suffixIcon: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            wttrServer = "https://wttr.in";
+                            _urlController.text = "https://wttr.in";
+                            _isValidUrl = true;
+                          });
+                        },
+                        icon: const Icon(Icons.restart_alt_rounded),
+                      ),
+                      labelText: "Set own wttr.in server",
+                      hintText: wttrServer,
+                      errorText: _isValidUrl ? null : 'Invalid URL',
+                      border: const OutlineInputBorder(),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.error),
+                      ),
+                      focusedErrorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.error),
+                      ),
                     ),
+                    onChanged: (value) {
+                      if (_isValid(value)) {
+                        setState(() {
+                          _isValidUrl = true;
+                        });
+                      } else {
+                        setState(() {
+                          _isValidUrl = false;
+                        });
+                      }
+                    },
                     onSubmitted: (value) {
                       _saveUrl();
                     },
                   ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.save),
-                    onPressed: _saveUrl,
+                  trailing: CircleAvatar(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    child: IconButton(
+                      color: Theme.of(context).colorScheme.onPrimary,
+                      icon: const Icon(Icons.save_outlined),
+                      onPressed: _saveUrl,
+                    ),
                   ),
                 ),
                 ListTile(
@@ -241,11 +296,41 @@ class _SettingsPageState extends State<SettingsPage> {
             floatingActionButton: FloatingActionButton(
               backgroundColor: Theme.of(context).colorScheme.secondary,
               foregroundColor: Theme.of(context).colorScheme.onSecondary,
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                _cameFromFAB = true;
+                _saveUrl();
+              },
               child: const Icon(Icons.check),
             ),
           ),
         );
+      },
+    );
+  }
+
+  void showAlertDialog(BuildContext context) {
+    // set up the button
+    Widget okButton = ElevatedButton(
+      child: const Text("OK"),
+      onPressed: () {
+        Navigator.of(context).pop(); // dismiss the dialog
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: const Text("URL saved"),
+      content: const Text("wttr.in server setted"),
+      actions: [
+        okButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
       },
     );
   }
