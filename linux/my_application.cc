@@ -47,7 +47,8 @@ static void my_application_activate(GApplication* application) {
     gtk_window_set_title(window, "world_clock_v2");
   }
 
-  gtk_window_set_default_size(window, 1280, 720);
+  gtk_window_set_default_size(window, 480, 720);
+  gtk_window_set_icon_from_file(GTK_WINDOW(window),"assets/linux_icon.ico",NULL);
   gtk_widget_show(GTK_WIDGET(window));
 
   g_autoptr(FlDartProject) project = fl_dart_project_new();
