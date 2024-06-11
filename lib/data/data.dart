@@ -5,3 +5,5 @@ String spLanguage = "English";
 bool sp24hr = true;
 bool showSeconds = true;
 bool showSecondsLocal = false;
+
+String wttrServer = "https://wttr.in";
