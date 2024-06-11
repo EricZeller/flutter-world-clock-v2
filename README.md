@@ -27,7 +27,7 @@ Flag icons from [flagpedia.net](https://flagpedia.net/download)
 
 Libraries/packages from pub.dev
 
-Used (keyless) weather API: [wttr.in](https://github.com/chubin/wttr.in) by @chubin
+Used (keyless) weather API: [wttr.in](https://github.com/chubin/wttr.in) by [@chubin](https://github.com/chubin)
 
 
 ## Installation
