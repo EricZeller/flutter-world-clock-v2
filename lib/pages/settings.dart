@@ -47,7 +47,9 @@ class _SettingsPageState extends State<SettingsPage> {
       });
       _saveStringValue('wttrServer', enteredUrl);
       showAlertDialog(context);
-      if (_cameFromFAB) Navigator.popAndPushNamed(context, '/home');
+      if (_cameFromFAB) {
+        Navigator.popAndPushNamed(context, '/home');
+      }
       _cameFromFAB = false;
     } else {
       setState(() {
@@ -66,6 +68,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     getThemeModePreference();
     dropdownValue = spThemeMode!;
+    _urlController.text = wttrServer;
   }
 
   @override
