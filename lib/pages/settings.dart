@@ -37,24 +37,24 @@ class _SettingsPageState extends State<SettingsPage> {
   final TextEditingController _urlController = TextEditingController();
 
   bool _isValidUrl = true;
-  bool _cameFromFAB = false;
 
   void _saveUrl() {
-    final enteredUrl = _urlController.text;
-    if (_isValid(enteredUrl)) {
-      setState(() {
-        wttrServer = enteredUrl;
-      });
-      _saveStringValue('wttrServer', enteredUrl);
-      showAlertDialog(context);
-      if (_cameFromFAB) {
-        Navigator.popAndPushNamed(context, '/home');
+    if (checkChangedServer()) {
+      final enteredUrl = _urlController.text;
+      if (_isValid(enteredUrl)) {
+        setState(() {
+          wttrServer = enteredUrl;
+        });
+        _saveStringValue('wttrServer', enteredUrl);
+        showAlertDialog(context, "URL saved",
+            "wttr.in server setted. \nPlease check the home screen to ensure that the new server is working properly. \nAPI will update in a maximum of 30 seconds.");
+      } else {
+        setState(() {
+          _isValidUrl = false;
+        });
       }
-      _cameFromFAB = false;
     } else {
-      setState(() {
-        _isValidUrl = false;
-      });
+      showAlertDialog(context, "No changes to save", "");
     }
   }
 
@@ -165,7 +165,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   Icons.arrow_back,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                if (!checkChangedServer()) {
+                  Navigator.pop(context);
+                } else {
+                  showAlertDialog(context, "Unsaved changes",
+                      "Please save the changes you have made to the wttr.in server");
+                }
+              },
               ),
             ),
             body: Column(
@@ -250,6 +257,9 @@ class _SettingsPageState extends State<SettingsPage> {
                             _urlController.text = "https://wttr.in";
                             _isValidUrl = true;
                           });
+                          _saveStringValue('wttrServer', wttrServer);
+                          showAlertDialog(context, "URL restored and saved",
+                              "API will update in a maximum of 30 seconds.");
                         },
                         icon: const Icon(Icons.restart_alt_rounded),
                       ),
@@ -291,6 +301,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text("Display more information on the homescreen"),
+                  trailing: Switch(
+                    thumbIcon: thumbIcon,
+                    value: spMoreInfo,
+                    onChanged: (bool value) {
+                      setState(() {
+                        spMoreInfo = value;
+                      });
+                      _saveBoolValue("spMoreInfo", spMoreInfo);
+                    },
+                  ),
+                ),
+                ListTile(
                   title: const Text("Language"),
                   subtitle: const Text("In progress"),
                   leading: const Icon(Icons.language),
@@ -299,11 +323,15 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              foregroundColor: Theme.of(context).colorScheme.onSecondary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               onPressed: () {
-                _cameFromFAB = true;
-                _saveUrl();
+                if (!checkChangedServer()) {
+                  Navigator.pop(context);
+                } else {
+                  showAlertDialog(context, "Unsaved changes",
+                      "Please save the changes you have made to the wttr.in server");
+                }
               },
               child: const Icon(Icons.check),
             ),
@@ -313,7 +341,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void showAlertDialog(BuildContext context) {
+  void showAlertDialog(BuildContext context, String title, String content) {
     // set up the button
     Widget okButton = ElevatedButton(
       child: const Text("OK"),
@@ -324,8 +352,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: const Text("URL saved"),
-      content: const Text("wttr.in server setted"),
+      title: Text(title),
+      content: Text(content),
       actions: [
         okButton,
       ],
@@ -338,5 +366,9 @@ class _SettingsPageState extends State<SettingsPage> {
         return alert;
       },
     );
+  }
+
+  bool checkChangedServer() {
+    return wttrServer != _urlController.text;
   }
 }

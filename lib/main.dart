@@ -90,6 +90,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String? cityName = "Berlin";
   String? timeZone = "Europe/Berlin";
   String cityWeatherZone = "Berlin";
+  String country = "Germany";
+  String utc = "+02:00";
+
+  int secondsElapsed = 0;
 
   final Uri _githubUrl =
       Uri.parse('https://github.com/EricZeller/flutter-world-clock-v2');
@@ -107,6 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
         cityName = city.name;
         cityWeatherZone = city.weatherZone;
         timeZone = city.timeZone;
+        country = city.country;
+        utc = city.utc;
         getWeather(cityName);
       } catch (e) {
         // Fehlerbehandlung, wenn JSON nicht erfolgreich dekodiert werden kann
@@ -135,6 +141,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (prefs.getBool('showSecondsLocal') != null) {
         showSecondsLocal = prefs.getBool('showSecondsLocal')!;
       }
+      if (prefs.getBool('spMoreInfo') != null) {
+        spMoreInfo = prefs.getBool('spMoreInfo')!;
+      }
     });
   }
 
@@ -143,7 +152,14 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     getThemeModePreference();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {});
+      setState(() {
+        if (secondsElapsed == 30) {
+          getWeather(cityWeatherZone);
+          secondsElapsed = 0;
+        } else {
+          secondsElapsed++;
+        }
+      });
     });
     getTimeZone();
     getPreferences();
@@ -221,6 +237,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   );
                   getWeather(cityWeatherZone);
                   break;
+                case 'changeCity':
+                  Navigator.pushNamed(context, '/location');
+                  getTimeZone();
+                  break;
                 case 'about':
                   Navigator.pushNamed(context, '/about');
                   break;
@@ -239,6 +259,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: ListTile(
                   title: Text('Settings'),
                   leading: Icon(Icons.settings),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'changeCity',
+                child: ListTile(
+                  title: Text('Change city'),
+                  leading: Icon(Icons.edit_location_alt),
                 ),
               ),
               const PopupMenuItem<String>(
@@ -285,7 +312,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   fontFamily: "Pacifico",
                   color: Theme.of(context).colorScheme.onPrimaryContainer),
             ),
-            const SizedBox(height: 20.0),
+            const SizedBox(height: 10.0),
+            Visibility(
+              visible: spMoreInfo,
+              child: Column(
+                children: [
+                  const SizedBox(height: 20.0),
+                  Text(
+                    "$country, UTC$utc",
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer),
+                  )
+                ],
+              ),
+            ),
             SizedBox(
               height: 120,
               child: FittedBox(
@@ -346,6 +387,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        onPressed: () => Navigator.pushNamed(
+          context,
+          '/settings',
+        ),
+        child: const Icon(Icons.settings),
       ),
     );
   }
