@@ -238,7 +238,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   getWeather(cityWeatherZone);
                   break;
                 case 'changeCity':
-                  Navigator.pushNamed(context, '/location');
+                  await Navigator.pushNamed(context, '/location');
                   getTimeZone();
                   break;
                 case 'about':
