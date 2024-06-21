@@ -175,152 +175,155 @@ class _SettingsPageState extends State<SettingsPage> {
               },
               ),
             ),
-            body: Column(
-              children: [
-                ListTile(
-                  title: const Text("Default theme"),
-                  subtitle: const Text("Restart app to apply"),
-                  leading: const Icon(Icons.color_lens),
-                  trailing: DropdownButton(
-                    value: dropdownValue,
-                    onChanged: (String? value) {
-                      setState(() {
-                        dropdownValue = value!;
-                        spThemeMode = dropdownValue;
-                        _saveStringValue('themeMode', spThemeMode!);
-                      });
-                    },
-                    items:
-                        themeList.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  ListTile(
+                    title: const Text("Default theme"),
+                    subtitle: const Text("Restart app to apply"),
+                    leading: const Icon(Icons.color_lens),
+                    trailing: DropdownButton(
+                      value: dropdownValue,
+                      onChanged: (String? value) {
+                        setState(() {
+                          dropdownValue = value!;
+                          spThemeMode = dropdownValue;
+                          _saveStringValue('themeMode', spThemeMode!);
+                        });
+                      },
+                      items:
+                          themeList.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                ),
-                ListTile(
-                  title: const Text("Show seconds"),
-                  leading: const Icon(Icons.schedule),
-                  subtitle: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("World clock"),
-                      Switch(
-                        thumbIcon: thumbIconGlobal,
-                        value: showSeconds,
-                        onChanged: (bool value) {
-                          setState(() {
-                            showSeconds = value;
-                          });
-                          _saveBoolValue("showSeconds", showSeconds);
-                        },
+                  ListTile(
+                    title: const Text("Show seconds"),
+                    leading: const Icon(Icons.schedule),
+                    subtitle: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("World clock"),
+                        Switch(
+                          thumbIcon: thumbIconGlobal,
+                          value: showSeconds,
+                          onChanged: (bool value) {
+                            setState(() {
+                              showSeconds = value;
+                            });
+                            _saveBoolValue("showSeconds", showSeconds);
+                          },
+                        ),
+                        const Text("Local"),
+                        Switch(
+                          thumbIcon: thumbIconLocal,
+                          value: showSecondsLocal,
+                          onChanged: (bool value) {
+                            setState(() {
+                              showSecondsLocal = value;
+                            });
+                            _saveBoolValue("showSecondsLocal", showSecondsLocal);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.travel_explore),
+                    title: const Text("Use 24hr format"),
+                    trailing: Switch(
+                      thumbIcon: thumbIcon,
+                      value: sp24hr,
+                      onChanged: (bool value) {
+                        setState(() {
+                          sp24hr = value;
+                        });
+                        _saveBoolValue("use24hr", sp24hr);
+                      },
+                    ),
+                  ),
+                  //SizedBox(height: 40,),
+                  ListTile(
+                    leading: const Icon(Icons.link),
+                    title: TextField(
+                      controller: _urlController,
+                      keyboardType: TextInputType.url,
+                      decoration: InputDecoration(
+                        suffixIcon: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              wttrServer = "https://wttr.in";
+                              _urlController.text = "https://wttr.in";
+                              _isValidUrl = true;
+                            });
+                            _saveStringValue('wttrServer', wttrServer);
+                            showAlertDialog(context, "URL restored and saved",
+                                "API will update in a maximum of 30 seconds.");
+                          },
+                          icon: const Icon(Icons.restart_alt_rounded),
+                        ),
+                        labelText: "Set own wttr.in server",
+                        hintText: wttrServer,
+                        errorText: _isValidUrl ? null : 'Invalid URL',
+                        border: const OutlineInputBorder(),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error),
+                        ),
                       ),
-                      const Text("Local"),
-                      Switch(
-                        thumbIcon: thumbIconLocal,
-                        value: showSecondsLocal,
-                        onChanged: (bool value) {
+                      onChanged: (value) {
+                        if (_isValid(value)) {
                           setState(() {
-                            showSecondsLocal = value;
-                          });
-                          _saveBoolValue("showSecondsLocal", showSecondsLocal);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.travel_explore),
-                  title: const Text("Use 24hr format"),
-                  trailing: Switch(
-                    thumbIcon: thumbIcon,
-                    value: sp24hr,
-                    onChanged: (bool value) {
-                      setState(() {
-                        sp24hr = value;
-                      });
-                      _saveBoolValue("use24hr", sp24hr);
-                    },
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.link),
-                  title: TextField(
-                    controller: _urlController,
-                    keyboardType: TextInputType.url,
-                    decoration: InputDecoration(
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          setState(() {
-                            wttrServer = "https://wttr.in";
-                            _urlController.text = "https://wttr.in";
                             _isValidUrl = true;
                           });
-                          _saveStringValue('wttrServer', wttrServer);
-                          showAlertDialog(context, "URL restored and saved",
-                              "API will update in a maximum of 30 seconds.");
-                        },
-                        icon: const Icon(Icons.restart_alt_rounded),
-                      ),
-                      labelText: "Set own wttr.in server",
-                      hintText: wttrServer,
-                      errorText: _isValidUrl ? null : 'Invalid URL',
-                      border: const OutlineInputBorder(),
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.error),
-                      ),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.error),
+                        } else {
+                          setState(() {
+                            _isValidUrl = false;
+                          });
+                        }
+                      },
+                      onSubmitted: (value) {
+                        _saveUrl();
+                      },
+                    ),
+                    trailing: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      child: IconButton(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                        icon: const Icon(Icons.save_outlined),
+                        onPressed: _saveUrl,
                       ),
                     ),
-                    onChanged: (value) {
-                      if (_isValid(value)) {
-                        setState(() {
-                          _isValidUrl = true;
-                        });
-                      } else {
-                        setState(() {
-                          _isValidUrl = false;
-                        });
-                      }
-                    },
-                    onSubmitted: (value) {
-                      _saveUrl();
-                    },
                   ),
-                  trailing: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    child: IconButton(
-                      color: Theme.of(context).colorScheme.onPrimary,
-                      icon: const Icon(Icons.save_outlined),
-                      onPressed: _saveUrl,
+                  ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text("Display more information on the homescreen"),
+                    trailing: Switch(
+                      thumbIcon: thumbIcon,
+                      value: spMoreInfo,
+                      onChanged: (bool value) {
+                        setState(() {
+                          spMoreInfo = value;
+                        });
+                        _saveBoolValue("spMoreInfo", spMoreInfo);
+                      },
                     ),
                   ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  title: const Text("Display more information on the homescreen"),
-                  trailing: Switch(
-                    thumbIcon: thumbIcon,
-                    value: spMoreInfo,
-                    onChanged: (bool value) {
-                      setState(() {
-                        spMoreInfo = value;
-                      });
-                      _saveBoolValue("spMoreInfo", spMoreInfo);
-                    },
+                  ListTile(
+                    title: const Text("Language"),
+                    subtitle: const Text("In progress"),
+                    leading: const Icon(Icons.language),
+                    trailing: Text(spLanguage),
                   ),
-                ),
-                ListTile(
-                  title: const Text("Language"),
-                  subtitle: const Text("In progress"),
-                  leading: const Icon(Icons.language),
-                  trailing: Text(spLanguage),
-                ),
-              ],
+                ],
+              ),
             ),
             floatingActionButton: FloatingActionButton(
               backgroundColor: Theme.of(context).colorScheme.primary,

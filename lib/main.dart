@@ -305,12 +305,20 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 40.0),
-            Text(
-              cityName!,
-              style: TextStyle(
-                  fontSize: 50.0,
-                  fontFamily: "Pacifico",
-                  color: Theme.of(context).colorScheme.onPrimaryContainer),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
+              child: SizedBox(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    cityName!,
+                    style: TextStyle(
+                        fontSize: 50.0,
+                        fontFamily: "Pacifico",
+                        color: Theme.of(context).colorScheme.onPrimaryContainer),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 10.0),
             Visibility(
@@ -318,11 +326,16 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Column(
                 children: [
                   const SizedBox(height: 20.0),
-                  Text(
-                    "$country, UTC$utc",
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer),
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "$country, UTC$utc",
+                      style: TextStyle(
+                          letterSpacing: 2,
+                          fontSize: 18,
+                          color:
+                              Theme.of(context).colorScheme.onPrimaryContainer),
+                    ),
                   )
                 ],
               ),
@@ -334,8 +347,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   getTimeInTimeZone(timeZone!),
                   style: TextStyle(
-                    fontSize:
-                        100.0, // Hier kann eine große Zahl stehen, um die maximale Schriftgröße festzulegen
+                    fontSize: 100.0,
                     fontFamily: "Red Hat Display",
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
@@ -343,12 +355,15 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             const SizedBox(height: 20.0),
-            Text(
-              _weather,
-              style: TextStyle(
-                  fontSize: 20.0,
-                  fontFamily: "Red Hat Display",
-                  color: Theme.of(context).colorScheme.onPrimaryContainer),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                _weather,
+                style: TextStyle(
+                    fontSize: 20.0,
+                    fontFamily: "Red Hat Display",
+                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+              ),
             ),
             Divider(
               height: 80.0,
