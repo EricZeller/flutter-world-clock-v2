@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/data/data.dart';
+import 'package:world_clock_v2/services/settings_provider.dart';
 
 class City {
   final String name;
@@ -183,174 +185,180 @@ class _LocationPageState extends State<LocationPage> {
   @override
   Widget build(BuildContext context) {
     int filteredCitiesCount = _filteredCities.length;
+    return Consumer<SettingsProvider>(builder: (context, settings, child) {
+      return DynamicColorBuilder(
+        builder: (lightDynamic, darkDynamic) {
+          ColorScheme lightColorScheme;
+          ColorScheme darkColorScheme;
 
-    return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
-      ColorScheme lightColorScheme;
-      ColorScheme darkColorScheme;
+          if (lightDynamic != null && darkDynamic != null) {
+            lightColorScheme = lightDynamic.harmonized();
+            darkColorScheme = darkDynamic.harmonized();
+          } else {
+            lightColorScheme =
+                ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
+            darkColorScheme = ColorScheme.fromSeed(
+                    seedColor: Colors.indigo, brightness: Brightness.dark)
+                .harmonized();
+          }
 
-      if (lightDynamic != null && darkDynamic != null) {
-        lightColorScheme = lightDynamic.harmonized();
-        darkColorScheme = darkDynamic.harmonized();
-      } else {
-        lightColorScheme =
-            ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
-        darkColorScheme = ColorScheme.fromSeed(
-                seedColor: Colors.indigo, brightness: Brightness.dark)
-            .harmonized();
-      }
+          ThemeMode? themeModePreference;
 
-      ThemeMode? themeModePreference;
+          if (spThemeMode == themeList[0]) {
+            themeModePreference = ThemeMode.system;
+          } else if (spThemeMode == themeList[1]) {
+            themeModePreference = ThemeMode.dark;
+          } else if (spThemeMode == themeList[2]) {
+            themeModePreference = ThemeMode.light;
+          }
 
-      if (spThemeMode == themeList[0]) {
-        themeModePreference = ThemeMode.system;
-      } else if (spThemeMode == themeList[1]) {
-        themeModePreference = ThemeMode.dark;
-      } else if (spThemeMode == themeList[2]) {
-        themeModePreference = ThemeMode.light;
-      }
-
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'World clock',
-        theme: ThemeData(
-          fontFamily: 'Red Hat Display',
-          colorScheme: lightColorScheme,
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          fontFamily: 'Red Hat Display',
-          colorScheme: darkColorScheme,
-          useMaterial3: true,
-        ),
-        themeMode: themeModePreference,
-        home: Scaffold(
-          appBar: AppBar(
-            actions: [
-              PopupMenuButton<String>(
-                tooltip: "Sort the list",
-                onSelected: (sorting) {
-                  // Hier kannst du die entsprechende Sortierlogik basierend auf dem ausgewählten Wert implementieren
-                  sortCities(sorting);
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(
-                    value: 'sortByCity',
-                    child: ListTile(
-                      leading: Icon(Icons.location_city_rounded),
-                      title: Text(
-                        'Sort by city',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'sortByCountry',
-                    child: ListTile(
-                      leading: Icon(Icons.flag_rounded),
-                      title: Text(
-                        'Sort by country',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'sortByUtc',
-                    child: ListTile(
-                      leading: Icon(Icons.access_time_filled),
-                      title: Text(
-                        'Sort by UTC timezone',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'sortByContinent',
-                    child: ListTile(
-                      leading: Icon(Icons.public),
-                      title: Text(
-                        'Sort by continent/region',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                  // Füge weitere Sortieroptionen hinzu, falls nötig
-                ],
-                icon: const Icon(Icons.sort),
-              ),
-            ],
-            centerTitle: true,
-            title: Text(widget.title,
-                style: TextStyle(
-                    fontFamily: "Pacifico",
-                    fontSize: 24,
-                    color: Theme.of(context).colorScheme.onPrimaryContainer)),
-            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new),
-              onPressed: () {
-                //print(_selectedOption);
-                Navigator.pop(context, _selectedOption);
-              },
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'World clock',
+            theme: ThemeData(
+              fontFamily: 'Red Hat Display',
+              colorScheme: lightColorScheme,
+              useMaterial3: true,
             ),
-          ),
-          body: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                child: TextField(
-                  onChanged: (query) => _searchCities(query),
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    labelText:
-                        'Search city or country ($filteredCitiesCount found)',
-                    prefixIcon: const Icon(Icons.search),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _filteredCities.length,
-                  itemBuilder: (context, index) {
-                    return RadioListTile(
-                      isThreeLine: true,
-                      value: _filteredCities[index],
-                      groupValue: _selectedOption,
-                      onChanged: (value) {
-                        setState(() {
-                          _selectedOption = value!;
-                          _saveSelectedCity('selectedOption', value);
-                        });
-                      },
-                      title: Text(
-                        _filteredCities[index].name,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Text(
-                          "${_filteredCities[index].country}, UTC${_filteredCities[index].utc} \n${_filteredCities[index].timeZone}"),
-                      secondary: SizedBox(
-                        width: 40,
-                        child: ClipRRect(
-                          child: Center(
-                            child: Image.asset(
-                              "assets/flags/${_filteredCities[index].flag}",
-                            ),
+            darkTheme: ThemeData(
+              fontFamily: 'Red Hat Display',
+              colorScheme: darkColorScheme,
+              useMaterial3: true,
+            ),
+            themeMode: themeModePreference,
+            home: Scaffold(
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+              appBar: AppBar(
+                actions: [
+                  PopupMenuButton<String>(
+                    tooltip: "Sort the list",
+                    onSelected: (sorting) {
+                      // Hier kannst du die entsprechende Sortierlogik basierend auf dem ausgewählten Wert implementieren
+                      sortCities(sorting);
+                    },
+                    itemBuilder: (BuildContext context) =>
+                        <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'sortByCity',
+                        child: ListTile(
+                          leading: Icon(Icons.location_city_rounded),
+                          title: Text(
+                            'Sort by city',
+                            style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                    );
+                      const PopupMenuItem<String>(
+                        value: 'sortByCountry',
+                        child: ListTile(
+                          leading: Icon(Icons.flag_rounded),
+                          title: Text(
+                            'Sort by country',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'sortByUtc',
+                        child: ListTile(
+                          leading: Icon(Icons.access_time_filled),
+                          title: Text(
+                            'Sort by UTC timezone',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'sortByContinent',
+                        child: ListTile(
+                          leading: Icon(Icons.public),
+                          title: Text(
+                            'Sort by continent/region',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                      // Füge weitere Sortieroptionen hinzu, falls nötig
+                    ],
+                    icon: const Icon(Icons.sort),
+                  ),
+                ],
+                centerTitle: true,
+                title: Text(widget.title,
+                    style: TextStyle(
+                        fontFamily: "Pacifico",
+                        fontSize: 24,
+                        color:
+                            Theme.of(context).colorScheme.onPrimaryContainer)),
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  onPressed: () {
+                    //print(_selectedOption);
+                    Navigator.pop(context, _selectedOption);
                   },
                 ),
               ),
-            ],
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => Navigator.pop(context, _selectedOption),
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            foregroundColor: Theme.of(context).colorScheme.onSecondary,
-            child: const Icon(Icons.check),
-          ),
-        ),
+              body: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                    child: TextField(
+                      onChanged: (query) => _searchCities(query),
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(),
+                        labelText:
+                            'Search city or country ($filteredCitiesCount found)',
+                        prefixIcon: const Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: _filteredCities.length,
+                      itemBuilder: (context, index) {
+                        return RadioListTile(
+                          isThreeLine: true,
+                          value: _filteredCities[index],
+                          groupValue: _selectedOption,
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedOption = value!;
+                              _saveSelectedCity('selectedOption', value);
+                            });
+                          },
+                          title: Text(
+                            _filteredCities[index].name,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          subtitle: Text(
+                              "${_filteredCities[index].country}, UTC${_filteredCities[index].utc} \n${_filteredCities[index].timeZone}"),
+                          secondary: SizedBox(
+                            width: 40,
+                            child: ClipRRect(
+                              child: Center(
+                                child: Image.asset(
+                                  "assets/flags/${_filteredCities[index].flag}",
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              floatingActionButton: FloatingActionButton(
+                onPressed: () => Navigator.pop(context, _selectedOption),
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                child: const Icon(Icons.check),
+              ),
+            ),
+          );
+        },
       );
     });
   }

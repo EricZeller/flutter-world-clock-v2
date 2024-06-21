@@ -133,9 +133,11 @@ class _SettingsPageState extends State<SettingsPage> {
             darkColorScheme = darkDynamic.harmonized();
           } else {
             lightColorScheme =
-                ColorScheme.fromSeed(seedColor: settings.customColor).harmonized();
+                ColorScheme.fromSeed(seedColor: settings.customColor)
+                    .harmonized();
             darkColorScheme = ColorScheme.fromSeed(
-                    seedColor: settings.customColor, brightness: Brightness.dark)
+                    seedColor: settings.customColor,
+                    brightness: Brightness.dark)
                 .harmonized();
           }
 
@@ -158,14 +160,13 @@ class _SettingsPageState extends State<SettingsPage> {
               useMaterial3: true,
             ),
             darkTheme: ThemeData(
-              fontFamily: 'Red Hat Display',
-              colorScheme: darkColorScheme,
-              useMaterial3: true,
-            ),
+                fontFamily: 'Red Hat Display',
+                colorScheme: darkColorScheme,
+                useMaterial3: true,
+                cardColor: Colors.amber),
             themeMode: themeModePreference,
             home: Scaffold(
-              backgroundColor:
-                  Theme.of(context).colorScheme.surfaceContainerHigh,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               appBar: AppBar(
                 centerTitle: true,
                 title: Text(
@@ -197,6 +198,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: Column(
                     children: [
                       Card(
+                        elevation: 40,
+                        shadowColor: Theme.of(context).colorScheme.primary,
                         child: Column(
                           children: [
                             ListTile(
@@ -223,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             ListTile(
                               leading: const Icon(Icons.color_lens_outlined),
-                              title: const Text("Use custom Material color"),
+                              title: const Text("Custom Material color"),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: Provider.of<SettingsProvider>(context)
@@ -240,22 +243,28 @@ class _SettingsPageState extends State<SettingsPage> {
                                 },
                               ),
                             ),
-                            Visibility(
-                              visible: useCustomColor,
-                              child: ColorPickerTile(
-                                materialColors: materialColors,
-                                selectedColor: materialColors[colorIndex],
-                                onColorSelected: (Color color) {
-                                  colorIndex = materialColors.indexOf(color);
-                                  _saveIntValue("colorIndex", materialColors.indexOf(color));
-                                  // Hier kannst du die Logik für das Speichern und Weiterverwenden der ausgewählten Farbe einfügen.
-                                  spCustomColor = color;
-                                  Provider.of<SettingsProvider>(context,
-                                          listen: false)
-                                      .setCustomColor(color);
-                                  // Update der UI
-                                  (context as Element).markNeedsBuild();
-                                },
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 750),
+                              curve: Curves.easeInOut,
+                              height: useCustomColor ? 70 : 0,
+                              child: Visibility(
+                                visible: useCustomColor,
+                                child: ColorPickerTile(
+                                  materialColors: materialColors,
+                                  selectedColor: materialColors[colorIndex],
+                                  onColorSelected: (Color color) {
+                                    colorIndex = materialColors.indexOf(color);
+                                    _saveIntValue("colorIndex",
+                                        materialColors.indexOf(color));
+                                    // Hier kannst du die Logik für das Speichern und Weiterverwenden der ausgewählten Farbe einfügen.
+                                    spCustomColor = color;
+                                    Provider.of<SettingsProvider>(context,
+                                            listen: false)
+                                        .setCustomColor(color);
+                                    // Update der UI
+                                    (context as Element).markNeedsBuild();
+                                  },
+                                ),
                               ),
                             ),
                           ],
@@ -263,6 +272,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       const SizedBox(height: 12.0),
                       Card(
+                        elevation: 40,
+                        shadowColor: Theme.of(context).colorScheme.primary,
                         child: Column(
                           children: [
                             ListTile(
@@ -315,8 +326,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             ListTile(
                               leading: const Icon(Icons.info_outline),
-                              title: const Text(
-                                  "Display more information on the homescreen"),
+                              title:
+                                  const Text("Display more info on homescreen"),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: spMoreInfo,
@@ -333,6 +344,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       const SizedBox(height: 12.0),
                       Card(
+                        elevation: 40,
+                        shadowColor: Theme.of(context).colorScheme.primary,
                         child: Padding(
                           padding:
                               const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),
@@ -520,23 +533,32 @@ class ColorPickerTileState extends State<ColorPickerTile> {
       trailing: DropdownButton<Color>(
         value: widget.selectedColor,
         items: widget.materialColors.map((Color color) {
+          List<String> guessedColorList = ColorNames.guess(color).split(" ");
+          String guessedColor;
+          if (guessedColorList.length <= 2) {
+            guessedColor = ColorNames.guess(color);
+          } else {
+            guessedColor = '${guessedColorList[0]} ${guessedColorList[1]}';
+          }
           return DropdownMenuItem<Color>(
             value: color,
             child: Row(
               children: [
                 CircleAvatar(
-                  maxRadius: 12,
+                  maxRadius: 10,
                   backgroundColor: color,
                 ),
-                const SizedBox(width: 8),
-                Text(ColorNames.guess(color)),
+                const SizedBox(width: 5),
+                Text(
+                  guessedColor,
+                  style: TextStyle(fontSize: 13),
+                ),
               ],
             ),
           );
         }).toList(),
         onChanged: (Color? newColor) {
           if (newColor != null) {
-
             widget.onColorSelected(newColor);
           }
         },
