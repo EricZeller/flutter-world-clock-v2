@@ -4,6 +4,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -13,10 +14,16 @@ import 'package:world_clock_v2/pages/about.dart';
 import 'package:http/http.dart' as http;
 import 'package:world_clock_v2/data/data.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:world_clock_v2/services/settings_provider.dart';
 
 void main() {
   tz.initializeTimeZones();
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => SettingsProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,54 +31,59 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
-      ColorScheme lightColorScheme;
-      ColorScheme darkColorScheme;
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, child) {
+        return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
+          ColorScheme lightColorScheme;
+          ColorScheme darkColorScheme;
 
-      if (lightDynamic != null && darkDynamic != null) {
-        lightColorScheme = lightDynamic.harmonized();
-        darkColorScheme = darkDynamic.harmonized();
-      } else {
-        lightColorScheme =
-            ColorScheme.fromSeed(seedColor: Colors.indigo).harmonized();
-        darkColorScheme = ColorScheme.fromSeed(
-                seedColor: Colors.indigo, brightness: Brightness.dark)
-            .harmonized();
-      }
+          if (lightDynamic != null && darkDynamic != null && !useCustomColor) {
+            lightColorScheme = lightDynamic.harmonized();
+            darkColorScheme = darkDynamic.harmonized();
+          } else {
+            lightColorScheme =
+                ColorScheme.fromSeed(seedColor: settings.customColor).harmonized();
+            darkColorScheme = ColorScheme.fromSeed(
+                    seedColor: settings.customColor, brightness: Brightness.dark)
+                .harmonized();
+          }
 
-      ThemeMode? themeModePreference;
+          ThemeMode? themeModePreference;
 
-      if (spThemeMode == themeList[0]) {
-        themeModePreference = ThemeMode.system;
-      } else if (spThemeMode == themeList[1]) {
-        themeModePreference = ThemeMode.dark;
-      } else if (spThemeMode == themeList[2]) {
-        themeModePreference = ThemeMode.light;
-      }
+          if (spThemeMode == themeList[0]) {
+            themeModePreference = ThemeMode.system;
+          } else if (spThemeMode == themeList[1]) {
+            themeModePreference = ThemeMode.dark;
+          } else if (spThemeMode == themeList[2]) {
+            themeModePreference = ThemeMode.light;
+          }
 
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'World clock',
-        theme: ThemeData(
-          fontFamily: "Red Hat Display",
-          colorScheme: lightColorScheme,
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          fontFamily: "Red Hat Display",
-          colorScheme: darkColorScheme,
-          useMaterial3: true,
-        ),
-        themeMode: themeModePreference,
-        initialRoute: '/home',
-        routes: {
-          '/home': (context) => const MyHomePage(title: "World clock v2"),
-          '/about': (context) => const AboutPage(title: "About this app"),
-          '/settings': (context) => const SettingsPage(title: "Settings"),
-          '/location': (context) => const LocationPage(title: "Choose city"),
-        },
-      );
-    });
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'World clock',
+            theme: ThemeData(
+              fontFamily: "Red Hat Display",
+              colorScheme: lightColorScheme,
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              fontFamily: "Red Hat Display",
+              colorScheme: darkColorScheme,
+              useMaterial3: true,
+            ),
+            themeMode: themeModePreference,
+            initialRoute: '/home',
+            routes: {
+              '/home': (context) => const MyHomePage(title: "World clock v2"),
+              '/about': (context) => const AboutPage(title: "About this app"),
+              '/settings': (context) => const SettingsPage(title: "Settings"),
+              '/location': (context) =>
+                  const LocationPage(title: "Choose city"),
+            },
+          );
+        });
+      },
+    );
   }
 }
 
@@ -143,6 +155,12 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       if (prefs.getBool('spMoreInfo') != null) {
         spMoreInfo = prefs.getBool('spMoreInfo')!;
+      }
+      if (prefs.getBool('useCustomColor') != null) {
+        useCustomColor = prefs.getBool('useCustomColor')!;
+      }
+      if (prefs.getInt('colorIndex') != null) {
+        colorIndex = prefs.getInt('colorIndex')!;
       }
     });
   }
@@ -315,7 +333,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     style: TextStyle(
                         fontSize: 50.0,
                         fontFamily: "Pacifico",
-                        color: Theme.of(context).colorScheme.onPrimaryContainer),
+                        color:
+                            Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
                 ),
               ),
