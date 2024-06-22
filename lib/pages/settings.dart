@@ -551,7 +551,7 @@ class ColorPickerTileState extends State<ColorPickerTile> {
                 const SizedBox(width: 5),
                 Text(
                   guessedColor,
-                  style: TextStyle(fontSize: 13),
+                  style: const TextStyle(fontSize: 13),
                 ),
               ],
             ),
