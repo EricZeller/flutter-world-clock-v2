@@ -36,6 +36,7 @@ Contributions are welcome! Here are some ways you can help:
 
 - Report bugs and request features by opening an [issue](https://github.com/EricZeller/flutter-world-clock-v2/issues).
 - Submit pull requests to fix bugs or add new features.
+- Add multi-language support
 
 ## Sources
 
