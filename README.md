@@ -9,7 +9,7 @@
 ![Last Commit](https://img.shields.io/github/last-commit/EricZeller/flutter-world-clock-v2?logo=data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjZmZmZmZmIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTYuOSAxMWE1IDUgMCAwIDAtOS44IDBIMnYyaDUuMWE1IDUgMCAwIDAgOS44IDBIMjJ2LTJoLTUuMXpNMTIgMTVjLTEuNjYgMC0zLTEuMzQtMy0zczEuMzQtMyAzLTMgMyAxLjM0IDMgMy0xLjM0IDMtMyAzeiIvPjwvc3ZnPg==)
 
 
-<a href="https://apt.izzysoft.de/fdroid/index/apk/de.ericz.worldclockv2/" target="_blank"><img src="assets/IzzyOnDroidButton_nofont.svg" height="50px"></a>
+<a href="https://apt.izzysoft.de/fdroid/index/apk/de.ericz.worldclockv2/" target=”_blank”><img src="assets/IzzyOnDroidButton_nofont.svg" height="50px"></a>
 
 World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience.
 
