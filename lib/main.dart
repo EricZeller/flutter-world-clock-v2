@@ -42,9 +42,11 @@ class MyApp extends StatelessWidget {
             darkColorScheme = darkDynamic.harmonized();
           } else {
             lightColorScheme =
-                ColorScheme.fromSeed(seedColor: settings.customColor).harmonized();
+                ColorScheme.fromSeed(seedColor: settings.customColor)
+                    .harmonized();
             darkColorScheme = ColorScheme.fromSeed(
-                    seedColor: settings.customColor, brightness: Brightness.dark)
+                    seedColor: settings.customColor,
+                    brightness: Brightness.dark)
                 .harmonized();
           }
 
@@ -162,6 +164,9 @@ class _MyHomePageState extends State<MyHomePage> {
       if (prefs.getInt('colorIndex') != null) {
         colorIndex = prefs.getInt('colorIndex')!;
       }
+      if (prefs.getBool('useFahrenheit') != null) {
+        useFahrenheit = prefs.getBool('useFahrenheit')!;
+      }
     });
   }
 
@@ -218,13 +223,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> getWeather(weatherZone) async {
     _weather = "🛰️ Loading...";
+    String requestURL;
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString('wttrServer') != null) {
       wttrServer = prefs.getString('wttrServer')!;
     }
     try {
-      var response =
-          await http.get(Uri.parse('$wttrServer/$weatherZone?format=%c+%C+%t'));
+      if (useFahrenheit) {
+        requestURL = '$wttrServer/$weatherZone?format=%c+%C+%t&u';
+      } else {
+        requestURL = '$wttrServer/$weatherZone?format=%c+%C+%t';
+      }
+      var response = await http.get(Uri.parse(requestURL));
       if (response.statusCode == 200) {
         setState(() {
           _weather = response.body;

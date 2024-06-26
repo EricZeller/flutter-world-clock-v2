@@ -115,7 +115,7 @@ class AboutPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Text(
                             style: body,
-                            "World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience."),
+                            "World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience.\nCheck out the numerous settings for an even more personalized experience."),
                         Divider(
                           height: 60.0,
                           thickness: 2,
@@ -135,7 +135,7 @@ class AboutPage extends StatelessWidget {
                         const SizedBox(height: 10),
                         Text(
                             style: body,
-                            "If you have any questions or suggestions, feel free to contact me over GitHub."),
+                            "If you have any questions or suggestions, feel free to contact me over GitHub or open an Issue over the repository of this app."),
                       ],
                     ),
                   ),

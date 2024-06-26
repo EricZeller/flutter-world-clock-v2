@@ -10,6 +10,7 @@ bool showSecondsLocal = false;
 bool spMoreInfo = true;
 
 String wttrServer = "https://wttr.in";
+bool useFahrenheit = false;
 
 Color spCustomColor = Colors.indigo;
 bool useCustomColor = false;

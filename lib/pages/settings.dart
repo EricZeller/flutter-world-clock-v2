@@ -325,6 +325,21 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             ListTile(
+                              leading: const Icon(Icons.travel_explore),
+                              title: const Text("Use °F"),
+                              trailing: Switch(
+                                thumbIcon: thumbIcon,
+                                value: useFahrenheit,
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    useFahrenheit = value;
+                                  });
+                                  _saveBoolValue(
+                                      "useFahrenheit", useFahrenheit);
+                                },
+                              ),
+                            ),
+                            ListTile(
                               leading: const Icon(Icons.info_outline),
                               title:
                                   const Text("Display more info on homescreen"),
