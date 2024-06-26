@@ -325,7 +325,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             ListTile(
-                              leading: const Icon(Icons.travel_explore),
+                              leading: const Icon(Icons.thermostat),
                               title: const Text("Use °F"),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
