@@ -68,7 +68,7 @@ flutter_launcher_icons:
     image_path: "assets/IconKitchen-Output/android/play_store_512.png"
   macos:
     generate: true
-    image_path: "assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher.png"
+    image_path: "assets/IconKitchen-Output/macos/AppIcon_1024x1024x32.png"
   web:
     generate: true
     image_path: "assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher.png"

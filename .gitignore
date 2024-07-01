@@ -43,3 +43,4 @@ app.*.map.json
 /android/app/release
 .idx/dev.nix
 fastlane/metadata/android/en-US/description_test.md
+installers/macos/*.dmg
