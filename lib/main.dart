@@ -341,8 +341,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text(
                     cityName!,
                     style: TextStyle(
-                        fontSize: 50.0,
-                        fontFamily: "Pacifico",
+                        fontSize: 55.0,
+                        fontFamily: 'Pacifico',
                         color:
                             Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
