@@ -278,9 +278,8 @@ class _LocationPageState extends State<LocationPage> {
                           ),
                         ),
                       ),
-                      // Füge weitere Sortieroptionen hinzu, falls nötig
                     ],
-                    icon: const Icon(Icons.sort),
+                    icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.onPrimaryContainer),
                   ),
                 ],
                 centerTitle: true,
@@ -294,7 +293,6 @@ class _LocationPageState extends State<LocationPage> {
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new),
                   onPressed: () {
-                    //print(_selectedOption);
                     Navigator.pop(context, _selectedOption);
                   },
                 ),

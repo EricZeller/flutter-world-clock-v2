@@ -434,12 +434,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                               ),
-                              ListTile(
-                                title: const Text("Language"),
-                                subtitle: const Text("In progress"),
-                                leading: const Icon(Icons.language),
-                                trailing: Text(spLanguage),
-                              ),
+              
                             ],
                           ),
                         ),
