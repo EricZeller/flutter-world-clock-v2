@@ -1,1 +1,1 @@
-display the current time and weather for various cities
+display offline time and online weather for various cities in a sleek Material You design.

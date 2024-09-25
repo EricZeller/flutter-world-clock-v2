@@ -1,5 +1,6 @@
 <p><i>World Clock</i> is a Flutter app that displays the current time and weather for various cities. The app uses the
     Material You theme to provide a modern and unique user experience.</p>
+<p><br>Feel free to suggest features, ideas or new cities to add over GitHub issues!</p>
 <p><br><b>Features:</b></p>
 <ul>
     <li>Displays the current time for selected cities (>180)</li>
