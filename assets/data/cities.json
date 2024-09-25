@@ -192,6 +192,14 @@
         "weatherZone": "Stockholm"
     },
     {
+        "name": "Helsinki",
+        "country": "Finland",
+        "timeZone": "Europe/Helsinki",
+        "utc": "+02:00",
+        "flag": "fi.png",
+        "weatherZone": "Helsinki"
+    },
+    {
         "name": "Bern",
         "country": "Switzerland",
         "timeZone": "Europe/Zurich",
@@ -263,6 +271,22 @@
         "flag": "us.png",
         "weatherZone": "New York"
     },
+    {
+        "name": "Seattle",
+        "country": "United States",
+        "timeZone": "America/Los_Angeles",
+        "utc": "-07:00",
+        "flag": "us.png",
+        "weatherZone": "Seattle"
+    },
+    {
+        "name": "Dallas",
+        "country": "United States",
+        "timeZone": "America/Chicago",
+        "utc": "-05:00",
+        "flag": "us.png",
+        "weatherZone": "Dallas"
+    },    
     {
         "name": "Dubai",
         "country": "United Arab Emirates",
