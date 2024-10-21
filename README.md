@@ -1,4 +1,4 @@
-# <img src="assets/branding.png" height="60px" alt="Material World Clock v2"><img src="assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher.png" height="60px">
+# <img src="assets/branding.png" height="60px" alt="Material World Clock v2"><img src="assets\IconKitchen-Output\macos\AppIcon_1024x1024x32.png" height="70px">
 # Material World Clock v2
 
 
