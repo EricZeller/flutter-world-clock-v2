@@ -1518,5 +1518,13 @@
         "utc": "-06:00",
         "flag": "us.png",
         "weatherZone": "Chicago"
+    },
+    {
+        "name": "Warsaw",
+        "country": "Poland",
+        "timeZone": "Poland/Warsaw",
+        "utc": "+02:00",
+        "flag": "pl.png",
+        "weatherZone": "Warsaw"
     }
 ]
