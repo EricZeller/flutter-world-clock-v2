@@ -1526,5 +1526,13 @@
         "utc": "+02:00",
         "flag": "pl.png",
         "weatherZone": "Warsaw"
+    },
+    {
+        "name": "Furtwangen",
+        "country": "Germany",
+        "timeZone": "Germany/Berlin",
+        "utc": "+02:00",
+        "flag": "de.png",
+        "weatherZone": "Furtwangen"
     }
 ]
