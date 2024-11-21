@@ -35,8 +35,8 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   dynamic_color: ^1.7.0
-  intl: ^0.19.0
-  timezone: ^0.9.3
+  intl: ^0.20.0
+  timezone: ^0.10.0
   http: ^1.2.1
   shared_preferences: ^2.2.3
   provider: ^6.1.2
@@ -45,7 +45,7 @@ dependencies:
   yaml: ^3.1.2
   flutter_native_splash: ^2.4.0
   sqflite: ^2.3.3+1
-  colornames: ^0.1.0
+  colornames: ^0.2.0
 
 dev_dependencies:
   flutter_test:
@@ -56,8 +56,8 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.1
 
 flutter_launcher_icons:
   linux: true

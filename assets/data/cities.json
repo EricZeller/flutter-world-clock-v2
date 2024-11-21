@@ -1522,7 +1522,7 @@
     {
         "name": "Warsaw",
         "country": "Poland",
-        "timeZone": "Poland/Warsaw",
+        "timeZone": "Europe/Warsaw",
         "utc": "+02:00",
         "flag": "pl.png",
         "weatherZone": "Warsaw"
@@ -1530,7 +1530,7 @@
     {
         "name": "Furtwangen",
         "country": "Germany",
-        "timeZone": "Germany/Berlin",
+        "timeZone": "Europe/Berlin",
         "utc": "+02:00",
         "flag": "de.png",
         "weatherZone": "Furtwangen"
