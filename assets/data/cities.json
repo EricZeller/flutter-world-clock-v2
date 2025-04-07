@@ -1168,22 +1168,6 @@
         "weatherZone": "Asunción"
     },
     {
-        "name": "Lima",
-        "country": "Peru",
-        "timeZone": "America/Lima",
-        "utc": "-05:00",
-        "flag": "pe.png",
-        "weatherZone": "Lima"
-    },
-    {
-        "name": "Lisbon",
-        "country": "Portugal",
-        "timeZone": "Europe/Lisbon",
-        "utc": "+01:00",
-        "flag": "pt.png",
-        "weatherZone": "Lisbon"
-    },
-    {
         "name": "Doha",
         "country": "Qatar",
         "timeZone": "Asia/Qatar",
@@ -1470,14 +1454,6 @@
         "utc": "+03:00",
         "flag": "ug.png",
         "weatherZone": "Kampala"
-    },
-    {
-        "name": "Kyiv",
-        "country": "Ukraine",
-        "timeZone": "Europe/Kyiv",
-        "utc": "+03:00",
-        "flag": "ua.png",
-        "weatherZone": "Kyiv"
     },
     {
         "name": "Abu Dhabi",
