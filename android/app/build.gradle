@@ -30,7 +30,7 @@ def keystorePropertiesFile = rootProject.file('key.properties')
     }
 
 android {
-    namespace = 'de.ericz.world_clock_v2'
+    namespace = 'com.example.world_clock_v2'
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
