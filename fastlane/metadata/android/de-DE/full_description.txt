@@ -1,0 +1,10 @@
+<p><i>World Clock</i> ist eine Flutter-App, die die aktuelle Uhrzeit und das Wetter für verschiedene Städte anzeigt.
+Die App verwendet das Material You-Design, um ein modernes und individuelles Nutzererlebnis zu bieten.</p>
+<p><br>Hast du Ideen oder Vorschläge? Du kannst neue Funktionen oder Städte gerne über GitHub-Issues vorschlagen!</p>
+<p><br><b>Features:</b></p>
+<ul>
+    <li>Anzeige der aktuellen Zeit für über 180 Städte</li>
+    <li>Anzeige des aktuellen Wetters (Temperatur, Wetterbedingungen) für die ausgewählte Stadt</li>
+    <li>Dynamisches Material You-Thema, das sich automatisch an das Farbschema des Systems anpasst</li>
+    <li>Umfangreiche Anpassungsmöglichkeiten in den Einstellungen</li>
+</ul>
