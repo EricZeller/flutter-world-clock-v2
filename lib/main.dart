@@ -76,7 +76,7 @@ class MyApp extends StatelessWidget {
             themeMode: themeModePreference,
             initialRoute: '/home',
             routes: {
-              '/home': (context) => const MyHomePage(title: "World clock v2"),
+              '/home': (context) => const MyHomePage(title: "World Clock v2"),
               '/about': (context) => const AboutPage(title: "About this app"),
               '/settings': (context) => const SettingsPage(title: "Settings"),
               '/location': (context) =>
