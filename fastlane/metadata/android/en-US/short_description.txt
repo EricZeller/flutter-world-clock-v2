@@ -1,1 +1,1 @@
-display offline time and online weather for various cities in a sleek Material You design.
+display offline time and online weather for various cities with Material You design.
