@@ -1,1 +1,1 @@
-zeigt die lokale Zeit (offline) und das aktuelle Wetter (online) für verschiedene Städte im Material-You-Design an.
+zeigt die Zeit offline und das Wetter online für viele Städte im Material Design
