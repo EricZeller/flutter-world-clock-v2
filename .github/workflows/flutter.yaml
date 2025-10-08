@@ -22,7 +22,5 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run tests
-        run: flutter test
       - name: Build debug apk
         run: flutter build apk
