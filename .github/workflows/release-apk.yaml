@@ -15,7 +15,7 @@ jobs:
       - name: Get version from pubspec.yaml
         id: version
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
       - name: Setup Flutter
