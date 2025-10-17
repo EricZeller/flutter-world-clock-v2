@@ -51,16 +51,9 @@ jobs:
             hdiutil create -volname "World Clock v2" -srcfolder build/macos/Build/Products/Release/World\ Clock\ v2.app -ov -format UDZO build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
       
-      - name: Get latest git tag
-        id: get_tag
-        run: |
-          TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
-
       - name: Upload artifacts
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.get_tag.outputs.tag }}
           files: |
             build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
             build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
