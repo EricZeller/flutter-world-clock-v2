@@ -19,6 +19,7 @@ jobs:
 
       - name: Get version from pubspec.yaml
         id: version
+        shell: bash
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
