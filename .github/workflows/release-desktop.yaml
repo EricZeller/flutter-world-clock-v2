@@ -1,0 +1,54 @@
+name: Build & Release Desktop Apps
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [linux, windows, macos]
+    runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || matrix.platform == 'macos' && 'macos-latest' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.5'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build
+        run: |
+          if [ "${{ matrix.platform }}" = "linux" ]; then
+            flutter build linux --release
+            tar -cJf build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz build/linux/x64/release/bundle
+          elif [ "${{ matrix.platform }}" = "windows" ]; then
+            powershell Compress-Archive -Path build\windows\runner\Release\* -DestinationPath build\worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
+          elif [ "${{ matrix.platform }}" = "macos" ]; then
+            flutter build macos --release
+            hdiutil create -volname "World Clock v2" -srcfolder build/macos/Build/Products/Release/World\ Clock\ v2.app -ov -format UDZO build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
+          fi
+
+      - name: Upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
+            build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
+            build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
