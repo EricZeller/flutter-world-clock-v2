@@ -56,7 +56,7 @@ jobs:
         with:
           name: worldclockv2-android-build
           path: |
-            build/**/*.apk
+            build/app/outputs/flutter-apk/worldclockv2*.apk
 
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v1

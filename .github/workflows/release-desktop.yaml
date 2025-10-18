@@ -38,7 +38,6 @@ jobs:
       - name: Run tests
         run: flutter test
 
-
       - name: Build
         run: |
           if [ ${{ matrix.os }} = ubuntu-latest ]; then
@@ -57,20 +56,17 @@ jobs:
             appdmg installers/macos/config.json build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
 
-      - name: List files
-        run: ls -la build/
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: worldclockv2-${{ matrix.os }}-build
           path: |
-            build/**/*.zip
-            build/**/*.tar.xz
-            build/**/*.dmg
+            build/worldclockv2*.zip
+            build/worldclockv2*.tar.xz
+            build/worldclockv2*.dmg
 
       
-      - name: Upload artifacts
+      - name: Upload artifacts to Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
