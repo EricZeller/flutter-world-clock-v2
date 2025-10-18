@@ -1,5 +1,6 @@
 {
   "title": "World Clock v2",
+  "icon": "../../assets/IconKitchen-Output/macos/AppIcon.icns",
   "background": "../../assets/background.png",
   "contents": [
     {

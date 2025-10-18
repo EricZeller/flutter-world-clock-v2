@@ -41,6 +41,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
 
+      - name: Install appdmg
+        if: runner.os == 'macOS'
+        run: |
+          npm install -g appdmg
+
       - name: Run tests
         run: flutter test
 
@@ -55,7 +60,7 @@ jobs:
             zip -r build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip build/windows/x64/runner/Release
           elif [ ${{ matrix.os }} = macos-latest ]; then
             flutter build macos --release
-            hdiutil create -volname "World Clock v2" -srcfolder build/macos/Build/Products/Release/World\ Clock\ v2.app -ov -format UDZO build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
+            appdmg installers/macos/config.json build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
 
       - name: List files
