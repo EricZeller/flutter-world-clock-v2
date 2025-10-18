@@ -58,6 +58,16 @@ jobs:
 
       - name: List files
         run: ls -la build/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldclockv2-${{ matrix.os }}-build
+          path: |
+            build/**/*.zip
+            build/**/*.tar.xz
+            build/**/*.dmg
+
       
       # - name: Upload artifacts
       #   uses: softprops/action-gh-release@v1
