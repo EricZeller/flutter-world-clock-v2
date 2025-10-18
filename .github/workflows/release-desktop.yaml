@@ -53,8 +53,7 @@ jobs:
           elif [ ${{ matrix.os }} = macos-latest ]; then
             npm install -g appdmg
             flutter build macos --release
-            cd installers/macos/
-            appdmg config.json ../../build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
+            appdmg installers/macos/config.jsonbuild/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
 
       - name: List files
