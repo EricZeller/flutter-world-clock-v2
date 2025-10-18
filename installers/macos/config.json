@@ -1,7 +1,7 @@
 {
   "title": "World Clock v2",
-  "icon": "../../assets/IconKitchen-Output/macos/AppIcon.icns",
-  "background": "../../assets/background.png",
+  "icon": "./assets/IconKitchen-Output/macos/AppIcon.icns",
+  "background": "./assets/background.png",
   "contents": [
     {
       "x": 445,
@@ -13,7 +13,7 @@
       "x": 155,
       "y": 260,
       "type": "file",
-      "path": "../../build/macos/Build/Products/Release/World Clock v2.app"
+      "path": "./build/macos/Build/Products/Release/World Clock v2.app"
     }
   ]
 }
