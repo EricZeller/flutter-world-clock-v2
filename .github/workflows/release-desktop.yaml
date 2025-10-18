@@ -53,6 +53,7 @@ jobs:
           elif [ ${{ matrix.os }} = macos-latest ]; then
             npm install -g appdmg
             flutter build macos --release
+            sudo codesign -s - --force --deep --timestamp --options runtime "build/macos/Build/Products/Release/World Clock v2.app"
             appdmg installers/macos/config.json build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
 
