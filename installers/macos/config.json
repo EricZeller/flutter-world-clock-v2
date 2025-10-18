@@ -2,6 +2,16 @@
   "title": "World Clock v2",
   "icon": "../../assets/IconKitchen-Output/macos/AppIcon.icns",
   "background": "../../assets/dmg_background.png",
+  "window": {
+    "position": {
+      "x": 400,
+      "y": 100
+    },
+    "size": {
+      "width": 2100,
+      "height": 1500
+    }
+  },
   "contents": [
     {
       "x": 445,
