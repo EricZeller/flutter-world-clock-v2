@@ -1,30 +1,66 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
 import 'package:world_clock_v2/main.dart';
+import 'package:world_clock_v2/services/settings_provider.dart';
+import 'package:timezone/data/latest.dart' as tz;
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(() {
+    tz.initializeTimeZones();
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('App should initialize and show title', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (context) => SettingsProvider(),
+        child: const MyApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    expect(find.text('World Clock v2'), findsOneWidget);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('App should show default city Berlin', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (context) => SettingsProvider(),
+        child: const MyApp(),
+      ),
+    );
+    
+    await tester.pumpAndSettle();
+    expect(find.text('Berlin'), findsOneWidget);
+  });
+
+  testWidgets('Settings button should be visible', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (context) => SettingsProvider(),
+        child: const MyApp(),
+      ),
+    );
+
+    expect(find.byIcon(Icons.settings), findsOneWidget);
+  });
+
+  testWidgets('Menu should contain all items', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (context) => SettingsProvider(),
+        child: const MyApp(),
+      ),
+    );
+
+    // Open menu
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+
+    // Check menu items
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Change city'), findsOneWidget);
+    expect(find.text('About'), findsOneWidget);
+    expect(find.text('Source Code'), findsOneWidget);
+    expect(find.text('Report a bug'), findsOneWidget);
   });
 }
