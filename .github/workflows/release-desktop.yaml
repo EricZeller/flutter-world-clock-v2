@@ -70,12 +70,12 @@ jobs:
             build/**/*.dmg
 
       
-      # - name: Upload artifacts
-      #   uses: softprops/action-gh-release@v1
-      #   with:
-      #     files: |
-      #       build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
-      #       build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
-      #       build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
+            build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
+            build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

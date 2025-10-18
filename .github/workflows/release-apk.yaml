@@ -51,6 +51,13 @@ jobs:
           mv build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/worldclockv2_v${VERSION}_android_arm64.apk
 
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: worldclockv2-android-build
+          path: |
+            build/**/*.apk
+
       - name: Upload APK to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
