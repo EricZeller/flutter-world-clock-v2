@@ -44,11 +44,11 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
             flutter build linux --release
-            tar -cJf build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz build/linux/x64/release/bundle
+            tar -cJf build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz build/linux/x64/release/bundle/*
           elif [ ${{ matrix.os }} = windows-latest ]; then
             choco install zip
             flutter build windows --release
-            zip -r build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip build/windows/x64/runner/Release
+            zip -r build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip build/windows/x64/runner/Release/*
           elif [ ${{ matrix.os }} = macos-latest ]; then
             npm install -g appdmg
             flutter build macos --release
