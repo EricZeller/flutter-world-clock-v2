@@ -64,11 +64,19 @@ jobs:
             build/worldclockv2*.zip
             build/worldclockv2*.tar.xz
             build/worldclockv2*.dmg
+            
+      - name: Get latest release tag
+        id: tag
+        run: |
+          TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      
       - name: Upload artifacts to Release
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: ${{ steps.tag.outputs.tag }}
           files: |
             build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
             build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
