@@ -1,5 +1,6 @@
 {
   "title": "World Clock v2",
+  "background": "../../assets/background.png",
   "contents": [
     {
       "x": 445,
