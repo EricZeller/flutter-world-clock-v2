@@ -47,12 +47,12 @@ jobs:
 
       - name: Build
         run: |
-          if [ "${{ matrix.os }}" = "linux" ]; then
+          if [ "${{ matrix.os }}" = ubuntu-latest ]; then
             flutter build linux --release
             tar -cJf build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz build/linux/x64/release/bundle
-          elif [ "${{ matrix.os }}" = "windows" ]; then
+          elif [ "${{ matrix.os }}" = windows-latest ]; then
             powershell Compress-Archive -Path build\windows\runner\Release\* -DestinationPath build\worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
-          elif [ "${{ matrix.os }}" = "macos" ]; then
+          elif [ "${{ matrix.os }}" = macos-latest ]; then
             flutter build macos --release
             hdiutil create -volname "World Clock v2" -srcfolder build/macos/Build/Products/Release/World\ Clock\ v2.app -ov -format UDZO build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
