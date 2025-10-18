@@ -8,20 +8,20 @@
       "y": 100
     },
     "size": {
-      "width": 2100,
-      "height": 1500
+      "width": 500,
+      "height": 360
     }
   },
   "contents": [
     {
-      "x": 445,
-      "y": 260,
+      "x": 400,
+      "y": 210,
       "type": "link",
       "path": "/Applications"
     },
     {
-      "x": 155,
-      "y": 260,
+      "x": 100,
+      "y": 210,
       "type": "file",
       "path": "../../build/macos/Build/Products/Release/World Clock v2.app"
     }
