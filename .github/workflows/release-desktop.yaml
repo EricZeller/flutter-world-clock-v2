@@ -8,18 +8,21 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash
+
     strategy:
       matrix:
-        platform: [linux, windows, macos]
-    runs-on: ${{ matrix.platform == 'linux' && 'ubuntu-latest' || matrix.platform == 'windows' && 'windows-latest' || matrix.platform == 'macos' && 'macos-latest' }}
-
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Get version from pubspec.yaml
         id: version
-        shell: bash
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
@@ -43,7 +46,6 @@ jobs:
 
 
       - name: Build
-        shell: bash
         run: |
           if [ "${{ matrix.platform }}" = "linux" ]; then
             flutter build linux --release
@@ -54,13 +56,16 @@ jobs:
             flutter build macos --release
             hdiutil create -volname "World Clock v2" -srcfolder build/macos/Build/Products/Release/World\ Clock\ v2.app -ov -format UDZO build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
+
+      - name: List files
+        run: ls -la build/
       
-      - name: Upload artifacts
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
-            build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
-            build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Upload artifacts
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     files: |
+      #       build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
+      #       build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
+      #       build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
