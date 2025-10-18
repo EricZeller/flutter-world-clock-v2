@@ -21,7 +21,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.5'
+          flutter-version: '3.35.6'
 
       - name: Decode keystore
         run: |
@@ -38,6 +38,9 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
+      
+      - name: Run tests
+        run: flutter test
 
       - name: Build signed release APK
         run: flutter build apk --release
