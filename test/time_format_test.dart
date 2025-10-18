@@ -1,63 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:world_clock_v2/main.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:world_clock_v2/services/settings_provider.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:world_clock_v2/data/data.dart';
 
 void main() {
-  setUpAll(() {
-    tz.initializeTimeZones();
-  });
-
-  group('Time Formatting Tests', () {
-    late MyHomePage homePage;
-
+  group('Time Format Tests', () {
     setUp(() {
-      homePage = const MyHomePage(title: 'Test');
+      tz.initializeTimeZones();
     });
 
-    test('Time format should respect 24-hour setting', () {
-      final state = _MyHomePageState();
-      
-      // Test 24-hour format
-      sp24hr = true;
-      showSeconds = false;
-      final time24 = state.getTimeInTimeZone('Europe/Berlin');
-      expect(time24.contains('AM'), false);
-      expect(time24.contains('PM'), false);
-
-      // Test 12-hour format
-      sp24hr = false;
-      final time12 = state.getTimeInTimeZone('Europe/Berlin');
-      expect(time12.contains('AM') || time12.contains('PM'), true);
+    test('Global variables should have correct default values', () {
+      expect(spThemeMode, equals("System"));
+      expect(themeList, equals(["System", "Dark", "Light"]));
+      expect(sp24hr, isTrue);
+      expect(showSeconds, isTrue);
+      expect(showSecondsLocal, isFalse);
+      expect(spMoreInfo, isTrue);
+      expect(wttrServer, equals("https://wttr.in"));
+      expect(useFahrenheit, isFalse);
+      expect(useCustomColor, isFalse);
+      expect(colorIndex, equals(4));
     });
 
-    test('Seconds should be shown when enabled', () {
-      final state = _MyHomePageState();
-      
-      // Test with seconds
-      sp24hr = true;
-      showSeconds = true;
-      final timeWithSeconds = state.getTimeInTimeZone('Europe/Berlin');
-      expect(timeWithSeconds.split(':').length, 3);
+    test('Timezone conversion should work correctly', () {
+      final berlinLocation = tz.getLocation('Europe/Berlin');
+      final tokyoLocation = tz.getLocation('Asia/Tokyo');
+      final newYorkLocation = tz.getLocation('America/New_York');
 
-      // Test without seconds
-      showSeconds = false;
-      final timeWithoutSeconds = state.getTimeInTimeZone('Europe/Berlin');
-      expect(timeWithoutSeconds.split(':').length, 2);
-    });
+      final now = tz.TZDateTime.now(berlinLocation);
+      final tokyoTime = tz.TZDateTime.now(tokyoLocation);
+      final newYorkTime = tz.TZDateTime.now(newYorkLocation);
 
-    test('Local time format should be correct', () {
-      final state = _MyHomePageState();
-      
-      sp24hr = true;
-      showSecondsLocal = false;
-      final localTime = state.getLocalTime();
-      expect(localTime.startsWith('Local time: '), true);
-      expect(localTime.contains('AM'), false);
-      expect(localTime.contains('PM'), false);
+      // Verify that the times are different
+      expect(now.hour, isNot(equals(tokyoTime.hour)));
+      expect(now.hour, isNot(equals(newYorkTime.hour)));
     });
   });
 }

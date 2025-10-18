@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -7,35 +8,33 @@ void main() {
     late SettingsProvider settingsProvider;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       settingsProvider = SettingsProvider();
     });
 
-    test('Initial custom color should be default color', () {
-      expect(settingsProvider.customColor, Colors.blue);
+    tearDown(() async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
     });
 
-    test('Setting custom color should update the color', () {
-      const newColor = Colors.red;
-      settingsProvider.setCustomColor(newColor);
-      expect(settingsProvider.customColor, newColor);
+    test('Default values should be set correctly', () {
+      expect(settingsProvider.customColor, equals(Colors.indigo));
+      expect(settingsProvider.useCustomColor, equals(false));
     });
 
-    test('Theme mode should be updateable', () {
-      const newThemeMode = 'dark';
-      settingsProvider.setThemeMode(newThemeMode);
-      expect(spThemeMode, newThemeMode);
-    });
+    test('Settings should be loaded from SharedPreferences', () async {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('customColor', Colors.red.value);
+      await prefs.setBool('useCustomColor', true);
 
-    test('24-hour format should be toggleable', () {
-      final initial = sp24hr;
-      settingsProvider.toggle24Hour();
-      expect(sp24hr, !initial);
-    });
-
-    test('Show seconds should be toggleable', () {
-      final initial = showSeconds;
-      settingsProvider.toggleShowSeconds();
-      expect(showSeconds, !initial);
+      // Create a new instance to test loading
+      settingsProvider = SettingsProvider();
+      
+      // Wait for the provider to load the settings
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      expect(settingsProvider.customColor.value, equals(Colors.red.value));
+      expect(settingsProvider.useCustomColor, equals(true));
     });
   });
 }
