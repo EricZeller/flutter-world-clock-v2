@@ -27,10 +27,17 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //' | cut -d'+' -f1)
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
+      - name: Get Flutter version from pubspec.yaml
+        id: flutter_version
+        run: |
+          FLUTTER_VERSION=$(grep 'flutter:' pubspec.yaml | head -1 | awk '{print $2}' | tr -d '^"')
+          echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
+
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.6'
+          flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
 
       - name: Get dependencies
         run: flutter pub get
