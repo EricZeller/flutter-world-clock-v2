@@ -48,6 +48,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 // TextClock handling
                 if (timeZone != null) {
                     setString(R.id.widget_time, "setTimeZone", timeZone)
+                    setString(R.id.widget_date, "setTimeZone", timeZone)
                 }
 
                 // Click to open app
