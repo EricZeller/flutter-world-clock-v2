@@ -354,6 +354,22 @@ class _SettingsPageState extends State<SettingsPage> {
                                 },
                               ),
                             ),
+                            ListTile(
+                              leading: const Icon(Icons.opacity),
+                              title: const Text("Widget transparency"),
+                              subtitle: Slider(
+                                value: settings.widgetOpacity,
+                                min: 0.0,
+                                max: 1.0,
+                                onChanged: (double value) {
+                                  settings.setWidgetOpacity(value);
+                                },
+                              ),
+                              trailing: Text(
+                                "${(settings.widgetOpacity * 100).toInt()}%",
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                           ],
                         ),
                       ),

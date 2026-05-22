@@ -31,13 +31,19 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 val bgColor = data.getString("bgColor", "#042c4d")
                 val primaryColor = data.getString("primaryColor", "#FFFFFF")
                 val secondaryColor = data.getString("secondaryColor", "#0aaea6")
+                val opacity = data.getFloat("opacity", 0.9f)
 
                 setTextViewText(R.id.widget_city, city)
                 setTextViewText(R.id.widget_weather, weather)
                 
-                // Apply colors
+                // Apply colors and opacity
                 try {
                     setInt(R.id.widget_background_view, "setColorFilter", Color.parseColor(bgColor))
+                    // setAlpha expects a value between 0 and 255 for RemoteViews on some versions, 
+                    // but for ImageView in XML it's 0.0 to 1.0. 
+                    // Using setInt with "setAlpha" usually expects 0-255.
+                    setInt(R.id.widget_background_view, "setAlpha", (opacity * 255).toInt())
+                    
                     setTextColor(R.id.widget_time, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_weather, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_city, Color.parseColor(secondaryColor))

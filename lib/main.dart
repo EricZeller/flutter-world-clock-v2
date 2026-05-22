@@ -158,8 +158,10 @@ class _MyHomePageState extends State<MyHomePage> {
       await HomeWidget.saveWidgetData<String>('bgColor', bgColor);
       await HomeWidget.saveWidgetData<String>('primaryColor', primaryColor);
       await HomeWidget.saveWidgetData<String>('secondaryColor', secondaryColor);
+      await HomeWidget.saveWidgetData<double>('opacity', Provider.of<SettingsProvider>(context, listen: false).widgetOpacity);
 
       // Tiny delay to ensure SharedPreferences are flushed to disk
+
       await Future.delayed(const Duration(milliseconds: 100));
 
       await HomeWidget.updateWidget(
