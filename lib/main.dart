@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:world_clock_v2/data/data.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
+import 'package:home_widget/home_widget.dart';
 
 void main() {
   tz.initializeTimeZones();
@@ -128,10 +129,46 @@ class _MyHomePageState extends State<MyHomePage> {
         country = city.country;
         utc = city.utc;
         getWeather(cityName);
+        _updateHomeWidget();
       } catch (e) {
         // Fehlerbehandlung, wenn JSON nicht erfolgreich dekodiert werden kann
       }
     });
+  }
+
+  String _colorToHex(Color color) {
+    return '#${color.value.toRadixString(16).padLeft(8, '0')}';
+  }
+
+  Future<void> _updateHomeWidget() async {
+    try {
+      if (cityName == null) return;
+      
+      // Get colors from Theme
+      final colorScheme = Theme.of(context).colorScheme;
+      final bgColor = _colorToHex(colorScheme.primaryContainer);
+      final primaryColor = _colorToHex(colorScheme.onPrimaryContainer);
+      final secondaryColor = _colorToHex(colorScheme.primary);
+
+      // We use a small delay to ensure that multiple calls to saveWidgetData 
+      // are processed correctly by the plugin before triggering the update.
+      await HomeWidget.saveWidgetData<String>('city', cityName);
+      await HomeWidget.saveWidgetData<String>('weather', _weather);
+      await HomeWidget.saveWidgetData<String>('timeZone', timeZone);
+      await HomeWidget.saveWidgetData<String>('bgColor', bgColor);
+      await HomeWidget.saveWidgetData<String>('primaryColor', primaryColor);
+      await HomeWidget.saveWidgetData<String>('secondaryColor', secondaryColor);
+
+      // Tiny delay to ensure SharedPreferences are flushed to disk
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      await HomeWidget.updateWidget(
+        name: 'WorldClockWidgetProvider',
+        androidName: 'WorldClockWidgetProvider',
+      );
+    } catch (e) {
+      debugPrint("Error updating home widget: $e");
+    }
   }
 
   Future<void> getThemeModePreference() async {
@@ -187,6 +224,16 @@ class _MyHomePageState extends State<MyHomePage> {
     getTimeZone();
     getPreferences();
     getWeather(cityWeatherZone);
+    // Update widget after first build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateHomeWidget();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _updateHomeWidget();
   }
 
   @override
@@ -238,14 +285,17 @@ class _MyHomePageState extends State<MyHomePage> {
       if (response.statusCode == 200) {
         setState(() {
           _weather = response.body;
+          _updateHomeWidget();
         });
       } else {
         setState(() {
           _weather = "🛜 Couldn't connect to API";
+          _updateHomeWidget();
         });
       }
     } catch (e) {
       _weather = "🛜 Connection error";
+      _updateHomeWidget();
     }
   }
 
