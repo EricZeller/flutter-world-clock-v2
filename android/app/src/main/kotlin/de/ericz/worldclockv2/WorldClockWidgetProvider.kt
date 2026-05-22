@@ -39,6 +39,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 try {
                     setInt(R.id.widget_background_view, "setColorFilter", Color.parseColor(bgColor))
                     setTextColor(R.id.widget_time, Color.parseColor(primaryColor))
+                    setTextColor(R.id.widget_date, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_weather, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_city, Color.parseColor(secondaryColor))
                 } catch (e: Exception) {
