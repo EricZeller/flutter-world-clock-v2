@@ -47,6 +47,7 @@ dependencies:
   flutter_native_splash: ^2.4.0
   sqflite: ^2.3.3+1
   colornames: ^0.2.0
+  home_widget: 0.6.0
 
 dev_dependencies:
   flutter_test:

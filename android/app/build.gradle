@@ -30,7 +30,7 @@ def keystorePropertiesFile = rootProject.file('key.properties')
     }
 
 android {
-    namespace = 'com.example.world_clock_v2'
+    namespace = 'de.ericz.worldclockv2'
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -55,19 +55,29 @@ android {
     }
 
     signingConfigs {
+        debug {
+            // Standard debug configuration
+        }
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])  // Hier wird der Wert aus der key.properties-Datei verwendet
-            storePassword keystoreProperties['storePassword']
+            if (keystoreProperties.containsKey('storeFile')) {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
         }
     }
 
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.release
+            if (keystoreProperties.containsKey('storeFile')) {
+                signingConfig = signingConfigs.release
+            } else {
+                signingConfig = signingConfigs.debug
+            }
             ndk {
                 // Alle automatisch gesetzten Filters löschen
                 abiFilters.clear()
