@@ -1,4 +1,4 @@
-name: Build & Release Signed APK
+name: Build & Release Signed APK + App Bundle
 
 on:
   release:
@@ -53,6 +53,9 @@ jobs:
       - name: Build signed release APK
         run: flutter build apk --release
 
+      - name: Build signed release App Bundle
+        run: flutter build appbundle --release
+
       - name: Rename APK with version and source
         run: |
           VERSION=${{ steps.version.outputs.version }}
@@ -70,18 +73,44 @@ jobs:
           
           echo "apk_name=${APK_NAME}" >> $GITHUB_OUTPUT
 
+      - name: Rename App Bundle with version and source
+        run: |
+          VERSION=${{ steps.version.outputs.version }}
+          
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            SHORT_SHA=$(git rev-parse --short=7 HEAD)
+            DATE=$(date +'%Y%m%d')
+            AAB_NAME="worldclockv2_v${VERSION}_${DATE}_${SHORT_SHA}.aab"
+          else
+            AAB_NAME="worldclockv2_v${VERSION}.aab"
+          fi
+          
+          mv build/app/outputs/bundle/release/app-release.aab \
+             build/app/outputs/bundle/release/${AAB_NAME}
+          
+          echo "aab_name=${AAB_NAME}" >> $GITHUB_OUTPUT
+
       - name: Upload build artifacts (Workflow Artifacts)
         uses: actions/upload-artifact@v7
         with:
           name: worldclockv2-android-build-${{ github.run_number }}
           path: |
             build/app/outputs/flutter-apk/worldclockv2*.apk
+            build/app/outputs/bundle/release/worldclockv2*.aab
           retention-days: 7
 
       - name: Upload APK to GitHub Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          files: build/app/outputs/flutter-apk/worldclockv2_v${{ steps.version.outputs.version }}_android_arm64.apk
+          files: build/app/outputs/flutter-apk/worldclockv2_v${{ steps.version.outputs.version }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload App Bundle to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/bundle/release/worldclockv2_v${{ steps.version.outputs.version }}.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
