@@ -3,6 +3,8 @@ name: Build & Release Signed APK
 on:
   release:
     types: [published]
+  push:
+    branches: [main]
 
 jobs:
   build:
@@ -24,12 +26,10 @@ jobs:
           FLUTTER_VERSION=$(grep 'flutter:' pubspec.yaml | head -1 | awk '{print $2}' | tr -d '^"')
           echo "flutter_version=$FLUTTER_VERSION" >> $GITHUB_OUTPUT
 
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
-
 
       - name: Decode keystore
         run: |
@@ -56,8 +56,16 @@ jobs:
       - name: Rename APK with version
         run: |
           VERSION=${{ steps.version.outputs.version }}
+          
+          # Für main-branch: Build-Nummer anhängen
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            APK_NAME="worldclockv2_v${VERSION}_android_arm64_main-${{ github.run_number }}.apk"
+          else
+            APK_NAME="worldclockv2_v${VERSION}_android_arm64.apk"
+          fi
+          
           mv build/app/outputs/flutter-apk/app-release.apk \
-             build/app/outputs/flutter-apk/worldclockv2_v${VERSION}_android_arm64.apk
+             build/app/outputs/flutter-apk/${APK_NAME}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -65,10 +73,3 @@ jobs:
           name: worldclockv2-android-build
           path: |
             build/app/outputs/flutter-apk/worldclockv2*.apk
-
-      - name: Upload APK to GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: build/app/outputs/flutter-apk/worldclockv2_v${{ steps.version.outputs.version }}_android_arm64.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
