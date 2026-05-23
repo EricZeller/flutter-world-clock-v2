@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get version from pubspec.yaml
         id: version
@@ -71,7 +71,7 @@ jobs:
           echo "apk_name=${APK_NAME}" >> $GITHUB_OUTPUT
 
       - name: Upload build artifacts (Workflow Artifacts)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: worldclockv2-android-build-${{ github.run_number }}
           path: |
