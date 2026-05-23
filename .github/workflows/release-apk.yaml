@@ -53,23 +53,35 @@ jobs:
       - name: Build signed release APK
         run: flutter build apk --release
 
-      - name: Rename APK with version
+      - name: Rename APK with version and source
         run: |
           VERSION=${{ steps.version.outputs.version }}
           
-          # Für main-branch: Build-Nummer anhängen
           if [[ "${{ github.event_name }}" == "push" ]]; then
-            APK_NAME="worldclockv2_v${VERSION}_android_arm64_main-${{ github.run_number }}.apk"
+            SHORT_SHA=$(git rev-parse --short=7 HEAD)
+            DATE=$(date +'%Y%m%d')
+            APK_NAME="worldclockv2_v${VERSION}_${DATE}_${SHORT_SHA}.apk"
           else
-            APK_NAME="worldclockv2_v${VERSION}_android_arm64.apk"
+            APK_NAME="worldclockv2_v${VERSION}.apk"
           fi
           
           mv build/app/outputs/flutter-apk/app-release.apk \
              build/app/outputs/flutter-apk/${APK_NAME}
+          
+          echo "apk_name=${APK_NAME}" >> $GITHUB_OUTPUT
 
-      - name: Upload build artifacts
+      - name: Upload build artifacts (Workflow Artifacts)
         uses: actions/upload-artifact@v4
         with:
-          name: worldclockv2-android-build
+          name: worldclockv2-android-build-${{ github.run_number }}
           path: |
             build/app/outputs/flutter-apk/worldclockv2*.apk
+          retention-days: 7
+
+      - name: Upload APK to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/worldclockv2_v${{ steps.version.outputs.version }}_android_arm64.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
