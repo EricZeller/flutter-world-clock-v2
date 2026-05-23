@@ -5,11 +5,10 @@ import 'package:world_clock_v2/data/data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:colornames/colornames.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
+import 'package:world_clock_v2/l10n/app_localizations.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key, required this.title});
-
-  final String title;
+  const SettingsPage({super.key});
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -52,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool _isValidUrl = true;
 
-  void _saveUrl() {
+  void _saveUrl(AppLocalizations l10n) {
     if (checkChangedServer()) {
       final enteredUrl = _urlController.text;
       if (_isValid(enteredUrl)) {
@@ -60,15 +59,15 @@ class _SettingsPageState extends State<SettingsPage> {
           wttrServer = enteredUrl;
         });
         _saveStringValue('wttrServer', enteredUrl);
-        showAlertDialog(context, "URL saved",
-            "wttr.in server setted. \nPlease check the home screen to ensure that the new server is working properly. \nAPI will update in a maximum of 30 seconds.");
+        showAlertDialog(context, l10n.urlSaved,
+            l10n.serverSuccessNotice);
       } else {
         setState(() {
           _isValidUrl = false;
         });
       }
     } else {
-      showAlertDialog(context, "No changes to save", "");
+      showAlertDialog(context, l10n.noChanges, "");
     }
   }
 
@@ -123,6 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
       },
     );
     return Consumer<SettingsProvider>(builder: (context, settings, child) {
+      final l10n = AppLocalizations.of(context)!;
       return DynamicColorBuilder(
         builder: (lightDynamic, darkDynamic) {
           ColorScheme lightColorScheme;
@@ -170,7 +170,7 @@ class _SettingsPageState extends State<SettingsPage> {
               appBar: AppBar(
                 centerTitle: true,
                 title: Text(
-                  widget.title,
+                  l10n.settings,
                   style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimaryContainer,
                       fontFamily: "Pacifico",
@@ -186,8 +186,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     if (!checkChangedServer()) {
                       Navigator.pop(context);
                     } else {
-                      showAlertDialog(context, "Unsaved changes",
-                          "Please save the changes you have made to the wttr.in server");
+                      showAlertDialog(context, l10n.unsavedChanges,
+                          l10n.saveChangesPrompt);
                     }
                   },
                 ),
@@ -203,8 +203,8 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: Column(
                           children: [
                             ListTile(
-                              title: const Text("Default theme"),
-                              subtitle: const Text("Restart app to apply"),
+                              title: Text(l10n.defaultTheme),
+                              subtitle: Text(l10n.restartToApply),
                               leading: const Icon(Icons.light_mode_outlined),
                               trailing: DropdownButton(
                                 value: dropdownValue,
@@ -226,7 +226,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             ListTile(
                               leading: const Icon(Icons.color_lens_outlined),
-                              title: const Text("Custom Material color"),
+                              title: Text(l10n.customMaterialColor),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: Provider.of<SettingsProvider>(context)
@@ -277,13 +277,13 @@ class _SettingsPageState extends State<SettingsPage> {
                         child: Column(
                           children: [
                             ListTile(
-                              title: const Text("Show seconds"),
+                              title: Text(l10n.showSeconds),
                               leading: const Icon(Icons.schedule),
                               subtitle: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("World clock"),
+                                  Text(l10n.worldClock),
                                   Switch(
                                     thumbIcon: thumbIconGlobal,
                                     value: showSeconds,
@@ -295,7 +295,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                           "showSeconds", showSeconds);
                                     },
                                   ),
-                                  const Text("Local"),
+                                  Text(l10n.local),
                                   Switch(
                                     thumbIcon: thumbIconLocal,
                                     value: showSecondsLocal,
@@ -312,7 +312,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             ListTile(
                               leading: const Icon(Icons.travel_explore),
-                              title: const Text("Use 24hr format"),
+                              title: Text(l10n.use24hrFormat),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: sp24hr,
@@ -326,7 +326,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             ListTile(
                               leading: const Icon(Icons.thermostat),
-                              title: const Text("Use °F"),
+                              title: Text(l10n.useFahrenheit),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: useFahrenheit,
@@ -342,7 +342,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ListTile(
                               leading: const Icon(Icons.info_outline),
                               title:
-                                  const Text("Display more info on homescreen"),
+                                  Text(l10n.displayMoreInfo),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: spMoreInfo,
@@ -384,16 +384,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                             'wttrServer', wttrServer);
                                         showAlertDialog(
                                             context,
-                                            "URL restored and saved",
-                                            "API will update in a maximum of 30 seconds.");
+                                            l10n.urlRestored,
+                                            l10n.apiUpdateNotice);
                                       },
                                       icon:
                                           const Icon(Icons.restart_alt_rounded),
                                     ),
-                                    labelText: "Set own wttr.in server",
+                                    labelText: l10n.setWttrServer,
                                     hintText: wttrServer,
                                     errorText:
-                                        _isValidUrl ? null : 'Invalid URL',
+                                        _isValidUrl ? null : l10n.invalidUrl,
                                     border: const OutlineInputBorder(),
                                     errorBorder: OutlineInputBorder(
                                       borderSide: BorderSide(
@@ -420,7 +420,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     }
                                   },
                                   onSubmitted: (value) {
-                                    _saveUrl();
+                                    _saveUrl(l10n);
                                   },
                                 ),
                                 trailing: CircleAvatar(
@@ -430,7 +430,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     color:
                                         Theme.of(context).colorScheme.onPrimary,
                                     icon: const Icon(Icons.save_outlined),
-                                    onPressed: _saveUrl,
+                                    onPressed: () => _saveUrl(l10n),
                                   ),
                                 ),
                               ),
@@ -451,8 +451,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   if (!checkChangedServer()) {
                     Navigator.pop(context);
                   } else {
-                    showAlertDialog(context, "Unsaved changes",
-                        "Please save the changes you have made to the wttr.in server");
+                    showAlertDialog(context, l10n.unsavedChanges,
+                        l10n.saveChangesPrompt);
                   }
                 },
                 child: const Icon(Icons.check),

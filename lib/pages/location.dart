@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/data/data.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
+import 'package:world_clock_v2/l10n/app_localizations.dart';
 
 class City {
   final String name;
@@ -54,9 +55,7 @@ Future<List<City>> loadCities() async {
 }
 
 class LocationPage extends StatefulWidget {
-  const LocationPage({super.key, required this.title});
-
-  final String title;
+  const LocationPage({super.key});
 
   @override
   State<LocationPage> createState() => _LocationPageState();
@@ -184,6 +183,7 @@ class _LocationPageState extends State<LocationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     int filteredCitiesCount = _filteredCities.length;
     return Consumer<SettingsProvider>(builder: (context, settings, child) {
       return DynamicColorBuilder(
@@ -238,43 +238,43 @@ class _LocationPageState extends State<LocationPage> {
                     },
                     itemBuilder: (BuildContext context) =>
                         <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'sortByCity',
                         child: ListTile(
-                          leading: Icon(Icons.location_city_rounded),
+                          leading: const Icon(Icons.location_city_rounded),
                           title: Text(
-                            'Sort by city',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            l10n.sortByCity,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'sortByCountry',
                         child: ListTile(
-                          leading: Icon(Icons.flag_rounded),
+                          leading: const Icon(Icons.flag_rounded),
                           title: Text(
-                            'Sort by country',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            l10n.sortByCountry,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'sortByUtc',
                         child: ListTile(
-                          leading: Icon(Icons.access_time_filled),
+                          leading: const Icon(Icons.access_time_filled),
                           title: Text(
-                            'Sort by UTC timezone',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            l10n.sortByUtc,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
-                      const PopupMenuItem<String>(
+                      PopupMenuItem<String>(
                         value: 'sortByContinent',
                         child: ListTile(
-                          leading: Icon(Icons.public),
+                          leading: const Icon(Icons.public),
                           title: Text(
-                            'Sort by continent/region',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            l10n.sortByContinent,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
@@ -283,7 +283,7 @@ class _LocationPageState extends State<LocationPage> {
                   ),
                 ],
                 centerTitle: true,
-                title: Text(widget.title,
+                title: Text(l10n.chooseCity,
                     style: TextStyle(
                         fontFamily: "Pacifico",
                         fontSize: 24,
@@ -305,8 +305,7 @@ class _LocationPageState extends State<LocationPage> {
                       onChanged: (query) => _searchCities(query),
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
-                        labelText:
-                            'Search city or country ($filteredCitiesCount found)',
+                        labelText: l10n.searchHint(filteredCitiesCount),
                         prefixIcon: const Icon(Icons.search),
                       ),
                     ),

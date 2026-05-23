@@ -16,6 +16,7 @@ import 'package:world_clock_v2/data/data.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:home_widget/home_widget.dart';
+import 'package:world_clock_v2/l10n/app_localizations.dart';
 
 void main() {
   tz.initializeTimeZones();
@@ -64,6 +65,8 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             title: 'World clock',
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             theme: ThemeData(
               fontFamily: "Red Hat Display",
               colorScheme: lightColorScheme,
@@ -77,11 +80,11 @@ class MyApp extends StatelessWidget {
             themeMode: themeModePreference,
             initialRoute: '/home',
             routes: {
-              '/home': (context) => const MyHomePage(title: "World Clock v2"),
-              '/about': (context) => const AboutPage(title: "About this app"),
-              '/settings': (context) => const SettingsPage(title: "Settings"),
+              '/home': (context) => const MyHomePage(),
+              '/about': (context) => const AboutPage(),
+              '/settings': (context) => const SettingsPage(),
               '/location': (context) =>
-                  const LocationPage(title: "Choose city"),
+                  const LocationPage(),
             },
           );
         });
@@ -91,9 +94,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -269,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getWeather(weatherZone) async {
-    _weather = "🛰️ Loading...";
+    _weather = AppLocalizations.of(context)!.weatherLoading;
     String requestURL;
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString('wttrServer') != null) {
@@ -289,18 +290,19 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       } else {
         setState(() {
-          _weather = "🛜 Couldn't connect to API";
+          _weather = AppLocalizations.of(context)!.apiError;
           _updateHomeWidget();
         });
       }
     } catch (e) {
-      _weather = "🛜 Connection error";
+      _weather = AppLocalizations.of(context)!.connectionError;
       _updateHomeWidget();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       appBar: AppBar(
@@ -332,39 +334,39 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             icon: const Icon(Icons.more_vert),
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'settings',
                 child: ListTile(
-                  title: Text('Settings'),
-                  leading: Icon(Icons.settings),
+                  title: Text(l10n.settings),
+                  leading: const Icon(Icons.settings),
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'changeCity',
                 child: ListTile(
-                  title: Text('Change city'),
-                  leading: Icon(Icons.edit_location_alt),
+                  title: Text(l10n.changeCity),
+                  leading: const Icon(Icons.edit_location_alt),
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'about',
                 child: ListTile(
-                  title: Text('About'),
-                  leading: Icon(Icons.info),
+                  title: Text(l10n.about),
+                  leading: const Icon(Icons.info),
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'source_code',
                 child: ListTile(
-                  title: Text('Source Code'),
-                  leading: Icon(Icons.code),
+                  title: Text(l10n.sourceCode),
+                  leading: const Icon(Icons.code),
                 ),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'bug_report',
                 child: ListTile(
-                  title: Text('Report a bug'),
-                  leading: Icon(Icons.bug_report),
+                  title: Text(l10n.reportBug),
+                  leading: const Icon(Icons.bug_report),
                 ),
               ),
             ],
@@ -373,7 +375,7 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.primaryContainer,
         foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
         title: Text(
-          widget.title,
+          l10n.appTitle,
           style: const TextStyle(fontFamily: "Red Hat Display"),
         ),
         centerTitle: true,
@@ -455,7 +457,7 @@ class _MyHomePageState extends State<MyHomePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  getLocalTime(),
+                  l10n.localTime(getLocalTime().replaceAll("Local time: ", "")),
                   style: TextStyle(
                       fontSize: 30.0,
                       fontFamily: "Red Hat Display",
@@ -470,7 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 getTimeZone();
               },
               label: Text(
-                "Change city",
+                l10n.changeCity,
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontFamily: "Red Hat Display",

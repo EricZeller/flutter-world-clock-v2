@@ -1,0 +1,70 @@
+{
+  "@@locale": "en",
+  "appTitle": "World Clock v2",
+  "settings": "Settings",
+  "about": "About",
+  "changeCity": "Change city",
+  "sourceCode": "Source Code",
+  "reportBug": "Report a bug",
+  "localTime": "Local time: {time}",
+  "@localTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "loading": "Loading...",
+  "weatherLoading": "🛰️ Loading...",
+  "connectionError": "🛜 Connection error",
+  "apiError": "🛜 Couldn't connect to API",
+  "searchCity": "Search for city",
+  "chooseCity": "Choose city",
+  "aboutThisApp": "About this app",
+  "license": "License",
+  "contact": "Contact",
+  "currentVersion": "Current version: v{version}",
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "defaultTheme": "Default theme",
+  "restartToApply": "Restart app to apply",
+  "customMaterialColor": "Custom Material color",
+  "selectColor": "Select color",
+  "showSeconds": "Show seconds",
+  "worldClock": "World clock",
+  "local": "Local",
+  "use24hrFormat": "Use 24hr format",
+  "useFahrenheit": "Use °F",
+  "displayMoreInfo": "Display more info on homescreen",
+  "widgetTransparency": "Widget transparency",
+  "setWttrServer": "Set own wttr.in server",
+  "invalidUrl": "Invalid URL",
+  "urlSaved": "URL saved",
+  "urlRestored": "URL restored and saved",
+  "noChanges": "No changes to save",
+  "unsavedChanges": "Unsaved changes",
+  "saveChangesPrompt": "Please save the changes you have made to the wttr.in server",
+  "apiUpdateNotice": "API will update in a maximum of 30 seconds.",
+  "serverSuccessNotice": "wttr.in server setted. \nPlease check the home screen to ensure that the new server is working properly. \nAPI will update in a maximum of 30 seconds.",
+  "ok": "OK",
+  "aboutDescription": "World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience.\nCheck out the numerous settings for an even more personalized experience.",
+  "licenseDescription": "This app is licensed under the GNU GPL 3.0. For more details, see the LICENSE file in the repository.",
+  "contactDescription": "If you have any questions or suggestions, feel free to contact me over GitHub or open an Issue over the repository of this app.",
+  "sortByCity": "Sort by city",
+  "sortByCountry": "Sort by country",
+  "sortByUtc": "Sort by UTC timezone",
+  "sortByContinent": "Sort by continent/region",
+  "searchHint": "Search city or country ({count} found)",
+  "@searchHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

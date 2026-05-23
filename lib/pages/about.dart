@@ -5,6 +5,7 @@ import 'package:world_clock_v2/data/data.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:yaml/yaml.dart';
+import 'package:world_clock_v2/l10n/app_localizations.dart';
 
 Future<String> getAppVersion() async {
   final pubspec = await rootBundle.loadString('pubspec.yaml');
@@ -15,12 +16,11 @@ Future<String> getAppVersion() async {
 }
 
 class AboutPage extends StatelessWidget {
-  const AboutPage({super.key, required this.title});
-
-  final String title;
+  const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<String>(
       future: getAppVersion(),
       builder: (context, snapshot) {
@@ -84,7 +84,7 @@ class AboutPage extends StatelessWidget {
                       Theme.of(context).colorScheme.secondaryContainer,
                   appBar: AppBar(
                     centerTitle: true,
-                    title: Text(title,
+                    title: Text(l10n.aboutThisApp,
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: "Red Hat Display",
@@ -104,8 +104,8 @@ class AboutPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("World Clock v2", style: heading),
-                        Text("Current version: v$version",
+                        Text(l10n.appTitle, style: heading),
+                        Text(l10n.currentVersion(version),
                             style: TextStyle(
                                 fontFamily: "Red Hat Display",
                                 fontSize: 20,
@@ -115,27 +115,27 @@ class AboutPage extends StatelessWidget {
                         const SizedBox(height: 20),
                         Text(
                             style: body,
-                            "World Clock is a Flutter app that displays the current time and weather for various cities. The app uses the Material You theme to provide a modern and customizable user experience.\nCheck out the numerous settings for an even more personalized experience."),
+                            l10n.aboutDescription),
                         Divider(
                           height: 60.0,
                           thickness: 2,
                           color: Theme.of(context).colorScheme.secondary,
                         ),
-                        Text("License", style: heading),
+                        Text(l10n.license, style: heading),
                         const SizedBox(height: 10),
                         Text(
                             style: body,
-                            "This app is licensed under the GNU GPL 3.0. For more details, see the LICENSE file in the repository."),
+                            l10n.licenseDescription),
                         Divider(
                           height: 60.0,
                           thickness: 2,
                           color: Theme.of(context).colorScheme.secondary,
                         ),
-                        Text("Contact", style: heading),
+                        Text(l10n.contact, style: heading),
                         const SizedBox(height: 10),
                         Text(
                             style: body,
-                            "If you have any questions or suggestions, feel free to contact me over GitHub or open an Issue over the repository of this app."),
+                            l10n.contactDescription),
                       ],
                     ),
                   ),
