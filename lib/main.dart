@@ -270,7 +270,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getWeather(weatherZone) async {
-    _weather = AppLocalizations.of(context)!.weatherLoading;
+    final l10n = AppLocalizations.of(context)!;
+    _weather = l10n.weatherLoading;
     String requestURL;
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString('wttrServer') != null) {
@@ -290,13 +291,17 @@ class _MyHomePageState extends State<MyHomePage> {
         });
       } else {
         setState(() {
-          _weather = AppLocalizations.of(context)!.apiError;
+          _weather = l10n.apiError;
           _updateHomeWidget();
         });
       }
     } catch (e) {
-      _weather = AppLocalizations.of(context)!.connectionError;
-      _updateHomeWidget();
+      if (mounted) {
+        setState(() {
+          _weather = l10n.connectionError;
+          _updateHomeWidget();
+        });
+      }
     }
   }
 
