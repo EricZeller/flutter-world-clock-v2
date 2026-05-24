@@ -103,44 +103,46 @@ class AboutPage extends StatelessWidget {
                       },
                     ),
                   ),
-                  body: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(l10n.appTitle, style: heading),
-                        Text(l10n.currentVersion(version),
-                            style: TextStyle(
-                                fontFamily: "Red Hat Display",
-                                fontSize: 20,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSecondaryContainer)),
-                        const SizedBox(height: 20),
-                        Text(
-                            style: body,
-                            l10n.aboutDescription),
-                        Divider(
-                          height: 60.0,
-                          thickness: 2,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        Text(l10n.license, style: heading),
-                        const SizedBox(height: 10),
-                        Text(
-                            style: body,
-                            l10n.licenseDescription),
-                        Divider(
-                          height: 60.0,
-                          thickness: 2,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                        Text(l10n.contact, style: heading),
-                        const SizedBox(height: 10),
-                        Text(
-                            style: body,
-                            l10n.contactDescription),
-                      ],
+                  body: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(l10n.appTitle, style: heading),
+                          Text(l10n.currentVersion(version),
+                              style: TextStyle(
+                                  fontFamily: "Red Hat Display",
+                                  fontSize: 20,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondaryContainer)),
+                          const SizedBox(height: 20),
+                          Text(
+                              style: body,
+                              l10n.aboutDescription),
+                          Divider(
+                            height: 60.0,
+                            thickness: 2,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          Text(l10n.license, style: heading),
+                          const SizedBox(height: 10),
+                          Text(
+                              style: body,
+                              l10n.licenseDescription),
+                          Divider(
+                            height: 60.0,
+                            thickness: 2,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          Text(l10n.contact, style: heading),
+                          const SizedBox(height: 10),
+                          Text(
+                              style: body,
+                              l10n.contactDescription),
+                        ],
+                      ),
                     ),
                   ),
                 ),
