@@ -7,4 +7,5 @@ Die App verwendet das Material You-Design, um ein modernes und individuelles Nut
     <li>Anzeige des aktuellen Wetters (Temperatur, Wetterbedingungen) für die ausgewählte Stadt</li>
     <li>Dynamisches Material You-Thema, das sich automatisch an das Farbschema des Systems anpasst</li>
     <li>Umfangreiche Anpassungsmöglichkeiten in den Einstellungen</li>
+    <li>Homescreen-Widget welches die Farbe und die ausgewählte Stadt übernimmt und anzeigt</li>
 </ul>

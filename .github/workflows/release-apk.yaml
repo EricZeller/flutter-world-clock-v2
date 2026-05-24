@@ -103,7 +103,7 @@ jobs:
 
       - name: Upload APK to GitHub Release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           files: build/app/outputs/flutter-apk/worldclockv2_v${{ steps.version.outputs.version }}.apk
         env:

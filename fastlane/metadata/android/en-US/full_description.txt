@@ -7,4 +7,5 @@
     <li>Shows the current weather (temperature, weather conditions) for the selected city</li>
     <li>Dynamic Material You theme, adapts to the color scheme of the system</li>
     <li>Highly customizable settings</li>
+    <li>Homescreen Widget which uses the same Material color and displays the selected city</li>
 </ul>
