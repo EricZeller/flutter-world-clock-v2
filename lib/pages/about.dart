@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/data/data.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -95,8 +96,11 @@ class AboutPage extends StatelessWidget {
                     backgroundColor:
                         Theme.of(context).colorScheme.secondaryContainer,
                     leading: IconButton(
-                      icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.arrow_back, semanticLabel: l10n.ok),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   body: Padding(
