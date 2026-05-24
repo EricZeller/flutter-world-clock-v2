@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -233,6 +234,7 @@ class _LocationPageState extends State<LocationPage> {
                   PopupMenuButton<String>(
                     tooltip: "Sort the list",
                     onSelected: (sorting) {
+                      HapticFeedback.lightImpact();
                       // Hier kannst du die entsprechende Sortierlogik basierend auf dem ausgewählten Wert implementieren
                       sortCities(sorting);
                     },
@@ -241,7 +243,7 @@ class _LocationPageState extends State<LocationPage> {
                       PopupMenuItem<String>(
                         value: 'sortByCity',
                         child: ListTile(
-                          leading: const Icon(Icons.location_city_rounded),
+                          leading: Icon(Icons.location_city_rounded, semanticLabel: l10n.sortByCity),
                           title: Text(
                             l10n.sortByCity,
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -251,7 +253,7 @@ class _LocationPageState extends State<LocationPage> {
                       PopupMenuItem<String>(
                         value: 'sortByCountry',
                         child: ListTile(
-                          leading: const Icon(Icons.flag_rounded),
+                          leading: Icon(Icons.flag_rounded, semanticLabel: l10n.sortByCountry),
                           title: Text(
                             l10n.sortByCountry,
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -261,7 +263,7 @@ class _LocationPageState extends State<LocationPage> {
                       PopupMenuItem<String>(
                         value: 'sortByUtc',
                         child: ListTile(
-                          leading: const Icon(Icons.access_time_filled),
+                          leading: Icon(Icons.access_time_filled, semanticLabel: l10n.sortByUtc),
                           title: Text(
                             l10n.sortByUtc,
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -271,7 +273,7 @@ class _LocationPageState extends State<LocationPage> {
                       PopupMenuItem<String>(
                         value: 'sortByContinent',
                         child: ListTile(
-                          leading: const Icon(Icons.public),
+                          leading: Icon(Icons.public, semanticLabel: l10n.sortByContinent),
                           title: Text(
                             l10n.sortByContinent,
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -279,7 +281,7 @@ class _LocationPageState extends State<LocationPage> {
                         ),
                       ),
                     ],
-                    icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.onPrimaryContainer),
+                    icon: Icon(Icons.sort, color: Theme.of(context).colorScheme.onPrimaryContainer, semanticLabel: "Sort"),
                   ),
                 ],
                 centerTitle: true,
@@ -291,8 +293,9 @@ class _LocationPageState extends State<LocationPage> {
                             Theme.of(context).colorScheme.onPrimaryContainer)),
                 backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 leading: IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new),
+                  icon: Icon(Icons.arrow_back_ios_new, semanticLabel: l10n.ok),
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     Navigator.pop(context, _selectedOption);
                   },
                 ),
@@ -306,7 +309,7 @@ class _LocationPageState extends State<LocationPage> {
                       decoration: InputDecoration(
                         border: const OutlineInputBorder(),
                         labelText: l10n.searchHint(filteredCitiesCount),
-                        prefixIcon: const Icon(Icons.search),
+                        prefixIcon: Icon(Icons.search, semanticLabel: l10n.searchCity),
                       ),
                     ),
                   ),
@@ -319,6 +322,7 @@ class _LocationPageState extends State<LocationPage> {
                           value: _filteredCities[index],
                           groupValue: _selectedOption,
                           onChanged: (value) {
+                            HapticFeedback.lightImpact();
                             setState(() {
                               _selectedOption = value!;
                               _saveSelectedCity('selectedOption', value);
@@ -348,10 +352,13 @@ class _LocationPageState extends State<LocationPage> {
                 ],
               ),
               floatingActionButton: FloatingActionButton(
-                onPressed: () => Navigator.pop(context, _selectedOption),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.pop(context, _selectedOption);
+                },
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                child: const Icon(Icons.check),
+                child: Icon(Icons.check, semanticLabel: l10n.ok),
               ),
             ),
           );

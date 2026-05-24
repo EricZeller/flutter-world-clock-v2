@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -314,6 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: (String result) async {
+              HapticFeedback.lightImpact();
               switch (result) {
                 case 'settings':
                   await Navigator.pushNamed(
@@ -343,35 +345,35 @@ class _MyHomePageState extends State<MyHomePage> {
                 value: 'settings',
                 child: ListTile(
                   title: Text(l10n.settings),
-                  leading: const Icon(Icons.settings),
+                  leading: Icon(Icons.settings, semanticLabel: l10n.settings),
                 ),
               ),
               PopupMenuItem<String>(
                 value: 'changeCity',
                 child: ListTile(
                   title: Text(l10n.changeCity),
-                  leading: const Icon(Icons.edit_location_alt),
+                  leading: Icon(Icons.edit_location_alt, semanticLabel: l10n.changeCity),
                 ),
               ),
               PopupMenuItem<String>(
                 value: 'about',
                 child: ListTile(
                   title: Text(l10n.about),
-                  leading: const Icon(Icons.info),
+                  leading: Icon(Icons.info, semanticLabel: l10n.about),
                 ),
               ),
               PopupMenuItem<String>(
                 value: 'source_code',
                 child: ListTile(
                   title: Text(l10n.sourceCode),
-                  leading: const Icon(Icons.code),
+                  leading: Icon(Icons.code, semanticLabel: l10n.sourceCode),
                 ),
               ),
               PopupMenuItem<String>(
                 value: 'bug_report',
                 child: ListTile(
                   title: Text(l10n.reportBug),
-                  leading: const Icon(Icons.bug_report),
+                  leading: Icon(Icons.bug_report, semanticLabel: l10n.reportBug),
                 ),
               ),
             ],
@@ -473,6 +475,7 @@ class _MyHomePageState extends State<MyHomePage> {
             const SizedBox(height: 20),
             TextButton.icon(
               onPressed: () async {
+                HapticFeedback.lightImpact();
                 await Navigator.pushNamed(context, '/location');
                 getTimeZone();
               },
@@ -484,7 +487,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: Theme.of(context).colorScheme.primary),
               ),
               icon: Icon(Icons.edit_location_alt_outlined,
-                  color: Theme.of(context).colorScheme.primary),
+                  color: Theme.of(context).colorScheme.primary,
+                  semanticLabel: l10n.changeCity),
             ),
           ],
         ),
@@ -492,11 +496,14 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        onPressed: () => Navigator.pushNamed(
-          context,
-          '/settings',
-        ),
-        child: const Icon(Icons.settings),
+        onPressed: () {
+          HapticFeedback.lightImpact();
+          Navigator.pushNamed(
+            context,
+            '/settings',
+          );
+        },
+        child: Icon(Icons.settings, semanticLabel: l10n.settings),
       ),
     );
   }

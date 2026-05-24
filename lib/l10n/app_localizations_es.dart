@@ -9,7 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get appTitle => 'Reloj Mundial v2';
+  String get appTitle => 'World Clock v2';
 
   @override
   String get settings => 'Ajustes';
