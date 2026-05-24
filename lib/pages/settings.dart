@@ -1,5 +1,6 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/data/data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -181,8 +182,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icon(
                     Icons.arrow_back,
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    semanticLabel: l10n.ok,
                   ),
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     if (!checkChangedServer()) {
                       Navigator.pop(context);
                     } else {
@@ -205,10 +208,11 @@ class _SettingsPageState extends State<SettingsPage> {
                             ListTile(
                               title: Text(l10n.defaultTheme),
                               subtitle: Text(l10n.restartToApply),
-                              leading: const Icon(Icons.light_mode_outlined),
+                              leading: Icon(Icons.light_mode_outlined, semanticLabel: l10n.defaultTheme),
                               trailing: DropdownButton(
                                 value: dropdownValue,
                                 onChanged: (String? value) {
+                                  HapticFeedback.lightImpact();
                                   setState(() {
                                     dropdownValue = value!;
                                     spThemeMode = dropdownValue;
@@ -225,13 +229,14 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             ListTile(
-                              leading: const Icon(Icons.color_lens_outlined),
+                              leading: Icon(Icons.color_lens_outlined, semanticLabel: l10n.customMaterialColor),
                               title: Text(l10n.customMaterialColor),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: Provider.of<SettingsProvider>(context)
                                     .useCustomColor,
                                 onChanged: (bool value) {
+                                  HapticFeedback.lightImpact();
                                   Provider.of<SettingsProvider>(context,
                                           listen: false)
                                       .setUseCustomColor(value);
@@ -278,7 +283,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           children: [
                             ListTile(
                               title: Text(l10n.showSeconds),
-                              leading: const Icon(Icons.schedule),
+                              leading: Icon(Icons.schedule, semanticLabel: l10n.showSeconds),
                               subtitle: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -288,6 +293,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     thumbIcon: thumbIconGlobal,
                                     value: showSeconds,
                                     onChanged: (bool value) {
+                                      HapticFeedback.lightImpact();
                                       setState(() {
                                         showSeconds = value;
                                       });
@@ -300,6 +306,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     thumbIcon: thumbIconLocal,
                                     value: showSecondsLocal,
                                     onChanged: (bool value) {
+                                      HapticFeedback.lightImpact();
                                       setState(() {
                                         showSecondsLocal = value;
                                       });
@@ -311,12 +318,13 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             ListTile(
-                              leading: const Icon(Icons.travel_explore),
+                              leading: Icon(Icons.travel_explore, semanticLabel: l10n.use24hrFormat),
                               title: Text(l10n.use24hrFormat),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: sp24hr,
                                 onChanged: (bool value) {
+                                  HapticFeedback.lightImpact();
                                   setState(() {
                                     sp24hr = value;
                                   });
@@ -325,12 +333,13 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             ListTile(
-                              leading: const Icon(Icons.thermostat),
+                              leading: Icon(Icons.thermostat, semanticLabel: l10n.useFahrenheit),
                               title: Text(l10n.useFahrenheit),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: useFahrenheit,
                                 onChanged: (bool value) {
+                                  HapticFeedback.lightImpact();
                                   setState(() {
                                     useFahrenheit = value;
                                   });
@@ -340,13 +349,14 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                             ),
                             ListTile(
-                              leading: const Icon(Icons.info_outline),
+                              leading: Icon(Icons.info_outline, semanticLabel: l10n.displayMoreInfo),
                               title:
                                   Text(l10n.displayMoreInfo),
                               trailing: Switch(
                                 thumbIcon: thumbIcon,
                                 value: spMoreInfo,
                                 onChanged: (bool value) {
+                                  HapticFeedback.lightImpact();
                                   setState(() {
                                     spMoreInfo = value;
                                   });
@@ -367,13 +377,14 @@ class _SettingsPageState extends State<SettingsPage> {
                           child: Column(
                             children: [
                               ListTile(
-                                leading: const Icon(Icons.link),
+                                leading: Icon(Icons.link, semanticLabel: l10n.setWttrServer),
                                 title: TextField(
                                   controller: _urlController,
                                   keyboardType: TextInputType.url,
                                   decoration: InputDecoration(
                                     suffixIcon: IconButton(
                                       onPressed: () {
+                                        HapticFeedback.mediumImpact();
                                         setState(() {
                                           wttrServer = "https://wttr.in";
                                           _urlController.text =
@@ -420,6 +431,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     }
                                   },
                                   onSubmitted: (value) {
+                                    HapticFeedback.lightImpact();
                                     _saveUrl(l10n);
                                   },
                                 ),
@@ -429,8 +441,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                   child: IconButton(
                                     color:
                                         Theme.of(context).colorScheme.onPrimary,
-                                    icon: const Icon(Icons.save_outlined),
-                                    onPressed: () => _saveUrl(l10n),
+                                    icon: Icon(Icons.save_outlined, semanticLabel: l10n.urlSaved),
+                                    onPressed: () {
+                                      HapticFeedback.lightImpact();
+                                      _saveUrl(l10n);
+                                    },
                                   ),
                                 ),
                               ),
@@ -448,6 +463,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Theme.of(context).colorScheme.onPrimary,
                 onPressed: () {
+                  HapticFeedback.lightImpact();
                   if (!checkChangedServer()) {
                     Navigator.pop(context);
                   } else {
@@ -455,7 +471,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         l10n.saveChangesPrompt);
                   }
                 },
-                child: const Icon(Icons.check),
+                child: Icon(Icons.check, semanticLabel: l10n.ok),
               ),
             ),
           );
