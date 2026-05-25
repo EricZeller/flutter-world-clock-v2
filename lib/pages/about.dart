@@ -2,8 +2,6 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:world_clock_v2/data/data.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:yaml/yaml.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';

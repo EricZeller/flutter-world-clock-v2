@@ -18,7 +18,7 @@ class SettingsProvider extends ChangeNotifier {
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final colorValue = prefs.getInt('customColor') ?? Colors.indigo.value;
+    final colorValue = prefs.getInt('customColor') ?? Colors.indigo.toARGB32();
     _customColor = Color(colorValue);
     _useCustomColor = prefs.getBool('useCustomColor') ?? false;
     _widgetOpacity = prefs.getDouble('widgetOpacity') ?? 0.8;
@@ -31,7 +31,7 @@ class SettingsProvider extends ChangeNotifier {
     _customColor = color;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('customColor', color.value);
+    await prefs.setInt('customColor', color.toARGB32());
   }
 
   Future<void> setUseCustomColor(bool value) async {

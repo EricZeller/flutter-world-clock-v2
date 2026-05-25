@@ -123,7 +123,7 @@ class _WidgetMockup extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 300),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: colorScheme.primaryContainer.withOpacity(opacity),
+        color: colorScheme.primaryContainer.withValues(alpha: opacity),
         borderRadius: BorderRadius.circular(24),
       ),
       child: layout == 'detailed'
