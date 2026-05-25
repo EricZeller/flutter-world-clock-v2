@@ -12,6 +12,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:world_clock_v2/pages/settings.dart';
 import 'package:world_clock_v2/pages/location.dart';
 import 'package:world_clock_v2/pages/about.dart';
+import 'package:world_clock_v2/pages/widget_settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:world_clock_v2/data/data.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
               '/home': (context) => const MyHomePage(),
               '/about': (context) => const AboutPage(),
               '/settings': (context) => const SettingsPage(),
+              '/widget_settings': (context) => const WidgetSettingsPage(),
               '/location': (context) =>
                   const LocationPage(),
             },
@@ -146,6 +148,8 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       if (cityName == null) return;
       
+      final settings = Provider.of<SettingsProvider>(context, listen: false);
+      
       // Get colors from Theme
       final colorScheme = Theme.of(context).colorScheme;
       final bgColor = _colorToHex(colorScheme.primaryContainer);
@@ -160,6 +164,10 @@ class _MyHomePageState extends State<MyHomePage> {
       await HomeWidget.saveWidgetData<String>('bgColor', bgColor);
       await HomeWidget.saveWidgetData<String>('primaryColor', primaryColor);
       await HomeWidget.saveWidgetData<String>('secondaryColor', secondaryColor);
+      
+      // New Widget Settings
+      await HomeWidget.saveWidgetData<double>('widgetOpacity', settings.widgetOpacity);
+      await HomeWidget.saveWidgetData<String>('widgetLayout', settings.widgetLayout);
 
       // Tiny delay to ensure SharedPreferences are flushed to disk
       await Future.delayed(const Duration(milliseconds: 100));

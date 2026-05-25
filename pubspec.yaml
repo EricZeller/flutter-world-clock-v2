@@ -39,17 +39,17 @@ dependencies:
   cupertino_icons: ^1.0.6
   dynamic_color: ^1.7.0
   intl: ^0.20.0
-  timezone: ^0.10.0
+  timezone: ^0.11.0
   http: ^1.2.1
   shared_preferences: ^2.2.3
   provider: ^6.1.2
   url_launcher: ^6.2.6
-  package_info_plus: ^9.0.0
+  package_info_plus: ^10.1.0
   yaml: ^3.1.2
   flutter_native_splash: ^2.4.0
   sqflite: ^2.3.3+1
   colornames: ^0.2.0
-  home_widget: 0.6.0
+  home_widget: ^0.9.2
 
 dev_dependencies:
   flutter_test:
@@ -80,7 +80,7 @@ flutter_launcher_icons:
     theme_color: "#336699"
 
 flutter_native_splash:
-  color: "#042c4d"
+  color: "#0061A4"
   branding: assets/branding.png
   image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png  
   background_image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_background.png
@@ -90,8 +90,8 @@ flutter_native_splash:
   android_12:
     image: assets/IconKitchen-Output/android/res/mipmap-xxxhdpi/ic_launcher_foreground.png
     branding: assets/branding2.png
-    color: "#0aaea6"
-    color_dark: "#07497e"
+    color: "#0061A4"
+    color_dark: "#141218"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

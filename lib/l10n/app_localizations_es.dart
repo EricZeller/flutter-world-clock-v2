@@ -94,6 +94,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get displayMoreInfo => 'Más info en pantalla de inicio';
 
   @override
+  String get widgetSettings => 'Ajustes del widget';
+
+  @override
+  String get widgetPreview => 'Vista previa';
+
+  @override
+  String get widgetLayout => 'Diseño';
+
+  @override
+  String get layoutDetailed => 'Detallado';
+
+  @override
+  String get layoutCompact => 'Compacto';
+
+  @override
   String get widgetTransparency => 'Transparencia del widget';
 
   @override

@@ -6,6 +6,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
 
@@ -27,17 +28,34 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 val weather = data.getString("weather", "Loading...")
                 val timeZone = data.getString("timeZone", "Europe/Berlin")
 
+                // Settings
+                val widgetOpacity = data.getFloat("widgetOpacity", 0.8f)
+                val widgetLayout = data.getString("widgetLayout", "detailed")
+
                 // Colors
-                val bgColor = data.getString("bgColor", "#042c4d")
+                val bgColorStr = data.getString("bgColor", "#042c4d")
                 val primaryColor = data.getString("primaryColor", "#FFFFFF")
                 val secondaryColor = data.getString("secondaryColor", "#0aaea6")
 
                 setTextViewText(R.id.widget_city, city)
                 setTextViewText(R.id.widget_weather, weather)
                 
-                // Apply colors
+                // Apply layout logic
+                if (widgetLayout == "compact") {
+                    setViewVisibility(R.id.widget_weather, View.GONE)
+                    setViewVisibility(R.id.widget_date, View.GONE)
+                } else {
+                    setViewVisibility(R.id.widget_weather, View.VISIBLE)
+                    setViewVisibility(R.id.widget_date, View.VISIBLE)
+                }
+
+                // Apply colors and transparency
                 try {
-                    setInt(R.id.widget_background_view, "setColorFilter", Color.parseColor(bgColor))
+                    val baseColor = Color.parseColor(bgColorStr)
+                    val alpha = (widgetOpacity * 255).toInt()
+                    val transparentColor = Color.argb(alpha, Color.red(baseColor), Color.green(baseColor), Color.blue(baseColor))
+                    
+                    setInt(R.id.widget_background_view, "setColorFilter", transparentColor)
                     setTextColor(R.id.widget_time, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_date, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_weather, Color.parseColor(primaryColor))
