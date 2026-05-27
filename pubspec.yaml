@@ -19,8 +19,8 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.7.1+23
 
 environment:
-  sdk: ">=3.12.0 <4.0.0"
-  flutter: ^3.44.0
+  sdk: ">=3.4.1 <4.0.0"
+  flutter: ^3.35.6
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -39,7 +39,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   dynamic_color: ^1.7.0
   intl: ^0.20.0
-  timezone: ^0.11.0
+  timezone: ^0.10.1
   http: ^1.2.1
   shared_preferences: ^2.2.3
   provider: ^6.1.2
