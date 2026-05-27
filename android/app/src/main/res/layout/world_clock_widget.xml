@@ -63,7 +63,7 @@
                 android:format12Hour="hh:mm"
                 android:format24Hour="HH:mm"
                 android:textColor="#FFFFFF"
-                android:textSize="31sp"
+                android:textSize="32sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/red_hat_display"
                 android:includeFontPadding="false"
@@ -121,7 +121,7 @@
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_weight="1"
-            android:scaleType="fitCenter"
+            android:scaleType="fitStart"
             android:adjustViewBounds="false" />
 
         <TextClock

@@ -125,7 +125,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
         val typeface = ResourcesCompat.getFont(context, R.font.pacifico)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = color
-            textSize = 60f
+            textSize = 70f
             this.typeface = typeface
         }
         val value = text.ifBlank { "Berlin" }
