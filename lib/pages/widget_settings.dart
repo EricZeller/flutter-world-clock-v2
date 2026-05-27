@@ -30,10 +30,15 @@ class WidgetSettingsPage extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Colors.blueGrey.shade900,
-                    Colors.blueGrey.shade700,
-                  ],
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? [
+                          Colors.blueGrey.shade900,
+                          Colors.blueGrey.shade700,
+                        ]
+                      : [
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                          Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                        ],
                 ),
               ),
               child: Column(
@@ -159,7 +164,7 @@ class _WidgetMockup extends StatelessWidget {
                       "Berlin",
                       style: TextStyle(
                         fontFamily: 'Pacifico',
-                        fontSize: 18,
+                        fontSize: 22,
                         color: colorScheme.onPrimaryContainer,
                       ),
                     ),

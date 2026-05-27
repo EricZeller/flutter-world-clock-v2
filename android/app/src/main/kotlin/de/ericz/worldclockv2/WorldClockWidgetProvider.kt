@@ -30,6 +30,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.world_clock_widget).apply {
                 val city = data.getString("city", "Berlin")
                 val weather = data.getString("weather", "Loading...")
+                val weatherIcon = data.getString("weather_icon", "☀️")
                 val timeZone = data.getString("timeZone", "Europe/Berlin")
 
                 // Settings
@@ -42,6 +43,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 val secondaryColor = data.getString("secondaryColor", "#0aaea6")
 
                 setTextViewText(R.id.widget_weather, weather)
+                setTextViewText(R.id.widget_weather_icon, weatherIcon)
                 
                 // Apply layout logic
                 if (widgetLayout == "compact") {
