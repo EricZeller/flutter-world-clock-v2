@@ -1,0 +1,75 @@
+{
+  "@@locale": "fr",
+  "appTitle": "Horloge Mondiale v2",
+  "settings": "Paramètres",
+  "about": "À propos",
+  "changeCity": "Changer de ville",
+  "sourceCode": "Code source",
+  "reportBug": "Signaler un bug",
+  "localTime": "Heure locale : {time}",
+  "@localTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "loading": "Chargement...",
+  "weatherLoading": "🛰️ Chargement...",
+  "connectionError": "🛜 Erreur de connexion",
+  "apiError": "🛜 Impossible de se connecter à l'API",
+  "searchCity": "Rechercher une ville",
+  "chooseCity": "Choisir une ville",
+  "aboutThisApp": "À propos de cette application",
+  "license": "Licence",
+  "contact": "Contact",
+  "currentVersion": "Version actuelle : v{version}",
+  "@currentVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "defaultTheme": "Thème par défaut",
+  "restartToApply": "Redémarrer l'application pour appliquer",
+  "customMaterialColor": "Couleur Material personnalisée",
+  "selectColor": "Sélectionner la couleur",
+  "showSeconds": "Afficher les secondes",
+  "worldClock": "Horloge mondiale",
+  "local": "Locale",
+  "use24hrFormat": "Utiliser le format 24h",
+  "useFahrenheit": "Utiliser °F",
+  "displayMoreInfo": "Plus d'infos sur l'écran d'accueil",
+  "widgetSettings": "Paramètres du Widget",
+  "widgetPreview": "Aperçu",
+  "widgetLayout": "Disposition",
+  "layoutDetailed": "Détaillé",
+  "layoutCompact": "Compact",
+  "widgetTransparency": "Transparence du widget",
+  "setWttrServer": "Définir son propre serveur wttr.in",
+  "invalidUrl": "URL invalide",
+  "urlSaved": "URL enregistrée",
+  "urlRestored": "URL restaurée et enregistrée",
+  "noChanges": "Aucun changement à enregistrer",
+  "unsavedChanges": "Changements non enregistrés",
+  "saveChangesPrompt": "Veuillez enregistrer les modifications apportées au serveur wttr.in",
+  "apiUpdateNotice": "L'API se mettra à jour dans un maximum de 30 secondes.",
+  "serverSuccessNotice": "Serveur wttr.in configuré. \nVeuillez vérifier l'écran d'accueil pour vous assurer que le nouveau serveur fonctionne correctement. \nL'API se mettra à jour dans un maximum de 30 secondes.",
+  "ok": "OK",
+  "aboutDescription": "Horloge Mondiale est une application Flutter qui affiche l'heure et la météo actuelles pour diverses villes. L'application utilise le thème Material You pour offrir une expérience utilisateur moderne et personnalisable.\nConsultez les nombreux paramètres pour une expérience encore plus personnalisée.",
+  "licenseDescription": "Cette application est sous licence GNU GPL 3.0. Pour plus de détails, consultez le fichier LICENSE dans le dépôt.",
+  "contactDescription": "Si vous avez des questions ou des suggestions, n'hésitez pas à me contacter via GitHub ou à ouvrir un ticket sur le dépôt de cette application.",
+  "sortByCity": "Trier par ville",
+  "sortByCountry": "Trier par pays",
+  "sortByUtc": "Trier par fuseau horaire UTC",
+  "sortByContinent": "Trier par continent/région",
+  "searchHint": "Rechercher une ville ou un pays ({count} trouvés)",
+  "@searchHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}
