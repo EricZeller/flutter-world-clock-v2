@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
@@ -67,6 +68,10 @@ class WidgetSettingsPage extends StatelessWidget {
                     max: 1.0,
                     onChanged: (value) {
                       settings.setWidgetOpacity(value);
+                      _updateAndroidWidgetSettings(
+                        opacity: value,
+                        layout: settings.widgetLayout,
+                      );
                     },
                   ),
                   const SizedBox(height: 24),
@@ -92,7 +97,12 @@ class WidgetSettingsPage extends StatelessWidget {
                     ],
                     selected: {settings.widgetLayout},
                     onSelectionChanged: (newSelection) {
-                      settings.setWidgetLayout(newSelection.first);
+                      final layout = newSelection.first;
+                      settings.setWidgetLayout(layout);
+                      _updateAndroidWidgetSettings(
+                        opacity: settings.widgetOpacity,
+                        layout: layout,
+                      );
                     },
                   ),
                 ],
@@ -101,6 +111,18 @@ class WidgetSettingsPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _updateAndroidWidgetSettings({
+    required double opacity,
+    required String layout,
+  }) async {
+    await HomeWidget.saveWidgetData<String>('widgetOpacity', opacity.toString());
+    await HomeWidget.saveWidgetData<String>('widgetLayout', layout);
+    await HomeWidget.updateWidget(
+      name: 'WorldClockWidgetProvider',
+      androidName: 'WorldClockWidgetProvider',
     );
   }
 }
@@ -152,6 +174,7 @@ class _WidgetMockup extends StatelessWidget {
                     Text(
                       timeStr,
                       style: TextStyle(
+                        fontFamily: 'Red Hat Display',
                         fontSize: 48,
                         fontWeight: FontWeight.bold,
                         color: colorScheme.onPrimaryContainer,
@@ -162,8 +185,9 @@ class _WidgetMockup extends StatelessWidget {
                       child: Text(
                         dateStr,
                         style: TextStyle(
+                          fontFamily: 'Red Hat Display',
                           fontSize: 14,
-                          color: colorScheme.onPrimaryContainer.withOpacity(0.8),
+                          color: colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                         ),
                       ),
                     ),
@@ -185,6 +209,7 @@ class _WidgetMockup extends StatelessWidget {
                 Text(
                   timeStr,
                   style: TextStyle(
+                    fontFamily: 'Red Hat Display',
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onPrimaryContainer,

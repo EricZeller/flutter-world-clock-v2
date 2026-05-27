@@ -8,56 +8,67 @@
         android:id="@+id/widget_background_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/widget_background_white"
-        android:scaleType="fitXY" />
-
-    <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_gravity="top|right"
-        android:layout_marginTop="6dp"
-        android:layout_marginRight="6dp"
-        android:src="@mipmap/ic_launcher_foreground"
-        android:alpha="0.6" />
+        android:src="@drawable/widget_background"
+        android:scaleType="fitXY"
+        android:alpha="0.8" />
 
     <LinearLayout
+        android:id="@+id/widget_detailed_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="18dp"
         android:paddingRight="18dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:id="@+id/widget_city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Berlin"
-            android:textColor="#0aaea6"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif-condensed-medium"
-            android:textAllCaps="true"
-            android:letterSpacing="0.2"
-            android:layout_marginBottom="1dp" />
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
-            <TextClock
-                android:id="@+id/widget_time"
+            <ImageView
+                android:id="@+id/widget_city"
+                android:layout_width="0dp"
+                android:layout_height="32dp"
+                android:layout_weight="1"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="false" />
+
+            <TextView
+                android:id="@+id/widget_weather_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="☀"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:fontFamily="sans-serif-medium" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_marginTop="2dp">
+
+            <TextClock
+                android:id="@+id/widget_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:format12Hour="hh:mm"
                 android:format24Hour="HH:mm"
                 android:textColor="#FFFFFF"
-                android:textSize="40sp"
-                android:fontFamily="sans-serif-medium"
+                android:textSize="31sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/red_hat_display"
                 android:includeFontPadding="false"
+                android:singleLine="true"
+                android:maxLines="1"
                 android:shadowColor="#20000000"
                 android:shadowDx="1"
                 android:shadowDy="1"
@@ -67,15 +78,17 @@
                 android:id="@+id/widget_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:format12Hour="EEE\nd. MMM"
-                android:format24Hour="EEE\nd. MMM"
+                android:format12Hour="EEE, d. MMM"
+                android:format24Hour="EEE, d. MMM"
                 android:textColor="#FFFFFF"
-                android:textSize="10sp"
-                android:fontFamily="sans-serif-condensed"
-                android:textAllCaps="true"
-                android:lineSpacingMultiplier="0.9"
+                android:textSize="12sp"
+                android:fontFamily="@font/red_hat_display"
                 android:alpha="0.9"
-                android:layout_marginLeft="12dp" />
+                android:gravity="right"
+                android:singleLine="true"
+                android:layout_marginLeft="12dp"
+                android:layout_marginBottom="5dp"
+                android:includeFontPadding="false" />
 
         </LinearLayout>
 
@@ -86,8 +99,45 @@
             android:text="☀️ 20°C"
             android:textColor="#FFFFFF"
             android:textSize="11sp"
-            android:fontFamily="sans-serif-light"
-            android:layout_marginTop="-1dp" />
+            android:fontFamily="@font/red_hat_display"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_compact_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="18dp"
+        android:paddingRight="18dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/widget_city_compact"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="false" />
+
+        <TextClock
+            android:id="@+id/widget_time_compact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:format12Hour="hh:mm"
+            android:format24Hour="HH:mm"
+            android:textColor="#FFFFFF"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/red_hat_display"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:maxLines="1"
+            android:layout_marginLeft="12dp" />
 
     </LinearLayout>
 
