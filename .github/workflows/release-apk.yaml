@@ -59,15 +59,17 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Rename APK with version and source
+        id: rename_apk  # ID hinzugefügt, für zugriff unten
         run: |
           VERSION=${{ steps.version.outputs.version }}
           
           if [[ "${{ github.event_name }}" == "push" ]]; then
             SHORT_SHA=$(git rev-parse --short=7 HEAD)
             DATE=$(date +'%Y%m%d')
-            APK_NAME="worldclockv2_v${VERSION}_${DATE}_${SHORT_SHA}.apk"
+            APK_NAME="worldclockv2_v${VERSION}_${DATE}_${SHORT_SHA}_android_arm64.apk"
           else
-            APK_NAME="worldclockv2_v${VERSION}.apk"
+            # Das wird bei einem echten Release (für IzzyOnDroid) genutzt:
+            APK_NAME="worldclockv2_v${VERSION}_android_arm64.apk"
           fi
           
           mv build/app/outputs/flutter-apk/app-release.apk \
@@ -76,6 +78,7 @@ jobs:
           echo "apk_name=${APK_NAME}" >> $GITHUB_OUTPUT
 
       - name: Rename App Bundle with version and source
+        id: rename_aab  # ID hinzugefügt
         run: |
           VERSION=${{ steps.version.outputs.version }}
           
@@ -105,14 +108,14 @@ jobs:
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v3
         with:
-          files: build/app/outputs/flutter-apk/worldclockv2_v${{ steps.version.outputs.version }}android_arm64.apk
+          files: build/app/outputs/flutter-apk/${{ steps.rename_apk.outputs.apk_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload App Bundle to GitHub Release
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
-          files: build/app/outputs/bundle/release/worldclockv2_v${{ steps.version.outputs.version }}.aab
+          files: build/app/outputs/bundle/release/${{ steps.rename_aab.outputs.aab_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
