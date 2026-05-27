@@ -262,6 +262,36 @@ abstract class AppLocalizations {
   /// **'Display more info on homescreen'**
   String get displayMoreInfo;
 
+  /// No description provided for @widgetSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Widget Settings'**
+  String get widgetSettings;
+
+  /// No description provided for @widgetPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get widgetPreview;
+
+  /// No description provided for @widgetLayout.
+  ///
+  /// In en, this message translates to:
+  /// **'Layout'**
+  String get widgetLayout;
+
+  /// No description provided for @layoutDetailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed'**
+  String get layoutDetailed;
+
+  /// No description provided for @layoutCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get layoutCompact;
+
   /// No description provided for @widgetTransparency.
   ///
   /// In en, this message translates to:

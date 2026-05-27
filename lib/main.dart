@@ -12,6 +12,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:world_clock_v2/pages/settings.dart';
 import 'package:world_clock_v2/pages/location.dart';
 import 'package:world_clock_v2/pages/about.dart';
+import 'package:world_clock_v2/pages/widget_settings.dart';
 import 'package:http/http.dart' as http;
 import 'package:world_clock_v2/data/data.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
               '/home': (context) => const MyHomePage(),
               '/about': (context) => const AboutPage(),
               '/settings': (context) => const SettingsPage(),
+              '/widget_settings': (context) => const WidgetSettingsPage(),
               '/location': (context) =>
                   const LocationPage(),
             },
@@ -146,6 +148,8 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       if (cityName == null) return;
       
+      final settings = Provider.of<SettingsProvider>(context, listen: false);
+      
       // Get colors from Theme
       final colorScheme = Theme.of(context).colorScheme;
       final bgColor = _colorToHex(colorScheme.primaryContainer);
@@ -156,10 +160,28 @@ class _MyHomePageState extends State<MyHomePage> {
       // are processed correctly by the plugin before triggering the update.
       await HomeWidget.saveWidgetData<String>('city', cityName);
       await HomeWidget.saveWidgetData<String>('weather', _weather);
+
+      // Extract emoji from weather report (it's at the very beginning)
+      String weatherIcon = "☀️";
+      if (_weather.isNotEmpty) {
+        final parts = _weather.trim().split(' ');
+        if (parts.isNotEmpty) {
+          weatherIcon = parts[0];
+        }
+      }
+      await HomeWidget.saveWidgetData<String>('weather_icon', weatherIcon);
+
       await HomeWidget.saveWidgetData<String>('timeZone', timeZone);
       await HomeWidget.saveWidgetData<String>('bgColor', bgColor);
       await HomeWidget.saveWidgetData<String>('primaryColor', primaryColor);
       await HomeWidget.saveWidgetData<String>('secondaryColor', secondaryColor);
+      
+      // New Widget Settings
+      await HomeWidget.saveWidgetData<String>(
+        'widgetOpacity',
+        settings.widgetOpacity.toString(),
+      );
+      await HomeWidget.saveWidgetData<String>('widgetLayout', settings.widgetLayout);
 
       // Tiny delay to ensure SharedPreferences are flushed to disk
       await Future.delayed(const Duration(milliseconds: 100));
@@ -215,7 +237,8 @@ class _MyHomePageState extends State<MyHomePage> {
     getThemeModePreference();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        if (secondsElapsed == 30) {
+        // Update weather every 15 minutes (900 seconds)
+        if (secondsElapsed >= 900) {
           getWeather(cityWeatherZone);
           secondsElapsed = 0;
         } else {
@@ -271,8 +294,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getWeather(weatherZone) async {
-    final l10n = AppLocalizations.of(context)!;
-    _weather = l10n.weatherLoading;
     String requestURL;
     final prefs = await SharedPreferences.getInstance();
     if (prefs.getString('wttrServer') != null) {
@@ -290,19 +311,9 @@ class _MyHomePageState extends State<MyHomePage> {
           _weather = response.body;
           _updateHomeWidget();
         });
-      } else {
-        setState(() {
-          _weather = l10n.apiError;
-          _updateHomeWidget();
-        });
       }
     } catch (e) {
-      if (mounted) {
-        setState(() {
-          _weather = l10n.connectionError;
-          _updateHomeWidget();
-        });
-      }
+      // Keep existing weather on error
     }
   }
 

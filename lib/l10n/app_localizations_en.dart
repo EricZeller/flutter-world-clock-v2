@@ -94,6 +94,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displayMoreInfo => 'Display more info on homescreen';
 
   @override
+  String get widgetSettings => 'Widget Settings';
+
+  @override
+  String get widgetPreview => 'Preview';
+
+  @override
+  String get widgetLayout => 'Layout';
+
+  @override
+  String get layoutDetailed => 'Detailed';
+
+  @override
+  String get layoutCompact => 'Compact';
+
+  @override
   String get widgetTransparency => 'Widget transparency';
 
   @override

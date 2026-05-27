@@ -94,6 +94,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get displayMoreInfo => 'Mehr Infos auf Startbildschirm';
 
   @override
+  String get widgetSettings => 'Widget-Einstellungen';
+
+  @override
+  String get widgetPreview => 'Vorschau';
+
+  @override
+  String get widgetLayout => 'Layout';
+
+  @override
+  String get layoutDetailed => 'Detailliert';
+
+  @override
+  String get layoutCompact => 'Kompakt';
+
+  @override
   String get widgetTransparency => 'Widget Transparenz';
 
   @override

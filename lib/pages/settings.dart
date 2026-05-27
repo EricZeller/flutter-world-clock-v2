@@ -279,6 +279,20 @@ class _SettingsPageState extends State<SettingsPage> {
                       Card(
                         elevation: 40,
                         shadowColor: Theme.of(context).colorScheme.primary,
+                        child: ListTile(
+                          leading: const Icon(Icons.widgets_outlined),
+                          title: Text(l10n.widgetSettings),
+                          trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.pushNamed(context, '/widget_settings');
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12.0),
+                      Card(
+                        elevation: 40,
+                        shadowColor: Theme.of(context).colorScheme.primary,
                         child: Column(
                           children: [
                             ListTile(
