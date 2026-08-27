@@ -44,3 +44,9 @@ app.*.map.json
 .idx/dev.nix
 fastlane/metadata/android/en-US/description_test.md
 installers/macos/*.dmg
+
+# FVM Version Cache
+.fvm/
+.fvm-cache/
+.xdg-config/
+.android-user/
