@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get Flutter version from pubspec.yaml
         id: flutter_version
@@ -53,7 +53,7 @@ jobs:
         run: flutter build apk --release
 
       - name: Upload APK artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: worldclockv2-apks-${{ github.run_number }}
           path: |
