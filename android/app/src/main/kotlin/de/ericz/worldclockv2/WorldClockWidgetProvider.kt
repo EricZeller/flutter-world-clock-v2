@@ -36,6 +36,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 // Settings
                 val widgetOpacity = getFloatPreference(data, "widgetOpacity", 0.8f)
                 val widgetLayout = data.getString("widgetLayout", "detailed")
+                val use24Hour = getBooleanPreference(data, "use24hr", true)
 
                 // Colors
                 val bgColorStr = data.getString("bgColor", "#042c4d")
@@ -94,6 +95,14 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                     setString(R.id.widget_date, "setTimeZone", timeZone)
                 }
 
+                // TextClock otherwise follows the device's 12/24-hour setting.
+                // Set both formats so the app's setting is authoritative.
+                val timeFormat = if (use24Hour) "HH:mm" else "hh:mm a"
+                setCharSequence(R.id.widget_time, "setFormat12Hour", timeFormat)
+                setCharSequence(R.id.widget_time, "setFormat24Hour", timeFormat)
+                setCharSequence(R.id.widget_time_compact, "setFormat12Hour", timeFormat)
+                setCharSequence(R.id.widget_time_compact, "setFormat24Hour", timeFormat)
+
                 // Click to open app
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
                 val pendingIntent = PendingIntent.getActivity(
@@ -121,6 +130,18 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
             is String -> value.toFloatOrNull() ?: defaultValue
             else -> defaultValue
         }.coerceIn(0.1f, 1f)
+    }
+
+    private fun getBooleanPreference(
+        data: android.content.SharedPreferences,
+        key: String,
+        defaultValue: Boolean
+    ): Boolean {
+        return when (val value = data.all[key]) {
+            is Boolean -> value
+            is String -> value.toBooleanStrictOrNull() ?: defaultValue
+            else -> defaultValue
+        }
     }
 
     private fun createPacificoText(context: Context, text: String, color: Int): Bitmap {

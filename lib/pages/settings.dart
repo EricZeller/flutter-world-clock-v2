@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:colornames/colornames.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
+import 'package:home_widget/home_widget.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -31,6 +32,18 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _saveBoolValue(String key, bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(key, value);
+  }
+
+  Future<void> _updateWidgetTimeFormat(bool use24Hour) async {
+    try {
+      await HomeWidget.saveWidgetData<bool>('use24hr', use24Hour);
+      await HomeWidget.updateWidget(
+        name: 'WorldClockWidgetProvider',
+        androidName: 'WorldClockWidgetProvider',
+      );
+    } catch (_) {
+      // Updating the widget must not prevent saving the app setting.
+    }
   }
 
   Future<void> saveColor(Color color) async {
@@ -343,6 +356,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     sp24hr = value;
                                   });
                                   _saveBoolValue("use24hr", sp24hr);
+                                  _updateWidgetTimeFormat(sp24hr);
                                 },
                               ),
                             ),
