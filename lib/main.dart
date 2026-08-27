@@ -182,6 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
         settings.widgetOpacity.toString(),
       );
       await HomeWidget.saveWidgetData<String>('widgetLayout', settings.widgetLayout);
+      await HomeWidget.saveWidgetData<bool>('use24hr', sp24hr);
 
       // Tiny delay to ensure SharedPreferences are flushed to disk
       await Future.delayed(const Duration(milliseconds: 100));
