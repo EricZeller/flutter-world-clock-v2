@@ -294,6 +294,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return "Local time: ${formatter.format(now)}";
   }
 
+  String getTimeDifference() {
+    final cityOffset = tz.TZDateTime.now(
+      tz.getLocation(timeZone!),
+    ).timeZoneOffset;
+    final localOffset = DateTime.now().timeZoneOffset;
+    final difference = cityOffset - localOffset;
+    final totalMinutes = difference.inMinutes;
+    final sign = totalMinutes < 0 ? '-' : '+';
+    final absoluteMinutes = totalMinutes.abs();
+    final hours = (absoluteMinutes ~/ 60).toString().padLeft(2, '0');
+    final minutes = (absoluteMinutes % 60).toString().padLeft(2, '0');
+    return '$sign$hours:$minutes';
+  }
+
   Future<void> getWeather(weatherZone) async {
     String requestURL;
     final prefs = await SharedPreferences.getInstance();
@@ -472,8 +486,10 @@ class _MyHomePageState extends State<MyHomePage> {
               endIndent: 30,
               color: Theme.of(context).colorScheme.primary,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
               children: [
                 Text(
                   l10n.localTime(getLocalTime().replaceAll("Local time: ", "")),
@@ -481,6 +497,15 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontSize: 30.0,
                       fontFamily: "Red Hat Display",
                       color: Theme.of(context).colorScheme.primary),
+                ),
+                Tooltip(
+                  message: 'Difference to local time',
+                  child: Chip(
+                    avatar: const Icon(Icons.compare_arrows, size: 18),
+                    label: Text('Δ ${getTimeDifference()}'),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
               ],
             ),
