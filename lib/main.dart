@@ -500,11 +500,29 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Tooltip(
                   message: 'Difference to local time',
-                  child: Chip(
-                    avatar: const Icon(Icons.compare_arrows, size: 18),
-                    label: Text('Δ ${getTimeDifference()}'),
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.zero,
+                  child: AssistChip(
+                    avatar: Icon(
+                      Icons.compare_arrows_rounded,
+                      size: 18,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    label: Text(
+                      'Δ ${getTimeDifference()}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    backgroundColor:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    visualDensity: VisualDensity.standard,
                   ),
                 ),
               ],
