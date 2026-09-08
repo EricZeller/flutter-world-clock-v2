@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Get version from pubspec.yaml
         id: version
@@ -30,6 +30,17 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Setup Java & Gradle Cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
       - name: Decode keystore
         run: |
@@ -59,7 +70,7 @@ jobs:
         run: flutter build appbundle --release
 
       - name: Rename APK with version and source
-        id: rename_apk  # ID hinzugefügt, für zugriff unten
+        id: rename_apk
         run: |
           VERSION=${{ steps.version.outputs.version }}
           
@@ -68,7 +79,6 @@ jobs:
             DATE=$(date +'%Y%m%d')
             APK_NAME="worldclockv2_v${VERSION}_${DATE}_${SHORT_SHA}_android_arm64.apk"
           else
-            # Das wird bei einem echten Release (für IzzyOnDroid) genutzt:
             APK_NAME="worldclockv2_v${VERSION}_android_arm64.apk"
           fi
           
@@ -78,7 +88,7 @@ jobs:
           echo "apk_name=${APK_NAME}" >> $GITHUB_OUTPUT
 
       - name: Rename App Bundle with version and source
-        id: rename_aab  # ID hinzugefügt
+        id: rename_aab
         run: |
           VERSION=${{ steps.version.outputs.version }}
           
@@ -96,7 +106,7 @@ jobs:
           echo "aab_name=${AAB_NAME}" >> $GITHUB_OUTPUT
 
       - name: Upload build artifacts (Workflow Artifacts)
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: worldclockv2-android-build-${{ github.run_number }}
           path: |
@@ -104,18 +114,12 @@ jobs:
             build/app/outputs/bundle/release/worldclockv2*.aab
           retention-days: 7
 
-      - name: Upload APK to GitHub Release
+      - name: Upload Release Assets
         if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@v2
         with:
-          files: build/app/outputs/flutter-apk/${{ steps.rename_apk.outputs.apk_name }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload App Bundle to GitHub Release
-        if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v3
-        with:
-          files: build/app/outputs/bundle/release/${{ steps.rename_aab.outputs.aab_name }}
+          files: |
+            build/app/outputs/flutter-apk/${{ steps.rename_apk.outputs.apk_name }}
+            build/app/outputs/bundle/release/${{ steps.rename_aab.outputs.aab_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
