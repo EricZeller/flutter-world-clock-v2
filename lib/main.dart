@@ -500,7 +500,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 Tooltip(
                   message: 'Difference to local time',
-                  child: AssistChip(
+                  child: Chip(
                     avatar: Icon(
                       Icons.compare_arrows_rounded,
                       size: 18,
