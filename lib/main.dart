@@ -486,10 +486,8 @@ class _MyHomePageState extends State<MyHomePage> {
               endIndent: 30,
               color: Theme.of(context).colorScheme.primary,
             ),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: 12,
+            Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   l10n.localTime(getLocalTime().replaceAll("Local time: ", "")),
@@ -498,31 +496,30 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontFamily: "Red Hat Display",
                       color: Theme.of(context).colorScheme.primary),
                 ),
+                const SizedBox(height: 6),
                 Tooltip(
                   message: 'Difference to local time',
-                  child: Chip(
-                    avatar: Icon(
-                      Icons.compare_arrows_rounded,
-                      size: 18,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    label: Text(
-                      'Δ ${getTimeDifference()}',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.compare_arrows_rounded,
+                        size: 17,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
-                    ),
-                    backgroundColor:
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    visualDensity: VisualDensity.standard,
+                      const SizedBox(width: 6),
+                      Text(
+                        'Δ ${getTimeDifference()}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onPrimaryContainer,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
