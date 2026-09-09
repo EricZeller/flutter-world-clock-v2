@@ -24,6 +24,25 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ steps.flutter_version.outputs.flutter_version }}
+          cache: true
+          cache-key: "flutter-:os:-:channel:-:version:-:arch:-:${{ hashFiles('**/pubspec.lock') }}"
+
+      - name: Setup Java
+        uses: actions/setup-java@v5 # Geändert auf v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Direkter Cache für Gradle (ersetzt gradle/actions/setup-gradle)
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
       - name: Get dependencies
         run: flutter pub get

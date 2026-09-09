@@ -294,6 +294,20 @@ class _MyHomePageState extends State<MyHomePage> {
     return "Local time: ${formatter.format(now)}";
   }
 
+  String getTimeDifference() {
+    final cityOffset = tz.TZDateTime.now(
+      tz.getLocation(timeZone!),
+    ).timeZoneOffset;
+    final localOffset = DateTime.now().timeZoneOffset;
+    final difference = cityOffset - localOffset;
+    final totalMinutes = difference.inMinutes;
+    final sign = totalMinutes < 0 ? '-' : '+';
+    final absoluteMinutes = totalMinutes.abs();
+    final hours = (absoluteMinutes ~/ 60).toString().padLeft(2, '0');
+    final minutes = (absoluteMinutes % 60).toString().padLeft(2, '0');
+    return '$sign$hours:$minutes';
+  }
+
   Future<void> getWeather(weatherZone) async {
     String requestURL;
     final prefs = await SharedPreferences.getInstance();
@@ -472,8 +486,8 @@ class _MyHomePageState extends State<MyHomePage> {
               endIndent: 30,
               color: Theme.of(context).colorScheme.primary,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   l10n.localTime(getLocalTime().replaceAll("Local time: ", "")),
@@ -482,6 +496,49 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontFamily: "Red Hat Display",
                       color: Theme.of(context).colorScheme.primary),
                 ),
+                Visibility(
+                  visible: spMoreInfo,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 6),
+                      Tooltip(
+                        message: 'Difference to local time',
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.schedule_rounded,
+                                size: 15,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                getTimeDifference(), // Zeigt z. B. "+02:00" oder "-05:00"
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.5,
+                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
               ],
             ),
             const SizedBox(height: 20),

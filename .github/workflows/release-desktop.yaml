@@ -19,7 +19,7 @@ jobs:
         os: [ubuntu-22.04, windows-latest, macos-latest]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Get version from pubspec.yaml
         id: version
@@ -55,6 +55,7 @@ jobs:
             tar -cJf ../../../../worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz ./*
           elif [ ${{ matrix.os }} = windows-latest ]; then
             choco install zip
+            export CMAKE_GENERATOR="Visual Studio 17 2022"
             flutter build windows --release
             cd build/windows/x64/runner/Release
             zip -r ../../../../worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip ./*
@@ -66,7 +67,7 @@ jobs:
           fi
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: worldclockv2-${{ matrix.os }}-build
           path: |
