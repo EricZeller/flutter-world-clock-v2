@@ -499,29 +499,38 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(height: 6),
                 Tooltip(
                   message: 'Difference to local time',
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.compare_arrows_rounded,
-                        size: 17,
-                        color: Theme.of(context).colorScheme.primary,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                        width: 1,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Δ ${getTimeDifference()}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.3,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onPrimaryContainer,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: 15,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 6),
+                        Text(
+                          getTimeDifference(), // Zeigt z. B. "+02:00" oder "-05:00"
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                )
               ],
             ),
             const SizedBox(height: 20),
