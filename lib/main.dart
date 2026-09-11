@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _colorToHex(Color color) {
-    return '#${color.value.toRadixString(16).padLeft(8, '0')}';
+    return '#${color.toARGB32().toRadixString(16).padLeft(8, '0')}';
   }
 
   Future<void> _updateHomeWidget() async {
@@ -413,8 +413,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
+      body: SafeArea(
+        child: Center(
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 40.0),
@@ -461,7 +462,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   getTimeInTimeZone(timeZone!),
                   style: TextStyle(
-                    fontSize: 100.0,
+                    fontSize: 80.0, 
                     fontFamily: "Red Hat Display",
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
@@ -502,15 +503,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(height: 6),
-                      Tooltip(
-                        message: 'Difference to local time',
+                Tooltip(
+                  triggerMode: TooltipTriggerMode.tap,
+                  message: l10n.timeDifferenceTooltip,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
                               width: 1,
                             ),
                           ),
@@ -560,6 +562,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   semanticLabel: l10n.changeCity),
             ),
           ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

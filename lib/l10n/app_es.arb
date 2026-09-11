@@ -7,6 +7,7 @@
   "sourceCode": "Código fuente",
   "reportBug": "Reportar un error",
   "localTime": "Hora local: {time}",
+  "timeDifferenceTooltip": "Diferencia con la hora local",
   "loading": "Cargando...",
   "weatherLoading": "🛰️ Cargando...",
   "connectionError": "🛜 Error de conexión",

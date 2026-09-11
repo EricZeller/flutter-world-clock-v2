@@ -32,6 +32,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get timeDifferenceTooltip => 'Décalage par rapport à l’heure locale';
+
+  @override
   String get loading => 'Chargement...';
 
   @override

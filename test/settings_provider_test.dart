@@ -33,7 +33,7 @@ void main() {
       // Wait for the provider to load the settings
       await Future.delayed(const Duration(milliseconds: 100));
       
-      expect(settingsProvider.customColor.value, equals(Colors.red.value));
+      expect(settingsProvider.customColor.toARGB32(), equals(Colors.red.value));
       expect(settingsProvider.useCustomColor, equals(true));
     });
   });

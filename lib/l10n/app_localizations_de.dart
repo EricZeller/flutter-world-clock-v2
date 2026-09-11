@@ -32,6 +32,9 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get timeDifferenceTooltip => 'Zeitunterschied zur lokalen Zeit';
+
+  @override
   String get loading => 'Laden...';
 
   @override
