@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Get Flutter version from pubspec.yaml
         id: flutter_version
@@ -35,7 +35,7 @@ jobs:
 
       # Direkter Cache für Gradle (ersetzt gradle/actions/setup-gradle)
       - name: Cache Gradle packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -65,18 +65,14 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      - name: Build debug APK
-        run: flutter build apk --debug
-
       - name: Build signed release APK
         run: flutter build apk --release
 
       - name: Upload APK artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: worldclockv2-apks-${{ github.run_number }}
-          path: |
-            build/app/outputs/flutter-apk/app-debug.apk
+          path: | 
             build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
           retention-days: 14
