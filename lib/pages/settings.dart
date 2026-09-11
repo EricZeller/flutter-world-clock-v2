@@ -48,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> saveColor(Color color) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String colorString = color.value.toRadixString(16);
+    String colorString = color.toARGB32().toRadixString(16);
     await prefs.setString('colorString', colorString);
   }
 

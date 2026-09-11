@@ -71,7 +71,7 @@ jobs:
         run: flutter test
 
       - name: Build signed release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --target-platform android-arm64
 
       - name: Build signed release App Bundle
         run: flutter build appbundle --release

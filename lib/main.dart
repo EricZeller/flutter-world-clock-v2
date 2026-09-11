@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String _colorToHex(Color color) {
-    return '#${color.value.toRadixString(16).padLeft(8, '0')}';
+    return '#${color.toARGB32().toRadixString(16).padLeft(8, '0')}';
   }
 
   Future<void> _updateHomeWidget() async {
@@ -509,10 +509,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
                               width: 1,
                             ),
                           ),
