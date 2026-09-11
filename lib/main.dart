@@ -413,8 +413,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Column(
+      body: SafeArea(
+        child: Center(
+          child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 40.0),
@@ -561,6 +562,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   semanticLabel: l10n.changeCity),
             ),
           ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

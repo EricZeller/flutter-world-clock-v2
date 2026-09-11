@@ -79,6 +79,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
             if (keystoreProperties.containsKey('storeFile')) {
                 signingConfig = signingConfigs.release
             } else {
