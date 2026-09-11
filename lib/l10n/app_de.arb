@@ -7,6 +7,7 @@
   "sourceCode": "Quellcode",
   "reportBug": "Fehler melden",
   "localTime": "Lokale Zeit: {time}",
+  "timeDifferenceTooltip": "Zeitunterschied zur lokalen Zeit",
   "loading": "Laden...",
   "weatherLoading": "🛰️ Lädt...",
   "connectionError": "🛜 Verbindungsfehler",

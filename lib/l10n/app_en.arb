@@ -7,6 +7,7 @@
   "sourceCode": "Source Code",
   "reportBug": "Report a bug",
   "localTime": "Local time: {time}",
+  "timeDifferenceTooltip": "Difference to local time",
   "@localTime": {
     "placeholders": {
       "time": {

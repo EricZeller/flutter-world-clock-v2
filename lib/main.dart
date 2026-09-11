@@ -502,8 +502,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(height: 6),
-                      Tooltip(
-                        message: 'Difference to local time',
+                Tooltip(
+                  triggerMode: TooltipTriggerMode.tap,
+                  message: l10n.timeDifferenceTooltip,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
