@@ -462,7 +462,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   getTimeInTimeZone(timeZone!),
                   style: TextStyle(
-                    fontSize: 100.0,
+                    fontSize: 80.0, 
                     fontFamily: "Red Hat Display",
                     color: Theme.of(context).colorScheme.onPrimaryContainer,
                   ),
