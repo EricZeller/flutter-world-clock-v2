@@ -1,0 +1,12 @@
+<p><b>World Clock</b> est une horloge mondiale simple et moderne pour consulter l’heure locale et la météo des villes du monde entier.</p>
+<p>L’heure est disponible hors ligne. Les données météo sont chargées en ligne lorsque vous souhaitez consulter les conditions actuelles.</p>
+<p><b>Fonctionnalités :</b></p>
+<ul>
+    <li>Heure locale actuelle de plus de 180 villes</li>
+    <li>Température et conditions météorologiques actuelles</li>
+    <li>Décalage horaire entre votre position et les villes sélectionnées</li>
+    <li>Design Material You avec les couleurs dynamiques du système</li>
+    <li>Paramètres personnalisables</li>
+    <li>Widget d’écran d’accueil pour la ville sélectionnée</li>
+</ul>
+<p>Une idée ou une erreur de traduction ? Vos retours et suggestions sont les bienvenus sur la page GitHub du projet.</p>

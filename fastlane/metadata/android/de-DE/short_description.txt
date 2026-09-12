@@ -1,1 +1,1 @@
-zeigt die Zeit offline und das Wetter online für viele Städte im Material Design
+Offline-Uhrzeit und Wetter für über 180 Städte im Material-You-Design.
