@@ -22,6 +22,7 @@ import 'package:world_clock_v2/l10n/app_localizations.dart';
 
 void main() {
   tz.initializeTimeZones();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   runApp(
     ChangeNotifierProvider(
       create: (context) => SettingsProvider(),
