@@ -445,7 +445,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      "$country, UTC$utc",
+                      "${country.isEmpty ? '' : '$country, '}UTC$utc",
                       style: TextStyle(
                           letterSpacing: 2,
                           fontSize: 18,

@@ -52,6 +52,17 @@
   "sortByUtc": "Ordenar por zona horaria UTC",
   "sortByContinent": "Ordenar por continente/región",
   "searchHint": "Buscar ciudad o país ({count} encontrados)",
+  "addCustomCity": "Añadir ciudad personalizada",
+  "cityName": "Nombre de la ciudad",
+  "countryOptional": "País (opcional)",
+  "flagOptional": "Bandera (opcional)",
+  "ianaTimeZone": "Zona horaria IANA",
+  "customCityOfflineHint": "La hora funciona sin conexión. Es posible que el clima no esté disponible si wttr.in no reconoce esta ciudad.",
+  "add": "Añadir",
+  "cancel": "Cancelar",
+  "editCustomCity": "Editar ciudad personalizada",
+  "edit": "Editar",
+  "delete": "Eliminar",
   "@searchHint": {
     "placeholders": {
       "count": {

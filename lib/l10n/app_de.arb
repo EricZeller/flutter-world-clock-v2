@@ -52,6 +52,17 @@
   "sortByUtc": "Nach UTC-Zeitzone sortieren",
   "sortByContinent": "Nach Kontinent/Region sortieren",
   "searchHint": "Stadt oder Land suchen ({count} gefunden)",
+  "addCustomCity": "Eigene Stadt hinzufügen",
+  "cityName": "Stadtname",
+  "countryOptional": "Land (optional)",
+  "flagOptional": "Flagge (optional)",
+  "ianaTimeZone": "IANA-Zeitzone",
+  "customCityOfflineHint": "Die Uhrzeit funktioniert offline. Das Wetter ist möglicherweise nicht verfügbar, wenn wttr.in diese Stadt nicht kennt.",
+  "add": "Hinzufügen",
+  "cancel": "Abbrechen",
+  "editCustomCity": "Eigene Stadt bearbeiten",
+  "edit": "Bearbeiten",
+  "delete": "Löschen",
   "@searchHint": {
     "placeholders": {
       "count": {

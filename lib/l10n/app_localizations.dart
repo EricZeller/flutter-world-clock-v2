@@ -415,6 +415,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search city or country ({count} found)'**
   String searchHint(int count);
+
+  /// No description provided for @addCustomCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Add custom city'**
+  String get addCustomCity;
+
+  /// No description provided for @cityName.
+  ///
+  /// In en, this message translates to:
+  /// **'City name'**
+  String get cityName;
+
+  /// No description provided for @countryOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Country (optional)'**
+  String get countryOptional;
+
+  /// No description provided for @flagOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Flag (optional)'**
+  String get flagOptional;
+
+  /// No description provided for @ianaTimeZone.
+  ///
+  /// In en, this message translates to:
+  /// **'IANA time zone'**
+  String get ianaTimeZone;
+
+  /// No description provided for @customCityOfflineHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Time works offline. Weather may be unavailable if wttr.in does not know this city.'**
+  String get customCityOfflineHint;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @editCustomCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit custom city'**
+  String get editCustomCity;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
 }
 
 class _AppLocalizationsDelegate

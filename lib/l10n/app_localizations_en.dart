@@ -174,4 +174,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String searchHint(int count) {
     return 'Search city or country ($count found)';
   }
+
+  @override
+  String get addCustomCity => 'Add custom city';
+
+  @override
+  String get cityName => 'City name';
+
+  @override
+  String get countryOptional => 'Country (optional)';
+
+  @override
+  String get flagOptional => 'Flag (optional)';
+
+  @override
+  String get ianaTimeZone => 'IANA time zone';
+
+  @override
+  String get customCityOfflineHint =>
+      'Time works offline. Weather may be unavailable if wttr.in does not know this city.';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get editCustomCity => 'Edit custom city';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get delete => 'Delete';
 }

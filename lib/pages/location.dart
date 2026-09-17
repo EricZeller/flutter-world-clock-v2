@@ -15,6 +15,9 @@ class City {
   final String flag;
   final String utc;
   final String weatherZone;
+  final double? latitude;
+  final double? longitude;
+  final bool isCustom;
 
   City(
       {required this.name,
@@ -22,7 +25,10 @@ class City {
       required this.timeZone,
       required this.flag,
       required this.utc,
-      required this.weatherZone});
+      required this.weatherZone,
+      this.latitude,
+      this.longitude,
+      this.isCustom = false});
 
   Map<String, dynamic> toJson() {
     return {
@@ -32,6 +38,9 @@ class City {
       'flag': flag,
       'utc': utc,
       'weatherZone': weatherZone,
+      'latitude': latitude,
+      'longitude': longitude,
+      'isCustom': isCustom,
     };
   }
 
@@ -43,6 +52,9 @@ class City {
       flag: json['flag'],
       utc: json['utc'],
       weatherZone: json['weatherZone'],
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      isCustom: json['isCustom'] == true,
     );
   }
 }
@@ -51,7 +63,15 @@ Future<List<City>> loadCities() async {
   final String response =
       await rootBundle.loadString('assets/data/cities.json');
   final data = await json.decode(response) as List;
-  return data.map((city) => City.fromJson(city)).toList();
+  final cities = data.map((city) => City.fromJson(city)).toList();
+  final prefs = await SharedPreferences.getInstance();
+  final custom = prefs.getString('customCities');
+  if (custom != null) {
+    final customData = (jsonDecode(custom) as List)
+        .map((city) => City.fromJson(city as Map<String, dynamic>));
+    cities.addAll(customData);
+  }
+  return cities;
 }
 
 class LocationPage extends StatefulWidget {
@@ -82,9 +102,167 @@ class _LocationPageState extends State<LocationPage> {
     }
   }
 
-  void _saveSelectedCity(String key, City city) async {
+  Future<void> _saveSelectedCity(String key, City city) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, jsonEncode(city.toJson()));
+  }
+
+  Future<void> _addCustomCity({City? editing}) async {
+    final l10n = AppLocalizations.of(context)!;
+    final nameController = TextEditingController(text: editing?.name);
+    final countryController = TextEditingController(text: editing?.country);
+    String? selectedTimeZone = editing?.timeZone;
+    String? selectedFlag = editing?.flag.isEmpty == true ? null : editing?.flag;
+    final timeZones = _cities.map((city) => city.timeZone).toSet().toList()..sort();
+    final countries = <String, String>{
+      for (final city in _cities)
+        if (city.flag.isNotEmpty) city.flag: city.country,
+    };
+
+    final city = await showDialog<City>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, dialogSetState) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.add_location_alt_rounded),
+              SizedBox(width: 12),
+              Flexible(child: Text(editing == null ? l10n.addCustomCity : l10n.editCustomCity)),
+            ],
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  onChanged: (_) => dialogSetState(() {}),
+                  decoration: InputDecoration(
+                    labelText: l10n.cityName,
+                    prefixIcon: Icon(Icons.location_city_rounded),
+                  ),
+                ),
+                TextField(
+                  controller: countryController,
+                  decoration: InputDecoration(
+                    labelText: l10n.countryOptional,
+                    prefixIcon: Icon(Icons.public_rounded),
+                  ),
+                ),
+                DropdownButtonFormField<String>(
+                  value: selectedFlag,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.flagOptional,
+                    prefixIcon: Icon(Icons.flag_rounded),
+                  ),
+                  items: countries.entries
+                      .map((entry) => DropdownMenuItem(
+                            value: entry.key,
+                            child: Row(
+                              children: [
+                                Image.asset('assets/flags/${entry.key}', width: 28),
+                                const SizedBox(width: 8),
+                                Text(entry.value),
+                              ],
+                            ),
+                          ))
+                      .toList(),
+                  onChanged: (value) => dialogSetState(() => selectedFlag = value),
+                ),
+                DropdownButtonFormField<String>(
+                  value: selectedTimeZone,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.ianaTimeZone,
+                    prefixIcon: Icon(Icons.schedule_rounded),
+                  ),
+                  items: timeZones
+                      .map((zone) => DropdownMenuItem(value: zone, child: Text(zone)))
+                      .toList(),
+                  onChanged: (value) => dialogSetState(() => selectedTimeZone = value),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.customCityOfflineHint,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
+            FilledButton(
+              onPressed: nameController.text.trim().isEmpty || selectedTimeZone == null
+                  ? null
+                  : () {
+                      final template = _cities.firstWhere(
+                        (item) => item.timeZone == selectedTimeZone,
+                      );
+                      Navigator.pop(
+                        context,
+                        City(
+                          name: nameController.text.trim(),
+                          country: countryController.text.trim(),
+                          timeZone: selectedTimeZone!,
+                          flag: selectedFlag ?? '',
+                          utc: template.utc,
+                          weatherZone: nameController.text.trim(),
+                          latitude: template.latitude,
+                          longitude: template.longitude,
+                          isCustom: true,
+                        ),
+                      );
+                    },
+              child: Text(l10n.add),
+            ),
+          ],
+        ),
+      ),
+    );
+    nameController.dispose();
+    countryController.dispose();
+    if (city == null) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final customCities = _cities.where((item) => item.isCustom && item != editing).toList()..add(city);
+    await prefs.setString(
+      'customCities',
+      jsonEncode(customCities.map((item) => item.toJson()).toList()),
+    );
+    setState(() {
+      if (editing != null) {
+        final position = _cities.indexOf(editing);
+        _cities[position] = city;
+      } else {
+        _cities.add(city);
+      }
+      _filteredCities = _orderedCities(_cities);
+      _selectedOption = city;
+    });
+    await _saveSelectedCity('selectedOption', city);
+  }
+
+  Future<void> _deleteCustomCity(City city) async {
+    final prefs = await SharedPreferences.getInstance();
+    _cities.remove(city);
+    await prefs.setString('customCities', jsonEncode(
+      _cities.where((item) => item.isCustom).map((item) => item.toJson()).toList(),
+    ));
+    if (_selectedOption == city) {
+      _selectedOption = _cities.first;
+      await _saveSelectedCity('selectedOption', _selectedOption);
+    }
+    setState(() => _filteredCities = _orderedCities(_cities));
+  }
+
+  List<City> _orderedCities(Iterable<City> cities) {
+    final result = cities.toList();
+    result.sort((a, b) {
+      if (a.isCustom != b.isCustom) return a.isCustom ? -1 : 1;
+      return a.name.compareTo(b.name);
+    });
+    return result;
   }
 
   void _searchCities(String query) {
@@ -102,7 +280,7 @@ class _LocationPageState extends State<LocationPage> {
     }).toList();
 
     setState(() {
-      _filteredCities = filtered;
+      _filteredCities = _orderedCities(filtered);
     });
   }
 
@@ -110,17 +288,26 @@ class _LocationPageState extends State<LocationPage> {
     setState(() {
       switch (sorting) {
         case "sortByCity":
-          _filteredCities.sort((a, b) => a.name.compareTo(b.name));
+          _filteredCities = _orderedCities(_filteredCities);
           break;
         case "sortByCountry":
-          _filteredCities.sort((a, b) => a.country.compareTo(b.country));
+          _filteredCities.sort((a, b) {
+            if (a.isCustom != b.isCustom) return a.isCustom ? -1 : 1;
+            return a.country.compareTo(b.country);
+          });
           break;
         case "sortByUtc":
-          _filteredCities.sort((a, b) => compareUtc(a.utc, b.utc));
+          _filteredCities.sort((a, b) {
+            if (a.isCustom != b.isCustom) return a.isCustom ? -1 : 1;
+            return compareUtc(a.utc, b.utc);
+          });
           break;
         case "sortByContinent":
           //_filteredCities.sort((a, b) => a.name.compareTo(b.name));
-          _filteredCities.sort((a, b) => a.timeZone.compareTo(b.timeZone));
+          _filteredCities.sort((a, b) {
+            if (a.isCustom != b.isCustom) return a.isCustom ? -1 : 1;
+            return a.timeZone.compareTo(b.timeZone);
+          });
           break;
       }
     });
@@ -169,7 +356,7 @@ class _LocationPageState extends State<LocationPage> {
     final cities = await loadCities();
     setState(() {
       _cities = cities;
-      _filteredCities = cities;
+      _filteredCities = _orderedCities(cities);
     });
 
     final selectedOption = await getSelectedOption();
@@ -230,6 +417,14 @@ class _LocationPageState extends State<LocationPage> {
               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               appBar: AppBar(
                 actions: [
+                  IconButton(
+                    tooltip: l10n.addCustomCity,
+                    icon: const Icon(Icons.add_location_alt_rounded),
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      _addCustomCity();
+                    },
+                  ),
                   PopupMenuButton<String>(
                     tooltip: "Sort the list",
                     onSelected: (sorting) {
@@ -316,33 +511,46 @@ class _LocationPageState extends State<LocationPage> {
                     child: ListView.builder(
                       itemCount: _filteredCities.length,
                       itemBuilder: (context, index) {
+                        final city = _filteredCities[index];
                         return RadioListTile(
                           isThreeLine: true,
-                          value: _filteredCities[index],
+                          value: city,
                           groupValue: _selectedOption,
                           onChanged: (value) {
                             HapticFeedback.lightImpact();
                             setState(() {
-                              _selectedOption = value!;
+                            _selectedOption = value!;
                               _saveSelectedCity('selectedOption', value);
                             });
                           },
                           title: Text(
-                            _filteredCities[index].name,
+                            city.name,
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                              "${_filteredCities[index].country}, UTC${_filteredCities[index].utc} \n${_filteredCities[index].timeZone}"),
-                          secondary: SizedBox(
-                            width: 40,
-                            child: ClipRRect(
-                              child: Center(
-                                child: Image.asset(
-                                  "assets/flags/${_filteredCities[index].flag}",
-                                ),
+                              "${city.country.isEmpty ? '' : '${city.country}, '}UTC${city.utc} \n${city.timeZone}"),
+                          secondary: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              SizedBox(
+                                width: 40,
+                                child: city.flag.isEmpty
+                                    ? const Icon(Icons.star_rounded)
+                                    : Image.asset("assets/flags/${city.flag}"),
                               ),
-                            ),
+                              if (city.isCustom)
+                                PopupMenuButton<String>(
+                                  onSelected: (action) {
+                                    if (action == 'edit') _addCustomCity(editing: city);
+                                    if (action == 'delete') _deleteCustomCity(city);
+                                  },
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(value: 'edit', child: Text(l10n.edit)),
+                                    PopupMenuItem(value: 'delete', child: Text(l10n.delete)),
+                                  ],
+                                ),
+                            ],
                           ),
                         );
                       },
