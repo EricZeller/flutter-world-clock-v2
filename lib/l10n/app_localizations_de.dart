@@ -208,4 +208,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get delete => 'Löschen';
+
+  @override
+  String citySelected(Object city) {
+    return '$city ausgewählt';
+  }
 }

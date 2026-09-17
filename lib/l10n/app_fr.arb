@@ -77,6 +77,7 @@
   "editCustomCity": "Modifier la ville personnalisée",
   "edit": "Modifier",
   "delete": "Supprimer",
+  "citySelected": "{city} sélectionnée",
   "@searchHint": {
     "placeholders": {
       "count": {

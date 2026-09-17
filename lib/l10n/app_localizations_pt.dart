@@ -209,4 +209,9 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get delete => 'Excluir';
+
+  @override
+  String citySelected(Object city) {
+    return '$city selecionada';
+  }
 }

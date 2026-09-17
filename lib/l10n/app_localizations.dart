@@ -481,6 +481,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
+
+  /// No description provided for @citySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'{city} selected'**
+  String citySelected(Object city);
 }
 
 class _AppLocalizationsDelegate

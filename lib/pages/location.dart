@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/data/data.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
+import 'package:world_clock_v2/widgets/world_map.dart';
 
 class City {
   final String name;
@@ -84,6 +85,7 @@ class LocationPage extends StatefulWidget {
 class _LocationPageState extends State<LocationPage> {
   List<City> _cities = [];
   List<City> _filteredCities = [];
+  bool _showMap = false;
   City _selectedOption = City(
       name: "Berlin",
       country: "Germany",
@@ -417,14 +419,6 @@ class _LocationPageState extends State<LocationPage> {
               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               appBar: AppBar(
                 actions: [
-                  IconButton(
-                    tooltip: l10n.addCustomCity,
-                    icon: const Icon(Icons.add_location_alt_rounded),
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      _addCustomCity();
-                    },
-                  ),
                   PopupMenuButton<String>(
                     tooltip: "Sort the list",
                     onSelected: (sorting) {
@@ -494,7 +488,20 @@ class _LocationPageState extends State<LocationPage> {
                   },
                 ),
               ),
-              body: Column(
+              body: _showMap
+                  ? WorldMap(
+                      cities: _cities,
+                      selectedCity: _selectedOption,
+                      onCityTap: (city) {
+                        setState(() => _selectedOption = city);
+                        _saveSelectedCity('selectedOption', city);
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.citySelected(city.name))),
+                        );
+                      },
+                    )
+                  : Column(
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
@@ -558,14 +565,41 @@ class _LocationPageState extends State<LocationPage> {
                   ),
                 ],
               ),
-              floatingActionButton: FloatingActionButton(
-                onPressed: () {
-                  HapticFeedback.lightImpact();
-                  Navigator.pop(context, _selectedOption);
-                },
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                foregroundColor: Theme.of(context).colorScheme.onSecondary,
-                child: Icon(Icons.check, semanticLabel: l10n.ok),
+              floatingActionButton: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  FloatingActionButton.small(
+                    heroTag: 'addCustomCity',
+                    tooltip: l10n.addCustomCity,
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
+                    foregroundColor: Theme.of(context).colorScheme.onTertiary,
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      _addCustomCity();
+                    },
+                    child: const Icon(Icons.add_location_alt_rounded),
+                  ),
+                  const SizedBox(height: 12),
+                  FloatingActionButton.small(
+                    heroTag: 'toggleMap',
+                    tooltip: _showMap ? 'Show list' : 'Show map',
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                    onPressed: () => setState(() => _showMap = !_showMap),
+                    child: Icon(_showMap ? Icons.list_rounded : Icons.map_rounded),
+                  ),
+                  const SizedBox(height: 12),
+                  FloatingActionButton(
+                    heroTag: 'confirmCity',
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      Navigator.pop(context, _selectedOption);
+                    },
+                    backgroundColor: Theme.of(context).colorScheme.secondary,
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary,
+                    child: Icon(Icons.check, semanticLabel: l10n.ok),
+                  ),
+                ],
               ),
             ),
           );
