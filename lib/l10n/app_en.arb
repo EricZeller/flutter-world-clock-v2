@@ -66,6 +66,18 @@
   "sortByUtc": "Sort by UTC timezone",
   "sortByContinent": "Sort by continent/region",
   "searchHint": "Search city or country ({count} found)",
+  "addCustomCity": "Add custom city",
+  "cityName": "City name",
+  "countryOptional": "Country (optional)",
+  "flagOptional": "Flag (optional)",
+  "ianaTimeZone": "IANA time zone",
+  "customCityOfflineHint": "Time works offline. Weather may be unavailable if wttr.in does not know this city.",
+  "add": "Add",
+  "cancel": "Cancel",
+  "editCustomCity": "Edit custom city",
+  "edit": "Edit",
+  "delete": "Delete",
+  "citySelected": "{city} selected",
   "@searchHint": {
     "placeholders": {
       "count": {

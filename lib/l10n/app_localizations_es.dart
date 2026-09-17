@@ -175,4 +175,43 @@ class AppLocalizationsEs extends AppLocalizations {
   String searchHint(int count) {
     return 'Buscar ciudad o país ($count encontrados)';
   }
+
+  @override
+  String get addCustomCity => 'Añadir ciudad personalizada';
+
+  @override
+  String get cityName => 'Nombre de la ciudad';
+
+  @override
+  String get countryOptional => 'País (opcional)';
+
+  @override
+  String get flagOptional => 'Bandera (opcional)';
+
+  @override
+  String get ianaTimeZone => 'Zona horaria IANA';
+
+  @override
+  String get customCityOfflineHint =>
+      'La hora funciona sin conexión. Es posible que el clima no esté disponible si wttr.in no reconoce esta ciudad.';
+
+  @override
+  String get add => 'Añadir';
+
+  @override
+  String get cancel => 'Cancelar';
+
+  @override
+  String get editCustomCity => 'Editar ciudad personalizada';
+
+  @override
+  String get edit => 'Editar';
+
+  @override
+  String get delete => 'Eliminar';
+
+  @override
+  String citySelected(Object city) {
+    return '$city seleccionada';
+  }
 }

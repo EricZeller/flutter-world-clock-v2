@@ -66,6 +66,18 @@
   "sortByUtc": "Trier par fuseau horaire UTC",
   "sortByContinent": "Trier par continent/région",
   "searchHint": "Rechercher une ville ou un pays ({count} trouvés)",
+  "addCustomCity": "Ajouter une ville personnalisée",
+  "cityName": "Nom de la ville",
+  "countryOptional": "Pays (facultatif)",
+  "flagOptional": "Drapeau (facultatif)",
+  "ianaTimeZone": "Fuseau horaire IANA",
+  "customCityOfflineHint": "L’heure fonctionne hors ligne. La météo peut être indisponible si wttr.in ne connaît pas cette ville.",
+  "add": "Ajouter",
+  "cancel": "Annuler",
+  "editCustomCity": "Modifier la ville personnalisée",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "citySelected": "{city} sélectionnée",
   "@searchHint": {
     "placeholders": {
       "count": {
