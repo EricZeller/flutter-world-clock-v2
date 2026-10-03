@@ -50,6 +50,7 @@ class SettingsSwitch extends StatelessWidget {
 }
 
 /// List tile with a leading icon and a [SettingsSwitch] as trailing widget.
+/// Tapping anywhere on the tile toggles the switch.
 class SwitchSettingTile extends StatelessWidget {
   const SwitchSettingTile({
     super.key,
@@ -66,10 +67,16 @@ class SwitchSettingTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon, semanticLabel: title),
-      title: Text(title),
-      trailing: SettingsSwitch(value: value, onChanged: onChanged),
+    return MergeSemantics(
+      child: ListTile(
+        leading: Icon(icon, semanticLabel: title),
+        title: Text(title),
+        trailing: SettingsSwitch(value: value, onChanged: onChanged),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          onChanged(!value);
+        },
+      ),
     );
   }
 }

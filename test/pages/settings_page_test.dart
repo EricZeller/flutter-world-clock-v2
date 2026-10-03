@@ -27,6 +27,16 @@ void main() {
     expect(prefs.getBool('use24hr'), isFalse);
   });
 
+  testWidgets('tapping the text of a setting toggles it', (tester) async {
+    final settings = await loadSettings();
+    await pumpPage(tester, const SettingsPage(), settings: settings);
+
+    await tester.tap(find.text('Use °F'));
+    await tester.pumpAndSettle();
+
+    expect(settings.useFahrenheit, isTrue);
+  });
+
   testWidgets('theme mode can be changed without restart', (tester) async {
     final settings = await loadSettings();
     await pumpPage(tester, const SettingsPage(), settings: settings);
