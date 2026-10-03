@@ -7,6 +7,8 @@ import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
 
+import 'fake_wttr.dart';
+
 const tokyo = City(
   name: 'Tokyo',
   country: 'Japan',
@@ -15,24 +17,6 @@ const tokyo = City(
   utc: '+09:00',
   weatherZone: 'Tokyo',
 );
-
-/// Weather service returning a fixed summary without network access.
-class FakeWeatherService extends WeatherService {
-  FakeWeatherService({this.summary = '☀️ Sunny +18°C'});
-
-  String? summary;
-  final requestedZones = <String>[];
-
-  @override
-  Future<String?> fetchSummary({
-    required String server,
-    required String zone,
-    required bool fahrenheit,
-  }) async {
-    requestedZones.add(zone);
-    return summary;
-  }
-}
 
 /// City repository with a small in-memory city list instead of the asset.
 class FakeCityRepository extends CityRepository {
@@ -52,6 +36,7 @@ Future<void> pumpPage(
   required SettingsProvider settings,
   WeatherService? weather,
   CityRepository? cities,
+  Locale locale = const Locale('en'),
 }) async {
   // A tall phone-like screen so whole pages fit without scrolling.
   tester.view.physicalSize = const Size(1080, 2400);
@@ -62,13 +47,12 @@ Future<void> pumpPage(
       providers: [
         ChangeNotifierProvider.value(value: settings),
         Provider<CityRepository>.value(value: cities ?? FakeCityRepository()),
-        Provider<WeatherService>.value(
-            value: weather ?? FakeWeatherService()),
+        Provider<WeatherService>.value(value: weather ?? FakeWttr().service),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
+        locale: locale,
         home: page,
         routes: {
           '/location': (_) => const Scaffold(body: Text('location route')),

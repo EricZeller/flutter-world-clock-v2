@@ -1,9 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:world_clock_v2/utils/time_utils.dart';
 
 void main() {
-  setUpAll(tz.initializeTimeZones);
+  setUpAll(() async {
+    tz.initializeTimeZones();
+    await initializeDateFormatting();
+  });
 
   // 2026-07-01 12:34:56 UTC, during daylight saving time in Europe and the US.
   final summer = DateTime.utc(2026, 7, 1, 12, 34, 56);
@@ -93,6 +97,45 @@ void main() {
     test('returns null when there is no sunrise or sunset', () {
       expect(formatWttrTime('No sunrise', use24hr: true), isNull);
       expect(formatWttrTime('No sunset', use24hr: false), isNull);
+    });
+  });
+
+  group('formatUpdateTime', () {
+    final now = DateTime(2026, 10, 3, 18, 0);
+
+    test('shows only the time for today', () {
+      expect(
+        formatUpdateTime(DateTime(2026, 10, 3, 17, 5),
+            use24hr: true, locale: 'en', now: now),
+        '17:05',
+      );
+      expect(
+        formatUpdateTime(DateTime(2026, 10, 3, 17, 5),
+            use24hr: false, locale: 'en', now: now),
+        '05:05 PM',
+      );
+    });
+
+    test('adds the date for older updates', () {
+      expect(
+        formatUpdateTime(DateTime(2026, 10, 1, 9, 30),
+            use24hr: true, locale: 'en', now: now),
+        'Oct 1, 09:30',
+      );
+      expect(
+        formatUpdateTime(DateTime(2026, 10, 1, 9, 30),
+            use24hr: true, locale: 'de', now: now),
+        '1. Okt., 09:30',
+      );
+    });
+  });
+
+  group('wallClockIn', () {
+    test('returns the local wall-clock time of the zone', () {
+      expect(wallClockIn('Asia/Tokyo', now: summer),
+          DateTime(2026, 7, 1, 21, 34, 56));
+      expect(wallClockIn('America/New_York', now: winter),
+          DateTime(2026, 1, 15, 3, 5, 9));
     });
   });
 }

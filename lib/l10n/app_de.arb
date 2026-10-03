@@ -75,5 +75,17 @@
   "themeLight": "Hell",
   "sortList": "Liste sortieren",
   "showList": "Liste anzeigen",
-  "showMap": "Karte anzeigen"
+  "showMap": "Karte anzeigen",
+  "lastUpdated": "Zuletzt aktualisiert {time}",
+  "sunrise": "Sonnenaufgang",
+  "sunset": "Sonnenuntergang",
+  "forecast": "3-Tage-Vorhersage",
+  "nextHours": "Nächste Stunden",
+  "today": "Heute",
+  "tomorrow": "Morgen",
+  "feelsLike": "Gefühlt {temperature}",
+  "humidity": "Luftfeuchtigkeit",
+  "wind": "Wind",
+  "chanceOfRain": "Regenwahrscheinlichkeit",
+  "showForecast": "Vorhersage anzeigen"
 }

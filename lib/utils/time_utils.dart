@@ -58,3 +58,27 @@ String? formatWttrTime(String raw, {required bool use24hr}) {
   }
   return (use24hr ? DateFormat('HH:mm') : DateFormat('hh:mm a')).format(time);
 }
+
+/// Time of a past update; includes the date unless it was on the same day.
+String formatUpdateTime(
+  DateTime time, {
+  required bool use24hr,
+  required String locale,
+  DateTime? now,
+}) {
+  final today = now ?? DateTime.now();
+  final clock = clockFormat(use24hr: use24hr, showSeconds: false).format(time);
+  final sameDay = time.year == today.year &&
+      time.month == today.month &&
+      time.day == today.day;
+  return sameDay ? clock : '${DateFormat.MMMd(locale).format(time)}, $clock';
+}
+
+/// Current wall-clock time of [timeZone] as a plain [DateTime], suitable for
+/// comparing with the local times in a weather forecast.
+DateTime wallClockIn(String timeZone, {DateTime? now}) {
+  final time = tz.TZDateTime.from(
+      now ?? DateTime.now(), tz.getLocation(timeZone));
+  return DateTime(
+      time.year, time.month, time.day, time.hour, time.minute, time.second);
+}

@@ -517,6 +517,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show map'**
   String get showMap;
+
+  /// No description provided for @lastUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Last updated {time}'**
+  String lastUpdated(String time);
+
+  /// No description provided for @sunrise.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunrise'**
+  String get sunrise;
+
+  /// No description provided for @sunset.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get sunset;
+
+  /// No description provided for @forecast.
+  ///
+  /// In en, this message translates to:
+  /// **'3-day forecast'**
+  String get forecast;
+
+  /// No description provided for @nextHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Next hours'**
+  String get nextHours;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// No description provided for @feelsLike.
+  ///
+  /// In en, this message translates to:
+  /// **'Feels like {temperature}'**
+  String feelsLike(String temperature);
+
+  /// No description provided for @humidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get humidity;
+
+  /// No description provided for @wind.
+  ///
+  /// In en, this message translates to:
+  /// **'Wind'**
+  String get wind;
+
+  /// No description provided for @chanceOfRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Chance of rain'**
+  String get chanceOfRain;
+
+  /// No description provided for @showForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Show forecast'**
+  String get showForecast;
 }
 
 class _AppLocalizationsDelegate

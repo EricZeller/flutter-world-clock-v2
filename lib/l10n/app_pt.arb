@@ -75,5 +75,17 @@
   "themeLight": "Claro",
   "sortList": "Ordenar a lista",
   "showList": "Mostrar lista",
-  "showMap": "Mostrar mapa"
+  "showMap": "Mostrar mapa",
+  "lastUpdated": "Última atualização {time}",
+  "sunrise": "Nascer do sol",
+  "sunset": "Pôr do sol",
+  "forecast": "Previsão de 3 dias",
+  "nextHours": "Próximas horas",
+  "today": "Hoje",
+  "tomorrow": "Amanhã",
+  "feelsLike": "Sensação {temperature}",
+  "humidity": "Umidade",
+  "wind": "Vento",
+  "chanceOfRain": "Chance de chuva",
+  "showForecast": "Mostrar previsão"
 }

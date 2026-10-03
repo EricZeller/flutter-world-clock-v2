@@ -229,4 +229,44 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get showMap => 'Mostrar mapa';
+
+  @override
+  String lastUpdated(String time) {
+    return 'Última actualización $time';
+  }
+
+  @override
+  String get sunrise => 'Amanecer';
+
+  @override
+  String get sunset => 'Atardecer';
+
+  @override
+  String get forecast => 'Pronóstico de 3 días';
+
+  @override
+  String get nextHours => 'Próximas horas';
+
+  @override
+  String get today => 'Hoy';
+
+  @override
+  String get tomorrow => 'Mañana';
+
+  @override
+  String feelsLike(String temperature) {
+    return 'Sensación $temperature';
+  }
+
+  @override
+  String get humidity => 'Humedad';
+
+  @override
+  String get wind => 'Viento';
+
+  @override
+  String get chanceOfRain => 'Probabilidad de lluvia';
+
+  @override
+  String get showForecast => 'Mostrar pronóstico';
 }
