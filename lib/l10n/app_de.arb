@@ -19,7 +19,6 @@
   "contact": "Kontakt",
   "currentVersion": "Aktuelle Version: v{version}",
   "defaultTheme": "Standard-Design",
-  "restartToApply": "App neu starten zum Übernehmen",
   "customMaterialColor": "Eigene Material Farbe",
   "selectColor": "Farbe wählen",
   "showSeconds": "Sekunden anzeigen",
@@ -70,5 +69,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "themeSystem": "System",
+  "themeDark": "Dunkel",
+  "themeLight": "Hell",
+  "sortList": "Liste sortieren",
+  "showList": "Liste anzeigen",
+  "showMap": "Karte anzeigen"
 }

@@ -70,9 +70,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get defaultTheme => 'Standard-Design';
 
   @override
-  String get restartToApply => 'App neu starten zum Übernehmen';
-
-  @override
   String get customMaterialColor => 'Eigene Material Farbe';
 
   @override
@@ -213,4 +210,22 @@ class AppLocalizationsDe extends AppLocalizations {
   String citySelected(Object city) {
     return '$city ausgewählt';
   }
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeDark => 'Dunkel';
+
+  @override
+  String get themeLight => 'Hell';
+
+  @override
+  String get sortList => 'Liste sortieren';
+
+  @override
+  String get showList => 'Liste anzeigen';
+
+  @override
+  String get showMap => 'Karte anzeigen';
 }

@@ -19,7 +19,6 @@
   "contact": "Contato",
   "currentVersion": "Versão atual: v{version}",
   "defaultTheme": "Tema padrão",
-  "restartToApply": "Reinicie o aplicativo para aplicar",
   "customMaterialColor": "Cor Material personalizada",
   "selectColor": "Selecionar cor",
   "showSeconds": "Mostrar segundos",
@@ -70,5 +69,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "themeSystem": "Sistema",
+  "themeDark": "Escuro",
+  "themeLight": "Claro",
+  "sortList": "Ordenar a lista",
+  "showList": "Mostrar lista",
+  "showMap": "Mostrar mapa"
 }

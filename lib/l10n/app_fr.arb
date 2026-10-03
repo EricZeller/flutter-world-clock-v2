@@ -33,7 +33,6 @@
     }
   },
   "defaultTheme": "Thème par défaut",
-  "restartToApply": "Redémarrer l'application pour appliquer",
   "customMaterialColor": "Couleur Material personnalisée",
   "selectColor": "Sélectionner la couleur",
   "showSeconds": "Afficher les secondes",
@@ -84,5 +83,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "themeSystem": "Système",
+  "themeDark": "Sombre",
+  "themeLight": "Clair",
+  "sortList": "Trier la liste",
+  "showList": "Afficher la liste",
+  "showMap": "Afficher la carte"
 }

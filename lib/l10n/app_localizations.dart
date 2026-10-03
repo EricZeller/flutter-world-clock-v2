@@ -218,12 +218,6 @@ abstract class AppLocalizations {
   /// **'Default theme'**
   String get defaultTheme;
 
-  /// No description provided for @restartToApply.
-  ///
-  /// In en, this message translates to:
-  /// **'Restart app to apply'**
-  String get restartToApply;
-
   /// No description provided for @customMaterialColor.
   ///
   /// In en, this message translates to:
@@ -487,6 +481,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{city} selected'**
   String citySelected(Object city);
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @sortList.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort the list'**
+  String get sortList;
+
+  /// No description provided for @showList.
+  ///
+  /// In en, this message translates to:
+  /// **'Show list'**
+  String get showList;
+
+  /// No description provided for @showMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Show map'**
+  String get showMap;
 }
 
 class _AppLocalizationsDelegate

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:world_clock_v2/services/home_widget_service.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
@@ -73,7 +73,7 @@ class WidgetSettingsPage extends StatelessWidget {
                     max: 1.0,
                     onChanged: (value) {
                       settings.setWidgetOpacity(value);
-                      _updateAndroidWidgetSettings(
+                      HomeWidgetService.updateAppearance(
                         opacity: value,
                         layout: settings.widgetLayout,
                       );
@@ -104,7 +104,7 @@ class WidgetSettingsPage extends StatelessWidget {
                     onSelectionChanged: (newSelection) {
                       final layout = newSelection.first;
                       settings.setWidgetLayout(layout);
-                      _updateAndroidWidgetSettings(
+                      HomeWidgetService.updateAppearance(
                         opacity: settings.widgetOpacity,
                         layout: layout,
                       );
@@ -116,18 +116,6 @@ class WidgetSettingsPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Future<void> _updateAndroidWidgetSettings({
-    required double opacity,
-    required String layout,
-  }) async {
-    await HomeWidget.saveWidgetData<String>('widgetOpacity', opacity.toString());
-    await HomeWidget.saveWidgetData<String>('widgetLayout', layout);
-    await HomeWidget.updateWidget(
-      name: 'WorldClockWidgetProvider',
-      androidName: 'WorldClockWidgetProvider',
     );
   }
 }

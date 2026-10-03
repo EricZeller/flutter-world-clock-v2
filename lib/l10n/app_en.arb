@@ -33,7 +33,6 @@
     }
   },
   "defaultTheme": "Default theme",
-  "restartToApply": "Restart app to apply",
   "customMaterialColor": "Custom Material color",
   "selectColor": "Select color",
   "showSeconds": "Show seconds",
@@ -84,5 +83,11 @@
         "type": "int"
       }
     }
-  }
+  },
+  "themeSystem": "System",
+  "themeDark": "Dark",
+  "themeLight": "Light",
+  "sortList": "Sort the list",
+  "showList": "Show list",
+  "showMap": "Show map"
 }
