@@ -37,6 +37,15 @@ void main() {
     expect(settings.useFahrenheit, isTrue);
   });
 
+  testWidgets('screen readers hear each setting once', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await pumpPage(tester, const SettingsPage(), settings: await loadSettings());
+
+    final node = tester.getSemantics(find.widgetWithText(ListTile, 'Use °F'));
+    expect(node.label, 'Use °F');
+    semantics.dispose();
+  });
+
   testWidgets('theme mode can be changed without restart', (tester) async {
     final settings = await loadSettings();
     await pumpPage(tester, const SettingsPage(), settings: settings);

@@ -69,7 +69,8 @@ class SwitchSettingTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return MergeSemantics(
       child: ListTile(
-        leading: Icon(icon, semanticLabel: title),
+        // No label: the merged tile already reads out the title.
+        leading: Icon(icon),
         title: Text(title),
         trailing: SettingsSwitch(value: value, onChanged: onChanged),
         onTap: () {

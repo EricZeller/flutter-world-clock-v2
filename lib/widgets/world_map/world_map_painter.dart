@@ -149,5 +149,6 @@ class MarkerPainter extends CustomPainter {
       oldDelegate.selectedCity != selectedCity ||
       oldDelegate.scale != scale ||
       oldDelegate.markerColor != markerColor ||
-      oldDelegate.labelBackground != labelBackground;
+      oldDelegate.labelBackground != labelBackground ||
+      oldDelegate.labelColor != labelColor;
 }

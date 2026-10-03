@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -18,9 +19,15 @@ tz.Location findLocation(String timeZone) {
   try {
     return tz.getLocation(timeZone);
   } on tz.LocationNotFoundException {
+    if (_reportedUnknownZones.add(timeZone)) {
+      debugPrint('Unknown time zone "$timeZone", showing UTC instead. '
+          'Run tool/generate_time_zones.dart after changing cities.json.');
+    }
     return tz.UTC;
   }
 }
+
+final _reportedUnknownZones = <String>{};
 
 DateFormat clockFormat({required bool use24hr, required bool showSeconds}) {
   if (showSeconds) {

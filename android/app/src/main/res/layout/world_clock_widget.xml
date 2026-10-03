@@ -33,13 +33,14 @@
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
+            <!-- The city name is set as content description at runtime. -->
             <ImageView
                 android:id="@+id/widget_city"
+                tools:ignore="ContentDescription"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:scaleType="fitStart"
-                android:importantForAccessibility="no"
                 android:adjustViewBounds="false" />
 
             <!-- Weather symbol and temperature, e.g. "☀️ 18°" -->
@@ -54,8 +55,7 @@
                 android:textSize="16sp"
                 android:fontFamily="@font/red_hat_display"
                 android:textStyle="bold"
-                android:singleLine="true"
-                android:importantForAccessibility="no" />
+                android:singleLine="true" />
 
         </LinearLayout>
 
@@ -90,7 +90,6 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="2"
-                android:importantForAccessibility="no"
                 tools:targetApi="o" />
 
             <TextClock
@@ -107,8 +106,7 @@
                 android:singleLine="true"
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="5dp"
-                android:includeFontPadding="false"
-                android:importantForAccessibility="no" />
+                android:includeFontPadding="false" />
 
         </LinearLayout>
 
@@ -128,11 +126,11 @@
 
         <ImageView
             android:id="@+id/widget_city_compact"
+            tools:ignore="ContentDescription"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_weight="1"
             android:scaleType="fitStart"
-            android:importantForAccessibility="no"
             android:adjustViewBounds="false" />
 
         <TextClock
@@ -148,7 +146,6 @@
             android:includeFontPadding="false"
             android:singleLine="true"
             android:maxLines="1"
-            android:importantForAccessibility="no"
             android:layout_marginStart="12dp" />
 
     </LinearLayout>

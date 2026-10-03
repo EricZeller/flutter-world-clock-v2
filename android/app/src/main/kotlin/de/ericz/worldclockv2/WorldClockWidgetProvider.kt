@@ -46,15 +46,13 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 val primaryColor = data.getString("primaryColor", "#FFFFFF")
                 val secondaryColor = data.getString("secondaryColor", "#0aaea6")
 
-                setTextViewText(
-                    R.id.widget_weather_icon,
-                    if (temperature.isEmpty()) weatherIcon else "$weatherIcon $temperature"
-                )
-                // Read out by screen readers instead of the individual parts.
-                setContentDescription(
-                    android.R.id.background,
-                    listOf(city, weather).filter { it.isNotBlank() }.joinToString(", ")
-                )
+                val weatherShort = if (temperature.isEmpty()) weatherIcon else "$weatherIcon $temperature"
+                setTextViewText(R.id.widget_weather_icon, weatherShort)
+                // Screen readers read the city image, the full weather text and
+                // then the time and date of the TextClocks.
+                setContentDescription(R.id.widget_city, city)
+                setContentDescription(R.id.widget_city_compact, city)
+                setContentDescription(R.id.widget_weather_icon, weather.ifBlank { weatherShort })
 
                 // Apply layout logic
                 if (widgetLayout == "compact") {
@@ -103,9 +101,14 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 setCharSequence(R.id.widget_time_compact, "setFormat12Hour", timeFormat)
                 setCharSequence(R.id.widget_time_compact, "setFormat24Hour", timeFormat)
                 // Android 8+ shrinks the time to fit; older versions get a
-                // smaller fixed size for the longer 12-hour format.
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !use24Hour) {
-                    setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, 22f)
+                // smaller fixed size for the longer 12-hour format. The size is
+                // always set, since an update may reuse the existing views.
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    setTextViewTextSize(
+                        R.id.widget_time,
+                        TypedValue.COMPLEX_UNIT_SP,
+                        if (use24Hour) 32f else 22f
+                    )
                 }
 
                 // Click to open app
@@ -163,16 +166,25 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
             this.typeface = typeface
         }
         val value = text.ifBlank { "Berlin" }
+        // Keep very long names small enough for the widget update.
+        val naturalWidth = paint.measureText(value)
+        if (naturalWidth > MAX_BITMAP_WIDTH) {
+            paint.textSize *= MAX_BITMAP_WIDTH / naturalWidth
+        }
         val reference = Rect().also { paint.getTextBounds(REFERENCE_TEXT, 0, REFERENCE_TEXT.length, it) }
         val bounds = Rect().also { paint.getTextBounds(value, 0, value.length, it) }
+        // Glyphs beyond the reference (stacked accents, other scripts) extend
+        // the bitmap instead of being cut off.
+        val top = minOf(reference.top, bounds.top)
+        val bottom = maxOf(reference.bottom, bounds.bottom)
         val padding = 6
         val width = (bounds.width() + 2 * padding).coerceAtLeast(1)
-        val height = reference.height() + 2 * padding
+        val height = bottom - top + 2 * padding
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         Canvas(bitmap).drawText(
             value,
             (padding - bounds.left).toFloat(),
-            (padding - reference.top).toFloat(),
+            (padding - top).toFloat(),
             paint
         )
         return bitmap
@@ -180,5 +192,6 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
 
     private companion object {
         const val REFERENCE_TEXT = "ÅHlgjy"
+        const val MAX_BITMAP_WIDTH = 1200f
     }
 }

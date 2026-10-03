@@ -137,6 +137,51 @@ void main() {
     await tester.enterText(timeZoneField, 'europe');
     await tester.pumpAndSettle();
     expect(menuEntries(), ['Europe/Berlin']);
+
+    await tester.enterText(timeZoneField, 'America/New_York');
+    await tester.pumpAndSettle();
+    expect(menuEntries(), ['America/New York']);
+  });
+
+  testWidgets('a search without picking an entry clears the selection',
+      (tester) async {
+    const custom = City(
+      name: 'Zuhause',
+      country: '',
+      timeZone: 'Asia/Tokyo',
+      flag: 'jp.png',
+      utc: '+09:00',
+      weatherZone: 'Zuhause',
+      isCustom: true,
+    );
+    SharedPreferences.setMockInitialValues({
+      CityRepository.customCitiesKey: jsonEncode([custom.toJson()]),
+    });
+    final repository = FakeCityRepository();
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    final addButton = find.widgetWithText(FilledButton, 'Add');
+    expect(tester.widget<FilledButton>(addButton).onPressed, isNotNull);
+
+    await tester.enterText(timeZoneField, 'berl');
+    await tester.pumpAndSettle();
+    expect(tester.widget<FilledButton>(addButton).onPressed, isNull,
+        reason: 'the typed text no longer names a time zone');
+
+    await tester.tap(find.text('Europe/Berlin').last);
+    await tester.pumpAndSettle();
+    await tester.enterText(flagField, '');
+    await tester.pumpAndSettle();
+    await tester.tap(addButton);
+    await tester.pumpAndSettle();
+
+    final saved = (await repository.loadCustomCities()).single;
+    expect(saved.timeZone, 'Europe/Berlin');
+    expect(saved.flag, isEmpty);
   });
 
   testWidgets('flags can be found by country', (tester) async {

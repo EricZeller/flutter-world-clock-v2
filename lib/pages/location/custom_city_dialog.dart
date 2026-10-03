@@ -28,6 +28,8 @@ class CustomCityDialog extends StatefulWidget {
 class _CustomCityDialogState extends State<CustomCityDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _countryController;
+  final _flagController = TextEditingController();
+  final _timeZoneController = TextEditingController();
   late final List<String> _timeZones;
   late final Map<String, String> _countries;
   // Everything a time zone can be found by: its name and its cities.
@@ -45,10 +47,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     _flag = editing == null || editing.flag.isEmpty ? null : editing.flag;
     _timeZones = widget.cities.map((city) => city.timeZone).toSet().toList()
       ..sort();
+    // Only bundled cities: custom ones may spell their country differently.
     _countries = Map.fromEntries([
       for (final city in widget.cities)
-        if (city.flag.isNotEmpty) MapEntry(city.flag, city.country),
-    ]..sort((a, b) => a.value.compareTo(b.value)));
+        if (city.flag.isNotEmpty && !city.isCustom)
+          MapEntry(city.flag, city.country),
+    ]..sort((a, b) => a.value.toLowerCase().compareTo(b.value.toLowerCase())));
     final searchText = <String, StringBuffer>{};
     for (final city in widget.cities) {
       (searchText[city.timeZone] ??= StringBuffer(timeZoneLabel(city.timeZone)))
@@ -59,6 +63,20 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
       for (final MapEntry(:key, :value) in searchText.entries)
         key: value.toString().toLowerCase(),
     };
+
+    // A typed search that was not confirmed by picking an entry must not
+    // keep the previous selection; clearing the text removes the flag.
+    _flagController.addListener(() {
+      if (_flag != null && _flagController.text != _countries[_flag]) {
+        setState(() => _flag = null);
+      }
+    });
+    _timeZoneController.addListener(() {
+      if (_timeZone != null &&
+          _timeZoneController.text != timeZoneLabel(_timeZone!)) {
+        setState(() => _timeZone = null);
+      }
+    });
   }
 
   // Underlined like the text fields above instead of the outlined default.
@@ -76,7 +94,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     String query,
     String Function(DropdownMenuEntry<String> entry) searchText,
   ) {
-    final words = query.toLowerCase().split(' ').where((w) => w.isNotEmpty);
+    // Underscores as in the IANA id `America/New_York` match the label.
+    final words = query
+        .toLowerCase()
+        .replaceAll('_', ' ')
+        .split(' ')
+        .where((word) => word.isNotEmpty);
     return entries
         .where((entry) => words.every(searchText(entry).contains))
         .toList();
@@ -86,6 +109,8 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   void dispose() {
     _nameController.dispose();
     _countryController.dispose();
+    _flagController.dispose();
+    _timeZoneController.dispose();
     super.dispose();
   }
 
@@ -149,6 +174,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
             ),
             const SizedBox(height: 8),
             DropdownMenu<String>(
+              controller: _flagController,
               initialSelection: _flag,
               expandedInsets: EdgeInsets.zero,
               menuHeight: 300,
@@ -177,6 +203,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
             ),
             const SizedBox(height: 8),
             DropdownMenu<String>(
+              controller: _timeZoneController,
               initialSelection: _timeZone,
               expandedInsets: EdgeInsets.zero,
               menuHeight: 300,

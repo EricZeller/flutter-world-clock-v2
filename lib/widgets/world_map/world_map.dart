@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
@@ -66,10 +67,14 @@ class _WorldMapState extends State<WorldMap> {
   void _centerOnSelectedCity(Size viewport, Size mapSize) {
     final point =
         MapProjection(mapSize).project(cityPosition(widget.selectedCity));
+    // math.min: rounding can make the map a hair narrower than the viewport,
+    // and clamp() throws if its lower limit ends up above the upper one.
     final dx = (viewport.width / 2 - point.dx)
-        .clamp(viewport.width - mapSize.width, 0.0);
+        .clamp(math.min(0.0, viewport.width - mapSize.width), 0.0)
+        .toDouble();
     final dy = (viewport.height / 2 - point.dy)
-        .clamp(viewport.height - mapSize.height, 0.0);
+        .clamp(math.min(0.0, viewport.height - mapSize.height), 0.0)
+        .toDouble();
     _controller.value = Matrix4.translationValues(dx, dy, 0);
   }
 

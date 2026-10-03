@@ -81,6 +81,23 @@ void main() {
 
     expect(tapped, isEmpty);
   });
+  testWidgets('wide screens never crash while centering', (tester) async {
+    // At this width the map rounds to a hair narrower than the screen.
+    tester.view.physicalSize = const Size(3120, 900);
+    tester.view.devicePixelRatio = 3.5;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(MaterialApp(
+      home: WorldMap(
+        cities: cities,
+        selectedCity: tokyo,
+        onCityTap: (_) {},
+      ),
+    ));
+
+    expect(tester.takeException(), isNull);
+    expect(transform(tester).getTranslation().x, closeTo(0, 0.001));
+  });
 }
 
 final _land = find.byWidgetPredicate(
