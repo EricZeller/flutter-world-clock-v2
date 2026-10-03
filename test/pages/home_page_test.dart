@@ -4,16 +4,16 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:world_clock_v2/pages/home/forecast_sheet.dart';
 import 'package:world_clock_v2/pages/home/home_page.dart';
 
 import '../helpers/fake_wttr.dart';
 import '../helpers/home_widget_recorder.dart';
 import '../helpers/test_app.dart';
+import '../helpers/time_zones.dart';
 
 void main() {
-  setUpAll(tz.initializeTimeZones);
+  setUpAll(initializeAppTimeZones);
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   testWidgets('shows Berlin and its weather when nothing is selected',

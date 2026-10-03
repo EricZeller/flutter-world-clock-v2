@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:world_clock_v2/app.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
+import 'package:world_clock_v2/utils/time_utils.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  tz.initializeTimeZones();
+  await initializeTimeZones(rootBundle);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   // Load settings before the first frame so the app never flashes defaults.

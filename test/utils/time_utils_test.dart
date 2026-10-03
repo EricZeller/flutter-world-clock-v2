@@ -1,11 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:world_clock_v2/utils/time_utils.dart';
+
+import '../helpers/time_zones.dart';
 
 void main() {
   setUpAll(() async {
-    tz.initializeTimeZones();
+    initializeAppTimeZones();
     await initializeDateFormatting();
   });
 
