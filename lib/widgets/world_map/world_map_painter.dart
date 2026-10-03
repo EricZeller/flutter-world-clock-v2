@@ -1,4 +1,3 @@
-import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -57,34 +56,28 @@ bool isLabelVisible(City city, {required bool isSelected, required double scale}
   return scale >= 3;
 }
 
-/// Draws the city markers, their labels and the sun. Sizes are divided by
-/// [scale] so they keep their size on screen while zooming.
+/// Draws the city markers and their labels. Sizes are divided by [scale] so
+/// they keep their size on screen while zooming.
 class MarkerPainter extends CustomPainter {
   MarkerPainter({
     required this.cities,
     required this.selectedCity,
-    required this.sun,
     required this.scale,
     required this.markerColor,
-    required this.sunColor,
     required this.labelBackground,
     required this.labelColor,
   });
 
   final List<City> cities;
   final City selectedCity;
-  final LatLng sun;
   final double scale;
   final Color markerColor;
-  final Color sunColor;
   final Color labelBackground;
   final Color labelColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final projection = MapProjection(size);
-    _paintSun(canvas, projection.project(sun));
-
     // Draw the selected city last so it is on top.
     final ordered = [
       ...cities.where((city) => city != selectedCity),
@@ -97,23 +90,6 @@ class MarkerPainter extends CustomPainter {
       if (isLabelVisible(city, isSelected: isSelected, scale: scale)) {
         _paintLabel(canvas, point, city.name, isSelected);
       }
-    }
-  }
-
-  /// A small sun with rays, so it cannot be mistaken for a city marker.
-  void _paintSun(Canvas canvas, Offset point) {
-    final unit = 1 / scale;
-    canvas.drawCircle(point, 18 * unit,
-        Paint()..color = sunColor.withValues(alpha: 0.18));
-    canvas.drawCircle(point, 5.5 * unit, Paint()..color = sunColor);
-    final rays = Paint()
-      ..color = sunColor
-      ..strokeWidth = 2 * unit
-      ..strokeCap = StrokeCap.round;
-    for (var i = 0; i < 8; i++) {
-      final direction = Offset.fromDirection(i * math.pi / 4);
-      canvas.drawLine(
-          point + direction * 8.5 * unit, point + direction * 12 * unit, rays);
     }
   }
 
@@ -171,7 +147,6 @@ class MarkerPainter extends CustomPainter {
   bool shouldRepaint(covariant MarkerPainter oldDelegate) =>
       oldDelegate.cities != cities ||
       oldDelegate.selectedCity != selectedCity ||
-      oldDelegate.sun != sun ||
       oldDelegate.scale != scale ||
       oldDelegate.markerColor != markerColor ||
       oldDelegate.labelBackground != labelBackground;

@@ -122,10 +122,8 @@ class _WorldMapState extends State<WorldMap> {
                     painter: MarkerPainter(
                       cities: widget.cities,
                       selectedCity: widget.selectedCity,
-                      sun: _sun,
                       scale: _scale,
                       markerColor: colorScheme.secondary,
-                      sunColor: colorScheme.tertiary,
                       labelBackground: colorScheme.inverseSurface,
                       labelColor: colorScheme.onInverseSurface,
                     ),
