@@ -21,16 +21,17 @@ class WeatherReport {
 
   DailyForecast? get today => days.isEmpty ? null : days.first;
 
-  /// The next [count] three-hourly slots after [cityNow] (the city's local
-  /// wall-clock time), starting with the slot that is currently running.
+  /// The next [count] three-hourly slots after [cityNow] (the city's
+  /// wall-clock time from `wallClockIn`), starting with the running slot.
+  /// Slot times are wall-clock times stored as UTC, like [cityNow].
   List<HourlySlot> upcomingHours(DateTime cityNow, {int count = 8}) {
     final earliest = cityNow.subtract(const Duration(minutes: 90));
     return [
       for (final day in days)
         for (final hour in day.hours)
           (
-            time: DateTime(day.date.year, day.date.month, day.date.day,
-                hour.hour),
+            time: DateTime.utc(
+                day.date.year, day.date.month, day.date.day, hour.hour),
             forecast: hour,
           ),
     ].where((slot) => slot.time.isAfter(earliest)).take(count).toList();

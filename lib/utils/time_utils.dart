@@ -74,11 +74,21 @@ String formatUpdateTime(
   return sameDay ? clock : '${DateFormat.MMMd(locale).format(time)}, $clock';
 }
 
-/// Current wall-clock time of [timeZone] as a plain [DateTime], suitable for
-/// comparing with the local times in a weather forecast.
+/// Current wall-clock time of [timeZone], suitable for comparing with the
+/// local times in a weather forecast. It is stored as a UTC [DateTime] so
+/// that the device's own daylight saving time never shifts it.
 DateTime wallClockIn(String timeZone, {DateTime? now}) {
   final time = tz.TZDateTime.from(
       now ?? DateTime.now(), tz.getLocation(timeZone));
-  return DateTime(
+  return DateTime.utc(
       time.year, time.month, time.day, time.hour, time.minute, time.second);
+}
+
+/// Number of calendar days from [from] to [to], ignoring the time of day.
+/// Computed on UTC dates so a daylight saving change (a 23 or 25 hour day)
+/// does not distort the result.
+int calendarDaysBetween(DateTime from, DateTime to) {
+  return DateTime.utc(to.year, to.month, to.day)
+      .difference(DateTime.utc(from.year, from.month, from.day))
+      .inDays;
 }

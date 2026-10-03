@@ -133,9 +133,31 @@ void main() {
   group('wallClockIn', () {
     test('returns the local wall-clock time of the zone', () {
       expect(wallClockIn('Asia/Tokyo', now: summer),
-          DateTime(2026, 7, 1, 21, 34, 56));
+          DateTime.utc(2026, 7, 1, 21, 34, 56));
       expect(wallClockIn('America/New_York', now: winter),
-          DateTime(2026, 1, 15, 3, 5, 9));
+          DateTime.utc(2026, 1, 15, 3, 5, 9));
+    });
+  });
+
+  group('calendarDaysBetween', () {
+    test('counts calendar days regardless of the time of day', () {
+      expect(calendarDaysBetween(DateTime(2026, 10, 3, 23, 59),
+          DateTime(2026, 10, 4, 0, 1)), 1);
+      expect(calendarDaysBetween(DateTime(2026, 10, 3), DateTime(2026, 10, 3)),
+          0);
+      expect(calendarDaysBetween(DateTime(2026, 10, 3), DateTime(2026, 10, 5)),
+          2);
+    });
+
+    test('is not affected by daylight saving changes of the device', () {
+      // Local dates around the European spring and autumn changes.
+      expect(calendarDaysBetween(DateTime(2026, 3, 28), DateTime(2026, 3, 29)),
+          1);
+      expect(calendarDaysBetween(DateTime(2026, 3, 29), DateTime(2026, 3, 30)),
+          1);
+      expect(
+          calendarDaysBetween(DateTime(2026, 10, 24), DateTime(2026, 10, 25)),
+          1);
     });
   });
 }

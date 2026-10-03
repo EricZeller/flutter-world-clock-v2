@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/weather.dart';
@@ -84,25 +85,32 @@ class WeatherService {
   }
 
   /// Fetches a fresh report and caches it; falls back to the cached report.
+  /// Never throws.
   Future<WeatherResult> refresh({
     required String server,
     required String zone,
     String? lang,
   }) async {
+    final WeatherReport report;
     try {
-      final report = await fetch(server: server, zone: zone, lang: lang);
-      await _store(zone, report);
-      return WeatherResult(report: report);
+      report = await fetch(server: server, zone: zone, lang: lang);
     } on WeatherException catch (e) {
       return WeatherResult(report: await loadCached(zone), failure: e.failure);
     }
+    try {
+      await _store(zone, report);
+    } catch (e) {
+      // A failing cache must not hide the fresh report.
+      debugPrint('Could not cache weather: $e');
+    }
+    return WeatherResult(report: report);
   }
 
+  /// The last cached report of [zone], or `null` if none can be read.
   Future<WeatherReport?> loadCached(String zone) async {
-    final entry = (await _loadCache())[zone];
-    if (entry == null) return null;
     try {
-      return WeatherReport.fromJson(entry);
+      final entry = (await _loadCache())[zone];
+      return entry == null ? null : WeatherReport.fromJson(entry);
     } catch (_) {
       return null;
     }

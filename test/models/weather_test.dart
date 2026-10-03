@@ -100,23 +100,23 @@ void main() {
 
   group('upcomingHours', () {
     test('starts with the running slot and continues into the next day', () {
-      final slots = parse().upcomingHours(DateTime(2026, 10, 3, 17, 19));
+      final slots = parse().upcomingHours(DateTime.utc(2026, 10, 3, 17, 19));
 
       expect(slots, hasLength(8));
-      expect(slots.first.time, DateTime(2026, 10, 3, 18));
+      expect(slots.first.time, DateTime.utc(2026, 10, 3, 18));
       expect(slots.first.forecast.tempC, 20);
-      expect(slots[2].time, DateTime(2026, 10, 4, 0));
-      expect(slots.last.time, DateTime(2026, 10, 4, 15));
+      expect(slots[2].time, DateTime.utc(2026, 10, 4, 0));
+      expect(slots.last.time, DateTime.utc(2026, 10, 4, 15));
     });
 
     test('includes a slot that started less than 90 minutes ago', () {
-      final slots = parse().upcomingHours(DateTime(2026, 10, 3, 16));
+      final slots = parse().upcomingHours(DateTime.utc(2026, 10, 3, 16));
 
-      expect(slots.first.time, DateTime(2026, 10, 3, 15));
+      expect(slots.first.time, DateTime.utc(2026, 10, 3, 15));
     });
 
     test('is empty when the forecast is outdated', () {
-      expect(parse().upcomingHours(DateTime(2026, 11, 1)), isEmpty);
+      expect(parse().upcomingHours(DateTime.utc(2026, 11, 1)), isEmpty);
     });
   });
 

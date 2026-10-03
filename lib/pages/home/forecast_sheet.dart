@@ -233,11 +233,7 @@ class _DayTile extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final fahrenheit = context.watch<SettingsProvider>().useFahrenheit;
     final colorScheme = Theme.of(context).colorScheme;
-    final today = DateTime(cityToday.year, cityToday.month, cityToday.day);
-    final daysAhead = DateTime(day.date.year, day.date.month, day.date.day)
-        .difference(today)
-        .inDays;
-    final label = switch (daysAhead) {
+    final label = switch (calendarDaysBetween(cityToday, day.date)) {
       0 => l10n.today,
       1 => l10n.tomorrow,
       _ => DateFormat.EEEE(l10n.localeName).format(day.date),

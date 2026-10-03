@@ -35,8 +35,10 @@ class _HomePageState extends State<HomePage> {
   WeatherFailure? _weatherFailure;
   bool _weatherLoading = true;
   DateTime _lastWeatherAttempt = DateTime.now();
-  ({String zone, Future<void> future})? _pendingWeather;
+  ({String request, Future<void> future})? _pendingWeather;
   String? _weatherLanguage;
+  // Until the stored city is known, nothing is pushed to the home widget.
+  bool _cityLoaded = false;
 
   @override
   void initState() {
@@ -67,7 +69,7 @@ class _HomePageState extends State<HomePage> {
     final language = languageCode == 'en' ? null : languageCode;
     final languageChanged = _weatherLanguage != language;
     _weatherLanguage = language;
-    if (languageChanged && !_weatherLoading) _refreshWeather();
+    if (languageChanged && _cityLoaded) _refreshWeather();
     // Theme changes alter the widget colors.
     _updateHomeWidget();
   }
@@ -83,14 +85,13 @@ class _HomePageState extends State<HomePage> {
     final city =
         await context.read<CityRepository>().loadSelectedCity() ?? City.berlin;
     if (!mounted) return;
-    final changed =
-        city != _city || city.weatherZone != _city.weatherZone;
-    if (changed || _weather == null) {
+    if (!_cityLoaded || !_isSamePlace(city, _city)) {
       final cached =
           await context.read<WeatherService>().loadCached(city.weatherZone);
       if (!mounted) return;
       setState(() {
         _city = city;
+        _cityLoaded = true;
         _weather = cached;
         _weatherFailure = null;
         _weatherLoading = true;
@@ -100,27 +101,34 @@ class _HomePageState extends State<HomePage> {
     await _refreshWeather();
   }
 
-  /// Fetches the weather unless a request for the same place is running.
+  static bool _isSamePlace(City a, City b) =>
+      a == b && a.weatherZone == b.weatherZone;
+
+  /// Fetches the weather unless the same request is already running.
   Future<void> _refreshWeather() {
-    final zone = _city.weatherZone;
+    final city = _city;
+    final server = context.read<SettingsProvider>().wttrServer;
+    final language = _weatherLanguage;
+    final request = '$server|${city.weatherZone}|$language';
     final pending = _pendingWeather;
-    if (pending != null && pending.zone == zone) return pending.future;
-    final future = _fetchWeather();
-    _pendingWeather = (zone: zone, future: future);
+    if (pending != null && pending.request == request) return pending.future;
+    final future = _fetchWeather(request, city, server, language);
+    _pendingWeather = (request: request, future: future);
     return future.whenComplete(() {
       if (identical(_pendingWeather?.future, future)) _pendingWeather = null;
     });
   }
 
-  Future<void> _fetchWeather() async {
+  Future<void> _fetchWeather(
+      String request, City city, String server, String? language) async {
     _lastWeatherAttempt = DateTime.now();
-    final city = _city;
     final result = await context.read<WeatherService>().refresh(
-          server: context.read<SettingsProvider>().wttrServer,
+          server: server,
           zone: city.weatherZone,
-          lang: _weatherLanguage,
+          lang: language,
         );
-    if (!mounted || city != _city) return;
+    // A newer request (other city, server or language) supersedes this one.
+    if (!mounted || _pendingWeather?.request != request) return;
     setState(() {
       _weather = result.report ?? _weather;
       _weatherFailure = result.failure;
@@ -130,10 +138,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _updateHomeWidget() {
+    if (!_cityLoaded) return;
     final settings = context.read<SettingsProvider>();
+    final weather = _weather;
     HomeWidgetService.update(
       city: _city,
-      weather: _weather?.summary(fahrenheit: settings.useFahrenheit),
+      // Without a report the widget shows the same status as the app.
+      weather: weather?.summary(fahrenheit: settings.useFahrenheit) ??
+          weatherStatusText(AppLocalizations.of(context)!,
+              failure: _weatherFailure, isLoading: _weatherLoading),
+      weatherIcon: weather?.current.symbol ??
+          (_weatherLoading ? '🛰️' : '🛜'),
       colorScheme: Theme.of(context).colorScheme,
       settings: settings,
     );
@@ -141,12 +156,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _openSettings() async {
     await Navigator.pushNamed(context, '/settings');
-    _refreshWeather();
+    if (mounted) _refreshWeather();
   }
 
   Future<void> _changeCity() async {
     await Navigator.pushNamed(context, '/location');
-    _loadCity();
+    if (mounted) _loadCity();
   }
 
   void _showForecast() {

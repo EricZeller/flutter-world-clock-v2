@@ -25,11 +25,13 @@ class _LocationPageState extends State<LocationPage> {
   bool _showMap = false;
   City _selected = City.berlin;
 
-  CityRepository get _repository => context.read<CityRepository>();
+  // Read once, so saving after an await never needs this page's context.
+  late final CityRepository _repository;
 
   @override
   void initState() {
     super.initState();
+    _repository = context.read<CityRepository>();
     _loadCities();
   }
 
@@ -65,8 +67,9 @@ class _LocationPageState extends State<LocationPage> {
       }
       _selected = city;
     });
-    await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
+    // The selection first: the home page reloads it as soon as this closes.
     await _repository.saveSelectedCity(city);
+    await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
   }
 
   Future<void> _deleteCustomCity(City city) async {
@@ -74,8 +77,8 @@ class _LocationPageState extends State<LocationPage> {
       _cities.removeWhere((item) => identical(item, city));
       if (_selected == city) _selected = City.berlin;
     });
-    await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
     await _repository.saveSelectedCity(_selected);
+    await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
   }
 
   void _close() {

@@ -9,6 +9,7 @@ import 'package:world_clock_v2/pages/home/forecast_sheet.dart';
 import 'package:world_clock_v2/pages/home/home_page.dart';
 
 import '../helpers/fake_wttr.dart';
+import '../helpers/home_widget_recorder.dart';
 import '../helpers/test_app.dart';
 
 void main() {
@@ -183,5 +184,116 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(wttr.requests, hasLength(2));
+  });
+
+  group('home screen widget', () {
+    // Each widget update waits briefly before refreshing the widget.
+    Future<void> flushWidgetUpdates(WidgetTester tester) =>
+        tester.pump(const Duration(seconds: 2));
+
+    testWidgets('only receives the stored city, never the default',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'selectedOption': jsonEncode(tokyo.toJson()),
+      });
+      final widget = HomeWidgetRecorder.install();
+
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+      await flushWidgetUpdates(tester);
+
+      expect(widget.valuesOf('city'), isNotEmpty);
+      expect(widget.valuesOf('city'), everyElement('Tokyo'));
+      expect(widget.valuesOf('timeZone'), everyElement('Asia/Tokyo'));
+      expect(widget.current['weather'], '☁️ Cloudy +20°C');
+      expect(widget.current['weather_icon'], '☁️');
+    });
+
+    testWidgets('does not keep the weather of the previous city',
+        (tester) async {
+      final wttr = FakeWttr();
+      final widget = HomeWidgetRecorder.install();
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+      await flushWidgetUpdates(tester);
+      expect(widget.current['weather'], '☁️ Cloudy +20°C');
+
+      // Switch to a city without cached weather while offline.
+      wttr.offline = true;
+      await tester.tap(find.text('Change city'));
+      await tester.pumpAndSettle();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('selectedOption', jsonEncode(tokyo.toJson()));
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+      await flushWidgetUpdates(tester);
+
+      expect(find.text('🛜 Connection error'), findsOneWidget);
+      expect(widget.current['city'], 'Tokyo');
+      expect(widget.current['weather'], '🛜 Connection error');
+      expect(widget.current['weather_icon'], '🛜');
+    });
+  });
+
+  group('weather requests', () {
+    testWidgets('a changed server is not answered by a running request',
+        (tester) async {
+      final wttr = FakeWttr()..hold = Completer();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+      expect(wttr.requests, hasLength(1));
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await settings.setWttrServer('https://example.org');
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+
+      expect(wttr.requests, hasLength(2));
+      expect(wttr.requests.last.host, 'example.org');
+      wttr.hold!.complete();
+      await tester.pumpAndSettle();
+      expect(find.text('☁️ Cloudy +20°C'), findsOneWidget);
+    });
+
+    testWidgets('a language change while loading requests translations',
+        (tester) async {
+      final wttr = FakeWttr()..hold = Completer();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+
+      await pumpPage(tester, const HomePage(),
+          settings: settings,
+          weather: wttr.service,
+          locale: const Locale('de'));
+      wttr.hold!.complete();
+      await tester.pumpAndSettle();
+
+      expect(wttr.requests, hasLength(2));
+      expect(wttr.requests.last.queryParameters['lang'], 'de');
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+    });
+
+    testWidgets('an older answer does not overwrite a newer one',
+        (tester) async {
+      final wttr = FakeWttr()..hold = Completer();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+      final englishRequest = wttr.hold!;
+
+      // The German request answers first, the English one afterwards.
+      wttr.hold = null;
+      await pumpPage(tester, const HomePage(),
+          settings: settings,
+          weather: wttr.service,
+          locale: const Locale('de'));
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+      englishRequest.complete();
+      await tester.pumpAndSettle();
+
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+    });
   });
 }

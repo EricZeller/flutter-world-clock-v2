@@ -8,6 +8,17 @@ import 'package:world_clock_v2/services/weather_service.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
 import 'package:world_clock_v2/widgets/info_chip.dart';
 
+/// Text shown instead of the weather while there is no report.
+String weatherStatusText(
+  AppLocalizations l10n, {
+  required WeatherFailure? failure,
+  required bool isLoading,
+}) {
+  if (isLoading) return l10n.weatherLoading;
+  if (failure == WeatherFailure.server) return l10n.apiError;
+  return l10n.connectionError;
+}
+
 /// Weather summary on the home screen. Tapping it opens the forecast.
 class WeatherSection extends StatelessWidget {
   const WeatherSection({
@@ -31,16 +42,8 @@ class WeatherSection extends StatelessWidget {
     final color = colorScheme.onPrimaryContainer;
     final report = this.report;
 
-    final String text;
-    if (report != null) {
-      text = report.summary(fahrenheit: settings.useFahrenheit);
-    } else if (isLoading) {
-      text = l10n.weatherLoading;
-    } else if (failure == WeatherFailure.server) {
-      text = l10n.apiError;
-    } else {
-      text = l10n.connectionError;
-    }
+    final text = report?.summary(fahrenheit: settings.useFahrenheit) ??
+        weatherStatusText(l10n, failure: failure, isLoading: isLoading);
 
     final sunrise = report?.today == null
         ? null
