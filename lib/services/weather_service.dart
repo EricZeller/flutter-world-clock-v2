@@ -51,7 +51,7 @@ class WeatherService {
 
   static Uri buildUri(String server, String zone, {String? lang}) {
     return Uri.parse('$server/${Uri.encodeComponent(zone)}').replace(
-      queryParameters: {'format': 'j1', if (lang != null) 'lang': lang},
+      queryParameters: {'format': 'j1', 'lang': ?lang},
     );
   }
 
