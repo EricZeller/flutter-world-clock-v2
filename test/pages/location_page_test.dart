@@ -9,6 +9,35 @@ import 'package:world_clock_v2/services/city_repository.dart';
 
 import '../helpers/test_app.dart';
 
+const newYork = City(
+  name: 'New York',
+  country: 'United States',
+  timeZone: 'America/New_York',
+  flag: 'us.png',
+  utc: '-04:00',
+  weatherZone: 'New York',
+);
+
+Finder get timeZoneField => find.descendant(
+      of: find.widgetWithText(DropdownMenu<String>, 'IANA time zone'),
+      matching: find.byType(TextField),
+    );
+
+Finder get flagField => find.descendant(
+      of: find.widgetWithText(DropdownMenu<String>, 'Flag (optional)'),
+      matching: find.byType(TextField),
+    );
+
+/// Labels of the entries the open dropdown menu currently offers.
+List<String> menuEntries() => find
+    .descendant(
+      of: find.byType(MenuItemButton).hitTestable(),
+      matching: find.byType(Text),
+    )
+    .evaluate()
+    .map((element) => (element.widget as Text).data!)
+    .toList();
+
 void main() {
   RadioListTile<City> tileFor(WidgetTester tester, String name) =>
       tester.widget<RadioListTile<City>>(
@@ -73,7 +102,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(
         find.widgetWithText(TextField, 'City name'), 'Zuhause');
-    await tester.tap(find.byType(DropdownButtonFormField<String>).last);
+    await tester.enterText(timeZoneField, 'tokyo');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Asia/Tokyo').last);
     await tester.pumpAndSettle();
@@ -87,6 +116,54 @@ void main() {
     expect(custom.single.timeZone, 'Asia/Tokyo');
     expect(custom.single.isCustom, isTrue);
     expect(await repository.loadSelectedCity(), custom.single);
+  });
+
+  testWidgets('time zones can be found by city or country', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(),
+        cities: FakeCityRepository([City.berlin, tokyo, newYork]));
+    await tester.tap(find.byTooltip('Add custom city'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(timeZoneField, 'japan');
+    await tester.pumpAndSettle();
+    expect(menuEntries(), ['Asia/Tokyo']);
+
+    await tester.enterText(timeZoneField, 'new york');
+    await tester.pumpAndSettle();
+    expect(menuEntries(), ['America/New York']);
+
+    await tester.enterText(timeZoneField, 'europe');
+    await tester.pumpAndSettle();
+    expect(menuEntries(), ['Europe/Berlin']);
+  });
+
+  testWidgets('flags can be found by country', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = FakeCityRepository([City.berlin, tokyo, newYork]);
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+    await tester.tap(find.byTooltip('Add custom city'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(flagField, 'jap');
+    await tester.pumpAndSettle();
+    expect(menuEntries(), ['Japan']);
+    await tester.tap(find.text('Japan').last);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+        find.widgetWithText(TextField, 'City name'), 'Zuhause');
+    await tester.enterText(timeZoneField, 'tokyo');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Asia/Tokyo').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    final custom = await repository.loadCustomCities();
+    expect(custom.single.flag, 'jp.png');
   });
 
   testWidgets('deleting the selected custom city falls back to Berlin',

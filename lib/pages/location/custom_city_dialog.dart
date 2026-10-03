@@ -30,6 +30,8 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   late final TextEditingController _countryController;
   late final List<String> _timeZones;
   late final Map<String, String> _countries;
+  // Everything a time zone can be found by: its name and its cities.
+  late final Map<String, String> _timeZoneSearchText;
   String? _timeZone;
   String? _flag;
 
@@ -43,10 +45,41 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     _flag = editing == null || editing.flag.isEmpty ? null : editing.flag;
     _timeZones = widget.cities.map((city) => city.timeZone).toSet().toList()
       ..sort();
-    _countries = {
+    _countries = Map.fromEntries([
       for (final city in widget.cities)
-        if (city.flag.isNotEmpty) city.flag: city.country,
+        if (city.flag.isNotEmpty) MapEntry(city.flag, city.country),
+    ]..sort((a, b) => a.value.compareTo(b.value)));
+    final searchText = <String, StringBuffer>{};
+    for (final city in widget.cities) {
+      (searchText[city.timeZone] ??= StringBuffer(timeZoneLabel(city.timeZone)))
+        ..write(' ${city.name}')
+        ..write(' ${city.country}');
+    }
+    _timeZoneSearchText = {
+      for (final MapEntry(:key, :value) in searchText.entries)
+        key: value.toString().toLowerCase(),
     };
+  }
+
+  // Underlined like the text fields above instead of the outlined default.
+  static const _fieldStyle = InputDecorationThemeData(
+    border: UnderlineInputBorder(),
+    contentPadding: EdgeInsets.symmetric(vertical: 12),
+  );
+
+  /// `America/New_York` reads better and is easier to find as
+  /// `America/New York`.
+  static String timeZoneLabel(String zone) => zone.replaceAll('_', ' ');
+
+  static List<DropdownMenuEntry<String>> _filter(
+    List<DropdownMenuEntry<String>> entries,
+    String query,
+    String Function(DropdownMenuEntry<String> entry) searchText,
+  ) {
+    final words = query.toLowerCase().split(' ').where((w) => w.isNotEmpty);
+    return entries
+        .where((entry) => words.every(searchText(entry).contains))
+        .toList();
   }
 
   @override
@@ -114,42 +147,51 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
                 prefixIcon: const Icon(Icons.public_rounded),
               ),
             ),
-            DropdownButtonFormField<String>(
-              initialValue: _flag,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: l10n.flagOptional,
-                prefixIcon: const Icon(Icons.flag_rounded),
-              ),
-              items: _countries.entries
-                  .map((entry) => DropdownMenuItem(
-                        value: entry.key,
-                        child: Row(
-                          children: [
-                            Image.asset('assets/flags/${entry.key}', width: 28),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Text(entry.value,
-                                  overflow: TextOverflow.ellipsis),
-                            ),
-                          ],
-                        ),
-                      ))
-                  .toList(),
-              onChanged: (value) => setState(() => _flag = value),
+            const SizedBox(height: 8),
+            DropdownMenu<String>(
+              initialSelection: _flag,
+              expandedInsets: EdgeInsets.zero,
+              menuHeight: 300,
+              enableFilter: true,
+              requestFocusOnTap: true,
+              inputDecorationTheme: _fieldStyle,
+              label: Text(l10n.flagOptional),
+              leadingIcon: _flag == null
+                  ? const Icon(Icons.flag_rounded)
+                  : Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Image.asset('assets/flags/$_flag', width: 24),
+                    ),
+              filterCallback: (entries, query) => _filter(
+                  entries, query, (entry) => entry.label.toLowerCase()),
+              dropdownMenuEntries: [
+                for (final MapEntry(key: flag, value: country)
+                    in _countries.entries)
+                  DropdownMenuEntry(
+                    value: flag,
+                    label: country,
+                    leadingIcon: Image.asset('assets/flags/$flag', width: 28),
+                  ),
+              ],
+              onSelected: (value) => setState(() => _flag = value),
             ),
-            DropdownButtonFormField<String>(
-              initialValue: _timeZone,
-              isExpanded: true,
-              decoration: InputDecoration(
-                labelText: l10n.ianaTimeZone,
-                prefixIcon: const Icon(Icons.schedule_rounded),
-              ),
-              items: _timeZones
-                  .map((zone) =>
-                      DropdownMenuItem(value: zone, child: Text(zone)))
-                  .toList(),
-              onChanged: (value) => setState(() => _timeZone = value),
+            const SizedBox(height: 8),
+            DropdownMenu<String>(
+              initialSelection: _timeZone,
+              expandedInsets: EdgeInsets.zero,
+              menuHeight: 300,
+              enableFilter: true,
+              requestFocusOnTap: true,
+              inputDecorationTheme: _fieldStyle,
+              label: Text(l10n.ianaTimeZone),
+              leadingIcon: const Icon(Icons.schedule_rounded),
+              filterCallback: (entries, query) => _filter(
+                  entries, query, (entry) => _timeZoneSearchText[entry.value]!),
+              dropdownMenuEntries: [
+                for (final zone in _timeZones)
+                  DropdownMenuEntry(value: zone, label: timeZoneLabel(zone)),
+              ],
+              onSelected: (value) => setState(() => _timeZone = value),
             ),
             const SizedBox(height: 16),
             Text(l10n.customCityOfflineHint),
