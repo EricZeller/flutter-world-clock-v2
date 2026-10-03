@@ -1,188 +1,178 @@
+import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
 import 'package:world_clock_v2/widgets/world_map/world_map_data.dart';
 
-class DotMatrixWorldMapPainter extends CustomPainter {
-  DotMatrixWorldMapPainter({
+/// Draws the land dots, dimmed where it is night. Only repaints when the
+/// minute, size or colors change; zooming merely scales the cached layer.
+class LandPainter extends CustomPainter {
+  LandPainter({required this.sun, required this.color});
+
+  final LatLng sun;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final projection = MapProjection(size);
+    final points = {
+      for (final daylight in Daylight.values) daylight: <double>[],
+    };
+    for (final cell in landCells) {
+      final offset = projection.project(cell);
+      points[daylightAt(cell, sun)]!
+        ..add(offset.dx)
+        ..add(offset.dy);
+    }
+
+    const alphas = {
+      Daylight.day: 0.5,
+      Daylight.twilight: 0.3,
+      Daylight.night: 0.14,
+    };
+    for (final MapEntry(key: daylight, value: coordinates) in points.entries) {
+      canvas.drawRawPoints(
+        ui.PointMode.points,
+        Float32List.fromList(coordinates),
+        Paint()
+          ..color = color.withValues(alpha: alphas[daylight])
+          ..strokeWidth = projection.dotDiameter
+          ..strokeCap = StrokeCap.round,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant LandPainter oldDelegate) =>
+      oldDelegate.sun != sun || oldDelegate.color != color;
+}
+
+/// Whether the name of [city] is drawn at the zoom level [scale].
+bool isLabelVisible(City city, {required bool isSelected, required double scale}) {
+  if (isSelected) return true;
+  if (majorMapCities.contains(city.name) || city.isCustom) return scale >= 1.6;
+  return scale >= 3;
+}
+
+/// Draws the city markers, their labels and the sun. Sizes are divided by
+/// [scale] so they keep their size on screen while zooming.
+class MarkerPainter extends CustomPainter {
+  MarkerPainter({
     required this.cities,
     required this.selectedCity,
+    required this.sun,
     required this.scale,
-    required this.color,
     required this.markerColor,
+    required this.sunColor,
     required this.labelBackground,
     required this.labelColor,
   });
 
   final List<City> cities;
   final City selectedCity;
+  final LatLng sun;
   final double scale;
-  final Color color;
   final Color markerColor;
+  final Color sunColor;
   final Color labelBackground;
   final Color labelColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    // --- 1. HOCHAUFLÖSENDES DOT MATRIX RASTER ---
-    final landDotPaint = Paint()
-      ..color = color.withValues(alpha: 0.32)
-      ..style = PaintingStyle.fill;
+    final projection = MapProjection(size);
+    _paintSun(canvas, projection.project(sun));
 
-    const cols = 120;
-    const rows = 90;
-
-    final cellWidth = size.width / cols;
-    final cellHeight = size.height / rows;
-    final dotRadius = (cellWidth < cellHeight ? cellWidth : cellHeight) * 0.38;
-
-    for (var r = 0; r < rows; r++) {
-      for (var c = 0; c < cols; c++) {
-        final lat = 90.0 - (r + 0.5) * (180.0 / rows);
-        final lon = (c + 0.5) * (360.0 / cols) - 180.0;
-
-        if (_isLand(lat, lon)) {
-          final x = (c + 0.5) * cellWidth;
-          final y = (r + 0.5) * cellHeight;
-          canvas.drawCircle(Offset(x, y), dotRadius, landDotPaint);
-        }
-      }
-    }
-
-    // --- 2. DYNAMISCHE STÄDTE-MARKER ---
-    final showAllMarkers = scale >= 2.4;
-    final showLabels = scale >= 5.2;
-
-    for (final city in cities) {
+    // Draw the selected city last so it is on top.
+    final ordered = [
+      ...cities.where((city) => city != selectedCity),
+      ...cities.where((city) => city == selectedCity),
+    ];
+    for (final city in ordered) {
       final isSelected = city == selectedCity;
-      final isMajor = majorMapCities.contains(city.name) || city.isCustom;
-
-      // Wenn herausgezoomt: Nur Hauptstädte/Auswahl anzeigen
-      if (!showAllMarkers && !isMajor && !isSelected) continue;
-
-      final point = projectCity(city, size);
-
-      // Äußerer Puls-Effekt für selektierte Stadt
-      if (isSelected || city.isCustom) {
-        canvas.drawCircle(
-          point,
-          (city.isCustom ? 14 : 10) / scale.clamp(1.0, 2.0),
-          Paint()..color = markerColor.withValues(alpha: 0.25),
-        );
-      }
-
-      // Hintergrund-Schutzring
-      canvas.drawCircle(
-        point,
-        (city.isCustom ? 6 : 4.5) / scale.clamp(1.0, 2.0),
-        Paint()..color = labelBackground,
-      );
-
-      // Marker Rand
-      canvas.drawCircle(
-        point,
-        (city.isCustom ? 5 : 3.5) / scale.clamp(1.0, 2.0),
-        Paint()
-          ..color = markerColor
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 1.2 / scale.clamp(1.0, 2.0),
-      );
-
-      // Marker Zentrum
-      canvas.drawCircle(
-        point,
-        (city.isCustom ? 3.5 : 2.0) / scale.clamp(1.0, 2.0),
-        Paint()
-          ..color = isSelected ? markerColor : markerColor.withValues(alpha: 0.85)
-          ..style = PaintingStyle.fill,
-      );
-
-      // --- 3. LABELS UND NORMALE STÄDTENAMEN ---
-      if (showLabels || isSelected) {
-        // Noch kleinere Basisschriftgröße (7.0pt / 8.5pt) + stärkere Skalierung beim Zoomen
-        final baseFontSize = isSelected ? 8.5 : 7.0;
-        final dynamicFontSize = (baseFontSize / (scale * 0.85)).clamp(1.5, baseFontSize);
-
-        final label = TextPainter(
-          text: TextSpan(
-            text: city.name,
-            style: TextStyle(
-              color: labelColor,
-              fontSize: dynamicFontSize,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.w400,
-            ),
-          ),
-          textDirection: TextDirection.ltr,
-        )..layout(maxWidth: size.width * .10); // Maximale Breite auf 10% reduziert
-
-        // Minimale Paddings & sehr nah am Marker positioniert
-        final paddingX = (2.5 / scale).clamp(0.8, 2.5);
-        final paddingY = (1.2 / scale).clamp(0.5, 1.2);
-        final offsetX = (4.0 / scale).clamp(1.5, 4.0);
-        final offsetY = (-10.0 / scale).clamp(-10.0, -3.0);
-
-        final bubble = RRect.fromRectAndRadius(
-          Rect.fromLTWH(
-            point.dx + offsetX - paddingX / 2,
-            point.dy + offsetY - paddingY / 2,
-            label.width + paddingX * 2,
-            label.height + paddingY * 2,
-          ),
-          Radius.circular((2.0 / scale).clamp(0.8, 2.0)),
-        );
-
-        canvas.drawRRect(
-          bubble,
-          Paint()..color = labelBackground.withValues(alpha: isSelected ? 0.85 : 0.45),
-        );
-
-        label.paint(canvas, point + Offset(offsetX, offsetY));
+      final point = projection.project(cityPosition(city));
+      _paintMarker(canvas, point, city, isSelected);
+      if (isLabelVisible(city, isSelected: isSelected, scale: scale)) {
+        _paintLabel(canvas, point, city.name, isSelected);
       }
     }
   }
 
-  bool _isLand(double lat, double lon) {
-    for (final polygon in continentPolygons) {
-      if (_pointInPolygon(lat, lon, polygon)) return true;
+  /// A small sun with rays, so it cannot be mistaken for a city marker.
+  void _paintSun(Canvas canvas, Offset point) {
+    final unit = 1 / scale;
+    canvas.drawCircle(point, 18 * unit,
+        Paint()..color = sunColor.withValues(alpha: 0.18));
+    canvas.drawCircle(point, 5.5 * unit, Paint()..color = sunColor);
+    final rays = Paint()
+      ..color = sunColor
+      ..strokeWidth = 2 * unit
+      ..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 8; i++) {
+      final direction = Offset.fromDirection(i * math.pi / 4);
+      canvas.drawLine(
+          point + direction * 8.5 * unit, point + direction * 12 * unit, rays);
     }
-    return false;
   }
 
-  bool _pointInPolygon(double lat, double lon, List<List<double>> polygon) {
-    var inside = false;
-    var j = polygon.length - 1;
-    for (var i = 0; i < polygon.length; i++) {
-      final pi = polygon[i];
-      final pj = polygon[j];
-      final yi = pi[0], xi = pi[1];
-      final yj = pj[0], xj = pj[1];
-
-      final intersect = ((yi > lat) != (yj > lat)) &&
-          (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
-      if (intersect) inside = !inside;
-      j = i;
+  void _paintMarker(Canvas canvas, Offset point, City city, bool isSelected) {
+    final unit = 1 / scale;
+    final radius = (isSelected ? 6.0 : city.isCustom ? 5.0 : 3.5) * unit;
+    if (isSelected) {
+      canvas.drawCircle(point, 14 * unit,
+          Paint()..color = markerColor.withValues(alpha: 0.25));
     }
-    return inside;
+    canvas.drawCircle(
+        point, radius + 1.5 * unit, Paint()..color = labelBackground);
+    canvas.drawCircle(
+      point,
+      radius,
+      Paint()
+        ..color = isSelected
+            ? markerColor
+            : markerColor.withValues(alpha: city.isCustom ? 0.9 : 0.75),
+    );
+  }
+
+  void _paintLabel(Canvas canvas, Offset point, String name, bool isSelected) {
+    final label = TextPainter(
+      text: TextSpan(
+        text: name,
+        style: TextStyle(
+          color: labelColor,
+          fontSize: (isSelected ? 13 : 11) / scale,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 1,
+      ellipsis: '…',
+    )..layout(maxWidth: 140 / scale);
+
+    final padding = EdgeInsets.symmetric(
+        horizontal: 5 / scale, vertical: 2 / scale);
+    final topLeft = point + Offset(8 / scale, -label.height / 2 - padding.top);
+    final bubble = RRect.fromRectAndRadius(
+      Rect.fromLTWH(topLeft.dx, topLeft.dy, label.width + padding.horizontal,
+          label.height + padding.vertical),
+      Radius.circular(6 / scale),
+    );
+    canvas.drawRRect(
+      bubble,
+      Paint()
+        ..color = labelBackground.withValues(alpha: isSelected ? 0.9 : 0.7),
+    );
+    label.paint(canvas, topLeft + Offset(padding.left, padding.top));
   }
 
   @override
-  bool shouldRepaint(covariant DotMatrixWorldMapPainter oldDelegate) =>
+  bool shouldRepaint(covariant MarkerPainter oldDelegate) =>
       oldDelegate.cities != cities ||
       oldDelegate.selectedCity != selectedCity ||
+      oldDelegate.sun != sun ||
       oldDelegate.scale != scale ||
-      oldDelegate.color != color ||
+      oldDelegate.markerColor != markerColor ||
       oldDelegate.labelBackground != labelBackground;
-}
-
-Offset projectCity(City city, Size size) {
-  if (city.latitude != null && city.longitude != null) {
-    return _projectLatLon(city.latitude!, city.longitude!, size);
-  }
-  final point = timeZoneCoordinates[city.timeZone] ?? regionPoint(city.timeZone);
-  return _projectLatLon(point.$1, point.$2, size);
-}
-
-Offset _projectLatLon(double latitude, double longitude, Size size) {
-  final x = (longitude + 180) / 360 * size.width;
-  final y = (90 - latitude) / 180 * size.height;
-  return Offset(x, y);
 }
