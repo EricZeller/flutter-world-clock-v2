@@ -43,8 +43,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {});
+    // The clocks tick on their own; this only checks whether the weather is
+    // due for a refresh.
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
       final interval = _weatherFailure == WeatherFailure.network
           ? _offlineRetryInterval
           : _refreshInterval;

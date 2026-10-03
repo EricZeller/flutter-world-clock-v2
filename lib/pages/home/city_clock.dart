@@ -4,6 +4,7 @@ import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
+import 'package:world_clock_v2/widgets/second_ticker.dart';
 
 /// City name, optional country/UTC line and the large clock.
 class CityClock extends StatelessWidget {
@@ -46,13 +47,15 @@ class CityClock extends StatelessWidget {
           height: 120,
           child: FittedBox(
             fit: BoxFit.scaleDown,
-            child: Text(
-              formatTimeInZone(
-                city.timeZone,
-                use24hr: settings.use24hr,
-                showSeconds: settings.showSeconds,
+            child: SecondTicker(
+              builder: (context) => Text(
+                formatTimeInZone(
+                  city.timeZone,
+                  use24hr: settings.use24hr,
+                  showSeconds: settings.showSeconds,
+                ),
+                style: TextStyle(fontSize: 80.0, color: color),
               ),
-              style: TextStyle(fontSize: 80.0, color: color),
             ),
           ),
         ),
