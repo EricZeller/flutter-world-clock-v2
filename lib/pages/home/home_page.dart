@@ -150,6 +150,9 @@ class _HomePageState extends State<HomePage> {
               failure: _weatherFailure, isLoading: _weatherLoading),
       weatherIcon: weather?.current.symbol ??
           (_weatherLoading ? '🛰️' : '🛜'),
+      temperature: weather == null
+          ? ''
+          : '${weather.current.temperature(settings.useFahrenheit)}°',
       colorScheme: Theme.of(context).colorScheme,
       settings: settings,
     );

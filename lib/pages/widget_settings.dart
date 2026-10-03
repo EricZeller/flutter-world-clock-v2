@@ -152,11 +152,18 @@ class _WidgetMockup extends StatelessWidget {
                       "Berlin",
                       style: TextStyle(
                         fontFamily: 'Pacifico',
-                        fontSize: 22,
+                        fontSize: 28,
                         color: colorScheme.onPrimaryContainer,
                       ),
                     ),
-                    Icon(Icons.wb_sunny, color: colorScheme.onPrimaryContainer, size: 20),
+                    Text(
+                      '☀️ 18°',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 8),

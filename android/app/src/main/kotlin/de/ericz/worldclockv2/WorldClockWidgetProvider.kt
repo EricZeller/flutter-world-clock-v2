@@ -8,6 +8,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.os.Build
+import android.util.TypedValue
 import androidx.core.content.res.ResourcesCompat
 import android.view.View
 import android.widget.RemoteViews
@@ -28,9 +30,10 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
 
         for (appWidgetId in appWidgetIds) {
             val views = RemoteViews(context.packageName, R.layout.world_clock_widget).apply {
-                val city = data.getString("city", "Berlin")
-                val weather = data.getString("weather", "Loading...")
-                val weatherIcon = data.getString("weather_icon", "☀️")
+                val city = data.getString("city", null)?.ifBlank { null } ?: "Berlin"
+                val weather = data.getString("weather", "") ?: ""
+                val weatherIcon = data.getString("weather_icon", "☀️") ?: "☀️"
+                val temperature = data.getString("weather_temp", "") ?: ""
                 val timeZone = data.getString("timeZone", "Europe/Berlin")
 
                 // Settings
@@ -43,9 +46,16 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 val primaryColor = data.getString("primaryColor", "#FFFFFF")
                 val secondaryColor = data.getString("secondaryColor", "#0aaea6")
 
-                setTextViewText(R.id.widget_weather, weather)
-                setTextViewText(R.id.widget_weather_icon, weatherIcon)
-                
+                setTextViewText(
+                    R.id.widget_weather_icon,
+                    if (temperature.isEmpty()) weatherIcon else "$weatherIcon $temperature"
+                )
+                // Read out by screen readers instead of the individual parts.
+                setContentDescription(
+                    android.R.id.background,
+                    listOf(city, weather).filter { it.isNotBlank() }.joinToString(", ")
+                )
+
                 // Apply layout logic
                 if (widgetLayout == "compact") {
                     setViewVisibility(R.id.widget_detailed_layout, View.GONE)
@@ -62,30 +72,20 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
 
                     setInt(R.id.widget_background_view, "setColorFilter", baseColor)
                     setInt(R.id.widget_background_view, "setImageAlpha", alpha)
-                    setImageViewBitmap(
-                        R.id.widget_city,
-                        createPacificoText(context, city ?: "Berlin", Color.parseColor(secondaryColor))
-                    )
-                    setImageViewBitmap(
-                        R.id.widget_city_compact,
-                        createPacificoText(context, city ?: "Berlin", Color.parseColor(secondaryColor))
-                    )
+                    // Both layouts share one bitmap to keep the update small.
+                    val cityBitmap = createPacificoText(context, city, Color.parseColor(secondaryColor))
+                    setImageViewBitmap(R.id.widget_city, cityBitmap)
+                    setImageViewBitmap(R.id.widget_city_compact, cityBitmap)
                     setTextColor(R.id.widget_time, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_time_compact, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_date, Color.parseColor(primaryColor))
-                    setTextColor(R.id.widget_weather, Color.parseColor(primaryColor))
                     setTextColor(R.id.widget_weather_icon, Color.parseColor(primaryColor))
                 } catch (e: Exception) {
                     setInt(R.id.widget_background_view, "setColorFilter", Color.parseColor("#042C4D"))
                     setInt(R.id.widget_background_view, "setImageAlpha", 204)
-                    setImageViewBitmap(
-                        R.id.widget_city,
-                        createPacificoText(context, city ?: "Berlin", Color.parseColor("#0AAEA6"))
-                    )
-                    setImageViewBitmap(
-                        R.id.widget_city_compact,
-                        createPacificoText(context, city ?: "Berlin", Color.parseColor("#0AAEA6"))
-                    )
+                    val cityBitmap = createPacificoText(context, city, Color.parseColor("#0AAEA6"))
+                    setImageViewBitmap(R.id.widget_city, cityBitmap)
+                    setImageViewBitmap(R.id.widget_city_compact, cityBitmap)
                 }
 
                 // TextClock handling
@@ -102,6 +102,11 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                 setCharSequence(R.id.widget_time, "setFormat24Hour", timeFormat)
                 setCharSequence(R.id.widget_time_compact, "setFormat12Hour", timeFormat)
                 setCharSequence(R.id.widget_time_compact, "setFormat24Hour", timeFormat)
+                // Android 8+ shrinks the time to fit; older versions get a
+                // smaller fixed size for the longer 12-hour format.
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !use24Hour) {
+                    setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, 22f)
+                }
 
                 // Click to open app
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
@@ -111,7 +116,7 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                     intent, 
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
-                setOnClickPendingIntent(R.id.widget_root, pendingIntent)
+                setOnClickPendingIntent(android.R.id.background, pendingIntent)
             }
             appWidgetManager.updateAppWidget(appWidgetId, views)
         }
@@ -144,21 +149,36 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
         }
     }
 
+    /**
+     * Renders [text] in Pacifico, which RemoteViews cannot use directly on all
+     * Android versions. The bitmap is cropped to the height of a reference text
+     * with tall accents and deep descenders, so every name is drawn at the same
+     * scale and fills its row without empty space above or below.
+     */
     private fun createPacificoText(context: Context, text: String, color: Int): Bitmap {
         val typeface = ResourcesCompat.getFont(context, R.font.pacifico)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             this.color = color
-            textSize = 70f
+            textSize = 96f
             this.typeface = typeface
         }
         val value = text.ifBlank { "Berlin" }
-        val bounds = Rect()
-        paint.getTextBounds(value, 0, value.length, bounds)
-        val width = (bounds.width() + 24).coerceAtLeast(80)
-        val height = 120
+        val reference = Rect().also { paint.getTextBounds(REFERENCE_TEXT, 0, REFERENCE_TEXT.length, it) }
+        val bounds = Rect().also { paint.getTextBounds(value, 0, value.length, it) }
+        val padding = 6
+        val width = (bounds.width() + 2 * padding).coerceAtLeast(1)
+        val height = reference.height() + 2 * padding
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        canvas.drawText(value, 12f - bounds.left, 60f - bounds.exactCenterY(), paint)
+        Canvas(bitmap).drawText(
+            value,
+            (padding - bounds.left).toFloat(),
+            (padding - reference.top).toFloat(),
+            paint
+        )
         return bitmap
+    }
+
+    private companion object {
+        const val REFERENCE_TEXT = "ÅHlgjy"
     }
 }

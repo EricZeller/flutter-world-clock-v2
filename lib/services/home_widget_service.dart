@@ -20,6 +20,7 @@ class HomeWidgetService {
     required City city,
     required String weather,
     required String weatherIcon,
+    required String temperature,
     required ColorScheme colorScheme,
     required SettingsProvider settings,
   }) {
@@ -31,6 +32,7 @@ class HomeWidgetService {
       await HomeWidget.saveWidgetData<String>('city', city.name);
       await HomeWidget.saveWidgetData<String>('weather', weather);
       await HomeWidget.saveWidgetData<String>('weather_icon', weatherIcon);
+      await HomeWidget.saveWidgetData<String>('weather_temp', temperature);
       await HomeWidget.saveWidgetData<String>('timeZone', city.timeZone);
       await HomeWidget.saveWidgetData<String>(
           'bgColor', colorToHex(colorScheme.primaryContainer));

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The root uses @android:id/background so Android 12+ can animate the app
+     launch from the widget. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/widget_root"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,6 +13,7 @@
         android:layout_height="match_parent"
         android:src="@drawable/widget_background"
         android:scaleType="fitXY"
+        android:importantForAccessibility="no"
         android:alpha="0.8" />
 
     <LinearLayout
@@ -17,15 +21,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:paddingLeft="18dp"
-        android:paddingRight="18dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:paddingTop="8dp"
         android:paddingBottom="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="1.5"
             android:orientation="horizontal"
             android:gravity="center_vertical">
 
@@ -35,45 +39,59 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:scaleType="fitStart"
+                android:importantForAccessibility="no"
                 android:adjustViewBounds="false" />
 
+            <!-- Weather symbol and temperature, e.g. "☀️ 18°" -->
             <TextView
                 android:id="@+id/widget_weather_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="☀"
+                android:layout_marginStart="8dp"
+                android:text="☀️"
+                tools:ignore="HardcodedText"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:fontFamily="sans-serif-medium" />
+                android:textSize="16sp"
+                android:fontFamily="@font/red_hat_display"
+                android:textStyle="bold"
+                android:singleLine="true"
+                android:importantForAccessibility="no" />
 
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1.8"
+            android:layout_weight="1.5"
             android:orientation="horizontal"
-            android:gravity="bottom"
-            android:layout_marginTop="2dp">
+            android:gravity="bottom">
 
+            <!-- Shrinks to fit (Android 8+), so long 12-hour times like
+                 "06:39 PM" are never cut off. -->
             <TextClock
                 android:id="@+id/widget_time"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:gravity="bottom|start"
                 android:format12Hour="hh:mm"
                 android:format24Hour="HH:mm"
                 android:textColor="#FFFFFF"
                 android:textSize="32sp"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="32sp"
+                android:autoSizeStepGranularity="1sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/red_hat_display"
                 android:includeFontPadding="false"
-                android:singleLine="true"
                 android:maxLines="1"
                 android:shadowColor="#20000000"
                 android:shadowDx="1"
                 android:shadowDy="1"
-                android:shadowRadius="2" />
+                android:shadowRadius="2"
+                android:importantForAccessibility="no"
+                tools:targetApi="o" />
 
             <TextClock
                 android:id="@+id/widget_date"
@@ -85,23 +103,14 @@
                 android:textSize="12sp"
                 android:fontFamily="@font/red_hat_display"
                 android:alpha="0.9"
-                android:gravity="right"
+                android:gravity="end"
                 android:singleLine="true"
-                android:layout_marginLeft="12dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginBottom="5dp"
-                android:includeFontPadding="false" />
+                android:includeFontPadding="false"
+                android:importantForAccessibility="no" />
 
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/widget_weather"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="☀️ 20°C"
-            android:textColor="#FFFFFF"
-            android:textSize="11sp"
-            android:fontFamily="@font/red_hat_display"
-            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -111,8 +120,8 @@
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="18dp"
-        android:paddingRight="18dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:visibility="gone">
@@ -123,6 +132,7 @@
             android:layout_height="46dp"
             android:layout_weight="1"
             android:scaleType="fitStart"
+            android:importantForAccessibility="no"
             android:adjustViewBounds="false" />
 
         <TextClock
@@ -138,7 +148,8 @@
             android:includeFontPadding="false"
             android:singleLine="true"
             android:maxLines="1"
-            android:layout_marginLeft="12dp" />
+            android:importantForAccessibility="no"
+            android:layout_marginStart="12dp" />
 
     </LinearLayout>
 

@@ -206,6 +206,7 @@ void main() {
       expect(widget.valuesOf('timeZone'), everyElement('Asia/Tokyo'));
       expect(widget.current['weather'], '☁️ Cloudy +20°C');
       expect(widget.current['weather_icon'], '☁️');
+      expect(widget.current['weather_temp'], '20°');
     });
 
     testWidgets('does not keep the weather of the previous city',
@@ -231,6 +232,7 @@ void main() {
       expect(widget.current['city'], 'Tokyo');
       expect(widget.current['weather'], '🛜 Connection error');
       expect(widget.current['weather_icon'], '🛜');
+      expect(widget.current['weather_temp'], '');
     });
   });
 
