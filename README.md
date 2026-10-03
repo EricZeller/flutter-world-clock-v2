@@ -31,10 +31,14 @@ World Clock is a Flutter app that displays the current time and weather for vari
 ## Screenshots
 
 <p align="center">
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_01_dark_lightmode.png" alt="Screenshot dark/light mode" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_02_city_search.png" alt="Screenshot city search" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_03_settings.png" alt="Screenshot settings" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_04_purple.png" alt="Screenshot purple" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_01_light_dark.png" alt="Screenshot light and dark mode" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_02_forecast.png" alt="Screenshot weather forecast" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_03_world_map.png" alt="Screenshot world map with day and night" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_04_city_search.png" alt="Screenshot city search" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_05_custom_city.png" alt="Screenshot custom city" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_06_settings.png" alt="Screenshot settings" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_07_purple.png" alt="Screenshot custom color" height="350"/>
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_08_widget.png" alt="Screenshot home screen widget" height="350"/>
 </p>
 
 ## Contributing
