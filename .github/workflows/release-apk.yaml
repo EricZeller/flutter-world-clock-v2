@@ -119,7 +119,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
           packageName: de.ericz.worldclockv2
           releaseFiles: build/app/outputs/bundle/release/${{ steps.rename_aab.outputs.aab_name }}
-          track: production
+          tracks: production
           status: completed
           # One file per language: whatsnew-<locale>, at most 500 characters.
           # Update them for every release.
