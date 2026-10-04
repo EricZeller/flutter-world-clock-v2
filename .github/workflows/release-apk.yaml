@@ -121,6 +121,9 @@ jobs:
           releaseFiles: build/app/outputs/bundle/release/${{ steps.rename_aab.outputs.aab_name }}
           track: production
           status: completed
+          # One file per language: whatsnew-<locale>, at most 500 characters.
+          # Update them for every release.
+          whatsNewDirectory: distribution/whatsnew
 
       - name: Upload build artifacts (Workflow Artifacts)
         uses: actions/upload-artifact@v7
