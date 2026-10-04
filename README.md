@@ -30,16 +30,20 @@ World Clock is a Flutter app that displays the current time and weather for vari
 
 ## Screenshots
 
-<p align="center">
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_01_light_dark.png" alt="Screenshot light and dark mode" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_02_forecast.png" alt="Screenshot weather forecast" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_03_world_map.png" alt="Screenshot world map with day and night" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_04_city_search.png" alt="Screenshot city search" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_05_custom_city.png" alt="Screenshot custom city" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_06_settings.png" alt="Screenshot settings" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_07_widget_settings.png" alt="Screenshot widget settings" height="350"/>
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_08_widget.png" alt="Screenshot home screen widget" height="350"/>
-</p>
+<table align="center">
+  <tr>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_01_light_dark.png" alt="Screenshot: Light and dark mode" width="180"/><br/><sub>Light and dark mode</sub></td>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_02_forecast.png" alt="Screenshot: Weather forecast" width="180"/><br/><sub>Weather forecast</sub></td>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_03_world_map.png" alt="Screenshot: World map with day and night" width="180"/><br/><sub>World map with day and night</sub></td>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_04_city_search.png" alt="Screenshot: City search" width="180"/><br/><sub>City search</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_05_custom_city.png" alt="Screenshot: Custom cities" width="180"/><br/><sub>Custom cities</sub></td>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_06_settings.png" alt="Screenshot: Settings and custom colors" width="180"/><br/><sub>Settings and custom colors</sub></td>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_07_widget_settings.png" alt="Screenshot: Widget settings" width="180"/><br/><sub>Widget settings</sub></td>
+    <td align="center"><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/screenshot_08_widget.png" alt="Screenshot: Home screen widget" width="180"/><br/><sub>Home screen widget</sub></td>
+  </tr>
+</table>
 
 ## Contributing
 
