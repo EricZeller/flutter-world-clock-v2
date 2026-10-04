@@ -1,0 +1,9 @@
+Neu in 1.10.0:
+• Wettervorhersage: Tippe aufs Wetter für die nächsten Stunden und 3 Tage
+• Sonnenauf- und -untergang auf dem Startbildschirm
+• Das Wetter bleibt auch offline verfügbar
+• Neue Weltkarte mit echten Küsten und Tag und Nacht
+• Suche nach Flagge und Zeitzone bei eigenen Städten
+• Verbessertes Widget: größerer Stadtname, Temperatur, keine abgeschnittene Uhrzeit mehr
+• Design-Änderungen gelten sofort
+• Viele Fehlerbehebungen und eine schnellere App
