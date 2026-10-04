@@ -45,13 +45,20 @@ class WidgetSettingsPage extends StatelessWidget {
                 children: [
                   Text(
                     l10n.widgetPreview,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      // White only works on the dark gradient.
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white70
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   // The Actual Widget Mockup
                   _WidgetMockup(
                     opacity: settings.widgetOpacity,
                     layout: settings.widgetLayout,
+                    use24hr: settings.use24hr,
                   ),
                 ],
               ),
@@ -123,15 +130,22 @@ class WidgetSettingsPage extends StatelessWidget {
 class _WidgetMockup extends StatelessWidget {
   final double opacity;
   final String layout;
+  final bool use24hr;
 
-  const _WidgetMockup({required this.opacity, required this.layout});
+  const _WidgetMockup({
+    required this.opacity,
+    required this.layout,
+    required this.use24hr,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final locale = AppLocalizations.of(context)!.localeName;
     final now = DateTime.now();
-    final timeStr = DateFormat('HH:mm').format(now);
-    final dateStr = DateFormat('EEE, d. MMM').format(now);
+    // Same formats as the home screen widget.
+    final timeStr = DateFormat(use24hr ? 'HH:mm' : 'hh:mm a').format(now);
+    final dateStr = DateFormat('EEE, d. MMM', locale).format(now);
 
     return Container(
       width: double.infinity,
@@ -171,15 +185,23 @@ class _WidgetMockup extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      timeStr,
-                      style: TextStyle(
-                        fontFamily: 'Red Hat Display',
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimaryContainer,
+                    // Shrinks like the real widget, e.g. for "10:57 AM".
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          timeStr,
+                          style: TextStyle(
+                            fontFamily: 'Red Hat Display',
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Text(
@@ -198,14 +220,21 @@ class _WidgetMockup extends StatelessWidget {
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Berlin",
-                  style: TextStyle(
-                    fontFamily: 'Pacifico',
-                    fontSize: 20,
-                    color: colorScheme.onPrimaryContainer,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Berlin",
+                      style: TextStyle(
+                        fontFamily: 'Pacifico',
+                        fontSize: 20,
+                        color: colorScheme.onPrimaryContainer,
+                      ),
+                    ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   timeStr,
                   style: TextStyle(
