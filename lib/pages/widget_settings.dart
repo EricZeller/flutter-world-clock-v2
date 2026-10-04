@@ -1,12 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:home_widget/home_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/services/city_repository.dart';
+import 'package:world_clock_v2/services/home_widget_service.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:world_clock_v2/utils/time_utils.dart';
+import 'package:world_clock_v2/widgets/second_ticker.dart';
 
-class WidgetSettingsPage extends StatelessWidget {
+class WidgetSettingsPage extends StatefulWidget {
   const WidgetSettingsPage({super.key});
+
+  @override
+  State<WidgetSettingsPage> createState() => _WidgetSettingsPageState();
+}
+
+class _WidgetSettingsPageState extends State<WidgetSettingsPage> {
+  // The preview shows the same city as the home screen widget.
+  City _city = City.berlin;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CityRepository>().loadSelectedCity().then((city) {
+      if (mounted && city != null) setState(() => _city = city);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +65,23 @@ class WidgetSettingsPage extends StatelessWidget {
                 children: [
                   Text(
                     l10n.widgetPreview,
-                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(
+                      // White only works on the dark gradient.
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white70
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 14,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   // The Actual Widget Mockup
-                  _WidgetMockup(
-                    opacity: settings.widgetOpacity,
-                    layout: settings.widgetLayout,
+                  SecondTicker(
+                    builder: (context) => _WidgetMockup(
+                      city: _city,
+                      opacity: settings.widgetOpacity,
+                      layout: settings.widgetLayout,
+                      use24hr: settings.use24hr,
+                    ),
                   ),
                 ],
               ),
@@ -71,13 +101,13 @@ class WidgetSettingsPage extends StatelessWidget {
                     value: settings.widgetOpacity,
                     min: 0.1,
                     max: 1.0,
-                    onChanged: (value) {
-                      settings.setWidgetOpacity(value);
-                      _updateAndroidWidgetSettings(
-                        opacity: value,
-                        layout: settings.widgetLayout,
-                      );
-                    },
+                    onChanged: settings.setWidgetOpacity,
+                    // Redrawing the home screen widget is expensive, so it
+                    // is only updated once the slider is released.
+                    onChangeEnd: (value) => HomeWidgetService.updateAppearance(
+                      opacity: value,
+                      layout: settings.widgetLayout,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -104,7 +134,7 @@ class WidgetSettingsPage extends StatelessWidget {
                     onSelectionChanged: (newSelection) {
                       final layout = newSelection.first;
                       settings.setWidgetLayout(layout);
-                      _updateAndroidWidgetSettings(
+                      HomeWidgetService.updateAppearance(
                         opacity: settings.widgetOpacity,
                         layout: layout,
                       );
@@ -118,32 +148,32 @@ class WidgetSettingsPage extends StatelessWidget {
       ),
     );
   }
-
-  Future<void> _updateAndroidWidgetSettings({
-    required double opacity,
-    required String layout,
-  }) async {
-    await HomeWidget.saveWidgetData<String>('widgetOpacity', opacity.toString());
-    await HomeWidget.saveWidgetData<String>('widgetLayout', layout);
-    await HomeWidget.updateWidget(
-      name: 'WorldClockWidgetProvider',
-      androidName: 'WorldClockWidgetProvider',
-    );
-  }
 }
 
 class _WidgetMockup extends StatelessWidget {
+  final City city;
   final double opacity;
   final String layout;
+  final bool use24hr;
 
-  const _WidgetMockup({required this.opacity, required this.layout});
+  const _WidgetMockup({
+    required this.city,
+    required this.opacity,
+    required this.layout,
+    required this.use24hr,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final now = DateTime.now();
-    final timeStr = DateFormat('HH:mm').format(now);
-    final dateStr = DateFormat('EEE, d. MMM').format(now);
+    final locale = AppLocalizations.of(context)!.localeName;
+    // Time and date of the city, with the same patterns as the home screen
+    // widget. The date follows the app language.
+    final now = wallClockIn(city.timeZone);
+    final timeStr = clockFormat(use24hr: use24hr, showSeconds: false).format(now);
+    final dateStr = DateFormat('EEE, d. MMM', locale).format(now);
+    // The widget draws the city name in the primary color.
+    final cityStyle = TextStyle(fontFamily: 'Pacifico', color: colorScheme.primary);
 
     return Container(
       width: double.infinity,
@@ -160,15 +190,23 @@ class _WidgetMockup extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(city.name,
+                            style: cityStyle.copyWith(fontSize: 28)),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
-                      "Berlin",
+                      '☀️ 18°',
                       style: TextStyle(
-                        fontFamily: 'Pacifico',
-                        fontSize: 22,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                         color: colorScheme.onPrimaryContainer,
                       ),
                     ),
-                    Icon(Icons.wb_sunny, color: colorScheme.onPrimaryContainer, size: 20),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -176,15 +214,23 @@ class _WidgetMockup extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      timeStr,
-                      style: TextStyle(
-                        fontFamily: 'Red Hat Display',
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onPrimaryContainer,
+                    // Shrinks like the real widget, e.g. for "10:57 AM".
+                    Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomLeft,
+                        child: Text(
+                          timeStr,
+                          style: TextStyle(
+                            fontFamily: 'Red Hat Display',
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onPrimaryContainer,
+                          ),
+                        ),
                       ),
                     ),
+                    const SizedBox(width: 8),
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: Text(
@@ -203,14 +249,15 @@ class _WidgetMockup extends StatelessWidget {
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  "Berlin",
-                  style: TextStyle(
-                    fontFamily: 'Pacifico',
-                    fontSize: 20,
-                    color: colorScheme.onPrimaryContainer,
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(city.name,
+                        style: cityStyle.copyWith(fontSize: 20)),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Text(
                   timeStr,
                   style: TextStyle(

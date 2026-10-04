@@ -1,0 +1,9 @@
+Novidades na 1.10.0:
+• Previsão: toque no clima para ver as próximas horas e 3 dias
+• Nascer e pôr do sol na tela inicial
+• O clima continua disponível offline
+• Novo mapa-múndi com costas reais, dia e noite
+• Busca de bandeira e fuso horário ao adicionar sua própria cidade
+• Widget melhorado: cidade maior, temperatura, a hora não é mais cortada
+• Mudanças de tema são aplicadas na hora
+• Muitas correções e um app mais rápido

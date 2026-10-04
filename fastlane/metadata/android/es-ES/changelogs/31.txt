@@ -1,0 +1,9 @@
+Novedades en 1.10.0:
+• Pronóstico: toca el tiempo para ver las próximas horas y 3 días
+• Amanecer y atardecer en la pantalla principal
+• El tiempo sigue disponible sin conexión
+• Nuevo mapa mundial con costas reales y día y noche
+• Busca bandera y zona horaria al añadir tu propia ciudad
+• Widget mejorado: ciudad más grande, temperatura, la hora ya no se corta
+• Los cambios de tema se aplican al instante
+• Muchas correcciones y una app más rápida

@@ -1,0 +1,9 @@
+New in 1.10.0:
+• Weather forecast: tap the weather to see the next hours and 3 days
+• Sunrise and sunset on the home screen
+• Weather stays available offline
+• New world map with real coastlines and day and night
+• Search for flags and time zones when adding your own city
+• Improved widget: larger city name, temperature, no more cut-off times
+• Theme changes apply instantly
+• Many bug fixes and a faster app

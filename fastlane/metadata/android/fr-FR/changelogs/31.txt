@@ -1,0 +1,9 @@
+Nouveautés de la 1.10.0 :
+• Prévisions : touchez la météo pour voir les prochaines heures et 3 jours
+• Lever et coucher du soleil sur l'écran d'accueil
+• La météo reste disponible hors ligne
+• Nouvelle carte du monde avec vraies côtes, jour et nuit
+• Recherche de drapeau et de fuseau pour vos propres villes
+• Widget amélioré : ville plus grande, température, heure jamais coupée
+• Thèmes appliqués immédiatement
+• Nombreuses corrections et une app plus rapide

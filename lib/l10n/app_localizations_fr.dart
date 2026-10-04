@@ -70,9 +70,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get defaultTheme => 'Thème par défaut';
 
   @override
-  String get restartToApply => 'Redémarrer l\'application pour appliquer';
-
-  @override
   String get customMaterialColor => 'Couleur Material personnalisée';
 
   @override
@@ -214,4 +211,62 @@ class AppLocalizationsFr extends AppLocalizations {
   String citySelected(Object city) {
     return '$city sélectionnée';
   }
+
+  @override
+  String get themeSystem => 'Système';
+
+  @override
+  String get themeDark => 'Sombre';
+
+  @override
+  String get themeLight => 'Clair';
+
+  @override
+  String get sortList => 'Trier la liste';
+
+  @override
+  String get showList => 'Afficher la liste';
+
+  @override
+  String get showMap => 'Afficher la carte';
+
+  @override
+  String lastUpdated(String time) {
+    return 'Dernière mise à jour $time';
+  }
+
+  @override
+  String get sunrise => 'Lever du soleil';
+
+  @override
+  String get sunset => 'Coucher du soleil';
+
+  @override
+  String get forecast => 'Prévisions sur 3 jours';
+
+  @override
+  String get nextHours => 'Prochaines heures';
+
+  @override
+  String get today => 'Aujourd\'hui';
+
+  @override
+  String get tomorrow => 'Demain';
+
+  @override
+  String feelsLike(String temperature) {
+    return 'Ressenti $temperature';
+  }
+
+  @override
+  String get humidity => 'Humidité';
+
+  @override
+  String get wind => 'Vent';
+
+  @override
+  String get chanceOfRain => 'Risque de pluie';
+
+  @override
+  String get showForecast => 'Afficher les prévisions';
 }

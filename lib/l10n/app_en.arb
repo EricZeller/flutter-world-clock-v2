@@ -33,7 +33,6 @@
     }
   },
   "defaultTheme": "Default theme",
-  "restartToApply": "Restart app to apply",
   "customMaterialColor": "Custom Material color",
   "selectColor": "Select color",
   "showSeconds": "Show seconds",
@@ -84,5 +83,37 @@
         "type": "int"
       }
     }
-  }
+  },
+  "themeSystem": "System",
+  "themeDark": "Dark",
+  "themeLight": "Light",
+  "sortList": "Sort the list",
+  "showList": "Show list",
+  "showMap": "Show map",
+  "lastUpdated": "Last updated {time}",
+  "@lastUpdated": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sunrise": "Sunrise",
+  "sunset": "Sunset",
+  "forecast": "3-day forecast",
+  "nextHours": "Next hours",
+  "today": "Today",
+  "tomorrow": "Tomorrow",
+  "feelsLike": "Feels like {temperature}",
+  "@feelsLike": {
+    "placeholders": {
+      "temperature": {
+        "type": "String"
+      }
+    }
+  },
+  "humidity": "Humidity",
+  "wind": "Wind",
+  "chanceOfRain": "Chance of rain",
+  "showForecast": "Show forecast"
 }

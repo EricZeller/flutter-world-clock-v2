@@ -33,7 +33,6 @@
     }
   },
   "defaultTheme": "Thème par défaut",
-  "restartToApply": "Redémarrer l'application pour appliquer",
   "customMaterialColor": "Couleur Material personnalisée",
   "selectColor": "Sélectionner la couleur",
   "showSeconds": "Afficher les secondes",
@@ -84,5 +83,23 @@
         "type": "int"
       }
     }
-  }
+  },
+  "themeSystem": "Système",
+  "themeDark": "Sombre",
+  "themeLight": "Clair",
+  "sortList": "Trier la liste",
+  "showList": "Afficher la liste",
+  "showMap": "Afficher la carte",
+  "lastUpdated": "Dernière mise à jour {time}",
+  "sunrise": "Lever du soleil",
+  "sunset": "Coucher du soleil",
+  "forecast": "Prévisions sur 3 jours",
+  "nextHours": "Prochaines heures",
+  "today": "Aujourd'hui",
+  "tomorrow": "Demain",
+  "feelsLike": "Ressenti {temperature}",
+  "humidity": "Humidité",
+  "wind": "Vent",
+  "chanceOfRain": "Risque de pluie",
+  "showForecast": "Afficher les prévisions"
 }
