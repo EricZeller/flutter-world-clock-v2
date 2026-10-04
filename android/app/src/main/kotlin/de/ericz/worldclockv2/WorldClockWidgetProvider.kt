@@ -110,6 +110,13 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
                         if (use24Hour) 32f else 22f
                     )
                 }
+                // The compact time sits next to the city name, so the longer
+                // 12-hour format is drawn smaller on every Android version.
+                setTextViewTextSize(
+                    R.id.widget_time_compact,
+                    TypedValue.COMPLEX_UNIT_SP,
+                    if (use24Hour) 25f else 19f
+                )
 
                 // Click to open app
                 val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)

@@ -13,8 +13,7 @@
         android:layout_height="match_parent"
         android:src="@drawable/widget_background"
         android:scaleType="fitXY"
-        android:importantForAccessibility="no"
-        android:alpha="0.8" />
+        android:importantForAccessibility="no" />
 
     <LinearLayout
         android:id="@+id/widget_detailed_layout"
