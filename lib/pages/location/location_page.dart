@@ -110,15 +110,20 @@ class _LocationPageState extends State<LocationPage> {
       } else {
         _cities.add(city);
       }
-      // A new city is shown right away; an edited one keeps its place.
-      final favorites = _favorites.where((item) => item != city).toList();
-      final favoriteIndex = editing == null ? -1 : favorites.indexOf(editing);
+      // A new city is shown right away; an edited one keeps its place and
+      // stays a favorite only if it was one.
+      final favoriteIndex = editing == null ? -1 : _favorites.indexOf(editing);
       if (favoriteIndex >= 0) {
-        favorites[favoriteIndex] = city;
-      } else {
-        favorites.add(city);
+        _favorites = [
+          for (final (index, item) in _favorites.indexed)
+            if (index == favoriteIndex)
+              city
+            else if (item != city)
+              item,
+        ];
+      } else if (editing == null) {
+        _favorites = [..._favorites.where((item) => item != city), city];
       }
-      _favorites = favorites;
     });
     // The favorites first: the home page reloads them as soon as this closes.
     await _repository.saveFavorites(_favorites);

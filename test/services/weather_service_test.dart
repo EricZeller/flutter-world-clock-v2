@@ -21,8 +21,10 @@ void main() {
         'https://wttr.in/S%C3%A3o%20Paulo?format=j1&lang=pt',
       );
       expect(
-        WeatherService.buildUri('https://example.org', 'Washington, D.C.')
-            .toString(),
+        WeatherService.buildUri(
+          'https://example.org',
+          'Washington, D.C.',
+        ).toString(),
         'https://example.org/Washington%2C%20D.C.?format=j1',
       );
     });
@@ -32,26 +34,33 @@ void main() {
     test('returns a fresh report and caches it', () async {
       final wttr = FakeWttr();
 
-      final result =
-          await wttr.service.refresh(server: server, zone: 'Berlin', lang: 'de');
+      final result = await wttr.service.refresh(
+        server: server,
+        zone: 'Berlin',
+        lang: 'de',
+      );
 
       expect(result.isFresh, isTrue);
       expect(result.failure, isNull);
       expect(result.report!.current.description, 'Wolkig');
-      expect(wttr.requests.single.queryParameters,
-          {'format': 'j1', 'lang': 'de'});
-      final cached = await wttr.service.loadCached('Berlin');
+      expect(wttr.requests.single.queryParameters, {
+        'format': 'j1',
+        'lang': 'de',
+      });
+      final cached = await wttr.service.loadCached(
+        server: server,
+        zone: 'Berlin',
+        lang: 'de',
+      );
       expect(cached!.toJson(), result.report!.toJson());
     });
 
     test('falls back to the cache when offline', () async {
       final wttr = FakeWttr();
-      final fresh =
-          await wttr.service.refresh(server: server, zone: 'Berlin');
+      final fresh = await wttr.service.refresh(server: server, zone: 'Berlin');
       wttr.offline = true;
 
-      final result =
-          await wttr.service.refresh(server: server, zone: 'Berlin');
+      final result = await wttr.service.refresh(server: server, zone: 'Berlin');
 
       expect(result.failure, WeatherFailure.network);
       expect(result.isFresh, isFalse);
@@ -61,8 +70,7 @@ void main() {
     test('reports a network failure without cache', () async {
       final wttr = FakeWttr(offline: true);
 
-      final result =
-          await wttr.service.refresh(server: server, zone: 'Berlin');
+      final result = await wttr.service.refresh(server: server, zone: 'Berlin');
 
       expect(result.failure, WeatherFailure.network);
       expect(result.report, isNull);
@@ -71,8 +79,10 @@ void main() {
     test('reports a server failure for error responses', () async {
       final wttr = FakeWttr(statusCode: 500);
 
-      final result =
-          await wttr.service.refresh(server: server, zone: 'Nowhere');
+      final result = await wttr.service.refresh(
+        server: server,
+        zone: 'Nowhere',
+      );
 
       expect(result.failure, WeatherFailure.server);
       expect(result.report, isNull);
@@ -92,7 +102,10 @@ void main() {
       final wttr = FakeWttr();
       await wttr.service.refresh(server: server, zone: 'Berlin');
 
-      expect(await wttr.service.loadCached('Tokyo'), isNull);
+      expect(
+        await wttr.service.loadCached(server: server, zone: 'Tokyo'),
+        isNull,
+      );
     });
   });
 
@@ -100,8 +113,9 @@ void main() {
     test('keeps only the most recently fetched locations', () async {
       var minute = 0;
       final service = WeatherService(
-        client: MockClient((_) async =>
-            http.Response.bytes(utf8.encode(wttrBerlinFixture), 200)),
+        client: MockClient(
+          (_) async => http.Response.bytes(utf8.encode(wttrBerlinFixture), 200),
+        ),
         clock: () => DateTime(2026, 10, 3, 12, minute++),
       );
 
@@ -109,24 +123,34 @@ void main() {
         await service.refresh(server: server, zone: 'City $i');
       }
 
-      expect(await service.loadCached('City 0'), isNull);
-      expect(await service.loadCached('City 1'), isNotNull);
+      expect(await service.loadCached(server: server, zone: 'City 0'), isNull);
       expect(
-          await service.loadCached('City ${WeatherService.maxCachedLocations}'),
-          isNotNull);
+        await service.loadCached(server: server, zone: 'City 1'),
+        isNotNull,
+      );
+      expect(
+        await service.loadCached(
+          server: server,
+          zone: 'City ${WeatherService.maxCachedLocations}',
+        ),
+        isNotNull,
+      );
     });
 
     test('ignores a corrupted cache', () async {
-      SharedPreferences.setMockInitialValues(
-          {WeatherService.cacheKey: 'not json'});
+      SharedPreferences.setMockInitialValues({
+        WeatherService.cacheKey: 'not json',
+      });
 
-      expect(await FakeWttr().service.loadCached('Berlin'), isNull);
+      expect(
+        await FakeWttr().service.loadCached(server: server, zone: 'Berlin'),
+        isNull,
+      );
     });
   });
 
   group('sharing', () {
-    test('concurrent refreshes of the same place share one download',
-        () async {
+    test('concurrent refreshes of the same place share one download', () async {
       final wttr = FakeWttr()..hold = Completer();
       final first = wttr.service.refresh(server: server, zone: 'Berlin');
       final second = wttr.service.refresh(server: server, zone: 'Berlin');
@@ -146,12 +170,64 @@ void main() {
       expect(wttr.requests, hasLength(1));
 
       final hourAgo = DateTime.now().subtract(const Duration(hours: 1));
-      await FakeWttr(clock: () => hourAgo)
-          .service
-          .refresh(server: server, zone: 'Tokyo');
+      await FakeWttr(
+        clock: () => hourAgo,
+      ).service.refresh(server: server, zone: 'Tokyo');
       final result = await wttr.service.current(server: server, zone: 'Tokyo');
       expect(wttr.requests.last.path, '/Tokyo');
       expect(result.isFresh, isTrue);
+    });
+  });
+
+  group('cache per request', () {
+    test('keeps reports of other languages and servers apart', () async {
+      final wttr = FakeWttr();
+      await wttr.service.refresh(server: server, zone: 'Berlin', lang: 'de');
+
+      expect(
+        await wttr.service.loadCached(
+          server: server,
+          zone: 'Berlin',
+          lang: 'de',
+        ),
+        isNotNull,
+      );
+      expect(
+        await wttr.service.loadCached(server: server, zone: 'Berlin'),
+        isNull,
+        reason: 'English is another request',
+      );
+      expect(
+        await wttr.service.loadCached(
+          server: 'https://example.org',
+          zone: 'Berlin',
+          lang: 'de',
+        ),
+        isNull,
+        reason: 'another server is another request',
+      );
+    });
+
+    test('current() downloads again after a language change', () async {
+      final wttr = FakeWttr();
+      await wttr.service.current(server: server, zone: 'Berlin', lang: 'de');
+      await wttr.service.current(server: server, zone: 'Berlin');
+
+      expect(wttr.requests.map((uri) => uri.queryParameters['lang']), [
+        'de',
+        null,
+      ]);
+    });
+
+    test('offline, a report in another language is better than none', () async {
+      final wttr = FakeWttr();
+      await wttr.service.refresh(server: server, zone: 'Berlin', lang: 'de');
+      wttr.offline = true;
+
+      final result = await wttr.service.refresh(server: server, zone: 'Berlin');
+
+      expect(result.failure, WeatherFailure.network);
+      expect(result.report!.current.description, 'Wolkig');
     });
   });
 }

@@ -52,7 +52,9 @@ class _CityPageState extends State<CityPage> {
   DateTime? _lastWeatherAttempt;
   ({String request, Future<void> future})? _pendingWeather;
   String? _weatherLanguage;
-  bool _started = false;
+  // Server, place and language of the report shown, to notice when any of
+  // them changes, e.g. in the settings while this page was not on screen.
+  String? _shownRequest;
 
   @override
   void initState() {
@@ -67,7 +69,6 @@ class _CityPageState extends State<CityPage> {
         _refreshWeather();
       }
     });
-    _loadWeather();
   }
 
   @override
@@ -75,16 +76,16 @@ class _CityPageState extends State<CityPage> {
     super.didChangeDependencies();
     // wttr.in translates the descriptions; English is its default.
     final languageCode = Localizations.localeOf(context).languageCode;
-    final language = languageCode == 'en' ? null : languageCode;
-    final languageChanged = _weatherLanguage != language;
-    _weatherLanguage = language;
-    if (languageChanged && _started) _refreshWeather();
+    _weatherLanguage = languageCode == 'en' ? null : languageCode;
+    // First call, or the app language changed.
+    if (_shownRequest != _request) _loadWeather();
   }
 
   @override
   void didUpdateWidget(CityPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.city.weatherZone != widget.city.weatherZone) {
+    if (_shownRequest != _request) {
+      // Other place, or the server changed in the settings.
       _loadWeather();
     } else if (widget.isActive &&
         (oldWidget.refreshGeneration != widget.refreshGeneration ||
@@ -92,6 +93,14 @@ class _CityPageState extends State<CityPage> {
       _refreshWeather();
     }
   }
+
+  String get _server => context.read<SettingsProvider>().wttrServer;
+
+  String get _request => WeatherService.cacheKeyFor(
+        server: _server,
+        zone: widget.city.weatherZone,
+        lang: _weatherLanguage,
+      );
 
   @override
   void dispose() {
@@ -112,15 +121,20 @@ class _CityPageState extends State<CityPage> {
   /// Shows the cached report at once and only downloads a new one when the
   /// cached one is outdated, so swiping between cities costs no data.
   Future<void> _loadWeather() async {
-    final zone = widget.city.weatherZone;
-    final cached = await context.read<WeatherService>().loadCached(zone);
-    if (!mounted || zone != widget.city.weatherZone) return;
+    final request = _request;
+    _shownRequest = request;
+    final cached = await context.read<WeatherService>().loadCached(
+          server: _server,
+          zone: widget.city.weatherZone,
+          lang: _weatherLanguage,
+        );
+    // A newer load (other place, server or language) supersedes this one.
+    if (!mounted || _shownRequest != request) return;
     setState(() {
       _weather = cached;
       _weatherFailure = null;
       _lastWeatherAttempt = cached?.fetchedAt;
       _weatherLoading = _isDue;
-      _started = true;
     });
     if (_isDue) await _refreshWeather();
   }
@@ -128,9 +142,9 @@ class _CityPageState extends State<CityPage> {
   /// Fetches the weather unless the same request is already running.
   Future<void> _refreshWeather() {
     final city = widget.city;
-    final server = context.read<SettingsProvider>().wttrServer;
+    final server = _server;
     final language = _weatherLanguage;
-    final request = '$server|${city.weatherZone}|$language';
+    final request = _request;
     final pending = _pendingWeather;
     if (pending != null && pending.request == request) return pending.future;
     final future = _fetchWeather(request, city, server, language);

@@ -98,7 +98,7 @@ class WeatherService {
     required String zone,
     String? lang,
   }) {
-    final key = '$server|$zone|$lang';
+    final key = cacheKeyFor(server: server, zone: zone, lang: lang);
     return _inFlight[key] ??= _refresh(server: server, zone: zone, lang: lang)
         // A block, not `=>`: returning the removed future would make
         // whenComplete wait for itself.
@@ -114,7 +114,7 @@ class WeatherService {
     required String zone,
     String? lang,
   }) async {
-    final cached = await loadCached(zone);
+    final cached = await loadCached(server: server, zone: zone, lang: lang);
     if (cached != null &&
         _clock().difference(cached.fetchedAt) < refreshInterval) {
       return WeatherResult(report: cached);
@@ -131,10 +131,13 @@ class WeatherService {
     try {
       report = await fetch(server: server, zone: zone, lang: lang);
     } on WeatherException catch (e) {
-      return WeatherResult(report: await loadCached(zone), failure: e.failure);
+      // Offline, an older report in another language beats none at all.
+      final cached = await loadCached(server: server, zone: zone, lang: lang) ??
+          await _loadAnyCached(zone);
+      return WeatherResult(report: cached, failure: e.failure);
     }
     try {
-      await _store(zone, report);
+      await _store(cacheKeyFor(server: server, zone: zone, lang: lang), report);
     } catch (e) {
       // A failing cache must not hide the fresh report.
       debugPrint('Could not cache weather: $e');
@@ -142,19 +145,47 @@ class WeatherService {
     return WeatherResult(report: report);
   }
 
-  /// The last cached report of [zone], or `null` if none can be read.
-  Future<WeatherReport?> loadCached(String zone) async {
+  /// Reports are cached per server, place and language, so a changed
+  /// server or app language never shows the old data as current.
+  static String cacheKeyFor({
+    required String server,
+    required String zone,
+    String? lang,
+  }) =>
+      '$server|$zone|${lang ?? 'en'}';
+
+  /// The last cached report for this request, or `null` if none can be read.
+  Future<WeatherReport?> loadCached({
+    required String server,
+    required String zone,
+    String? lang,
+  }) async {
     try {
-      final entry = (await _loadCache())[zone];
+      final entry = (await _loadCache())[
+          cacheKeyFor(server: server, zone: zone, lang: lang)];
       return entry == null ? null : WeatherReport.fromJson(entry);
     } catch (_) {
       return null;
     }
   }
 
-  Future<void> _store(String zone, WeatherReport report) async {
+  /// The newest cached report of [zone] from any server or language.
+  Future<WeatherReport?> _loadAnyCached(String zone) async {
+    try {
+      final cache = await _loadCache();
+      final keys = cache.keys
+          .where((key) => key.split('|').elementAtOrNull(1) == zone)
+          .toList()
+        ..sort((a, b) => _fetchedAt(cache[b]).compareTo(_fetchedAt(cache[a])));
+      return keys.isEmpty ? null : WeatherReport.fromJson(cache[keys.first]);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _store(String key, WeatherReport report) async {
     final cache = await _loadCache();
-    cache[zone] = report.toJson();
+    cache[key] = report.toJson();
     // Keep only the most recently fetched locations.
     final zones = cache.keys.toList()
       ..sort((a, b) => _fetchedAt(cache[b]).compareTo(_fetchedAt(cache[a])));

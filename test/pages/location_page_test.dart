@@ -259,6 +259,70 @@ void main() {
     expect(custom.single.flag, 'jp.png');
   });
 
+  testWidgets('editing a favorite custom city keeps its place',
+      (tester) async {
+    const custom = City(
+      name: 'Zuhause',
+      country: '',
+      timeZone: 'Asia/Tokyo',
+      flag: '',
+      utc: '+09:00',
+      weatherZone: 'Zuhause',
+      isCustom: true,
+    );
+    SharedPreferences.setMockInitialValues({
+      CityRepository.customCitiesKey: jsonEncode([custom.toJson()]),
+    });
+    final repository = FakeCityRepository();
+    await repository.saveFavorites([custom, City.berlin]);
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+
+    // Only the flag changes, so the city stays equal to the old one.
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    await tester.enterText(flagField, 'jap');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Japan').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    expect(favoriteNames(tester), ['Zuhause', 'Berlin']);
+    final favorites = await repository.loadFavorites();
+    expect(favorites.first.flag, 'jp.png');
+  });
+
+  testWidgets('editing a custom city does not make it a favorite',
+      (tester) async {
+    const custom = City(
+      name: 'Zuhause',
+      country: '',
+      timeZone: 'Asia/Tokyo',
+      flag: '',
+      utc: '+09:00',
+      weatherZone: 'Zuhause',
+      isCustom: true,
+    );
+    SharedPreferences.setMockInitialValues({
+      CityRepository.customCitiesKey: jsonEncode([custom.toJson()]),
+    });
+    final repository = FakeCityRepository();
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    expect(favoriteNames(tester), ['Berlin']);
+  });
+
   testWidgets('deleting the selected custom city falls back to Berlin',
       (tester) async {
     const custom = City(

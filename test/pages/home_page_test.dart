@@ -400,4 +400,56 @@ void main() {
       expect(find.bySemanticsLabel('City 2 of 3'), findsOneWidget);
     });
   });
+
+  group('cached weather', () {
+    Future<void> storeFavorites(List<City> favorites) async {
+      SharedPreferences.setMockInitialValues({
+        CityRepository.favoritesKey:
+            jsonEncode(favorites.map((city) => city.toJson()).toList()),
+      });
+    }
+
+    testWidgets('other cities load from a new server once they are shown',
+        (tester) async {
+      await storeFavorites([City.berlin, tokyo]);
+      final wttr = FakeWttr();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+      Future<void> swipe(double dx) async {
+        await tester.fling(find.byType(PageView), Offset(dx, 0), 1000);
+        await tester.pumpAndSettle();
+      }
+
+      // Tokyo is cached from the default server.
+      await swipe(-300);
+      await swipe(300);
+      expect(wttr.requests.map((uri) => '${uri.host}${uri.path}'),
+          ['wttr.in/Berlin', 'wttr.in/Tokyo']);
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await settings.setWttrServer('https://example.org');
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+      await swipe(-300);
+
+      expect(wttr.requests.map((uri) => '${uri.host}${uri.path}').skip(2),
+          ['example.org/Berlin', 'example.org/Tokyo']);
+    });
+
+    testWidgets('a recent report in another language is not reused',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final wttr = FakeWttr();
+      await wttr.service
+          .refresh(server: 'https://wttr.in', zone: 'Berlin', lang: 'de');
+
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+
+      expect(find.text('☁️ Cloudy +20°C'), findsOneWidget);
+      expect(wttr.requests.last.queryParameters['lang'], isNull);
+    });
+  });
 }
