@@ -98,4 +98,26 @@ void main() {
       expect(await repository.loadCurrentIndex(), 2);
     });
   });
+
+  group('widget cities', () {
+    test('are stored per widget and can be removed', () async {
+      expect(await repository.loadWidgetCities(), isEmpty);
+
+      await repository.saveWidgetCity(7, custom);
+      await repository.saveWidgetCity(9, City.berlin);
+      await repository.saveWidgetCity(7, City.berlin);
+      expect(await repository.loadWidgetCities(),
+          {7: City.berlin, 9: City.berlin});
+
+      await repository.removeWidgetCities([9, 42]);
+      expect(await repository.loadWidgetCities(), {7: City.berlin});
+    });
+
+    test('ignore broken data', () async {
+      SharedPreferences.setMockInitialValues(
+          {CityRepository.widgetCitiesKey: '{"x": 1}'});
+
+      expect(await repository.loadWidgetCities(), isEmpty);
+    });
+  });
 }

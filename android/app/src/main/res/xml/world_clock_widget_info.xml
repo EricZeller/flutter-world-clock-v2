@@ -9,5 +9,7 @@
     android:initialLayout="@layout/world_clock_widget"
     android:previewLayout="@layout/world_clock_widget_preview"
     android:resizeMode="horizontal|vertical"
+    android:configure="de.ericz.worldclockv2.MainActivity"
+    android:widgetFeatures="reconfigurable|configuration_optional"
     android:widgetCategory="home_screen">
 </appwidget-provider>

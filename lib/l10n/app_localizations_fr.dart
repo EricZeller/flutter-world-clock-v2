@@ -291,4 +291,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String cityPosition(int index, int count) {
     return 'Ville $index sur $count';
   }
+
+  @override
+  String get widgetCity => 'Ville du widget';
 }

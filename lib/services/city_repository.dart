@@ -14,6 +14,7 @@ class CityRepository {
   static const customCitiesKey = 'customCities';
   static const favoritesKey = 'favoriteCities';
   static const currentIndexKey = 'currentCityIndex';
+  static const widgetCitiesKey = 'widgetCities';
 
   final AssetBundle _bundle;
 
@@ -86,6 +87,41 @@ class CityRepository {
   Future<void> saveCurrentIndex(int index) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(currentIndexKey, index);
+  }
+
+  /// Cities of home screen widgets that were given their own city, by
+  /// Android widget ID. Other widgets show the first favorite.
+  Future<Map<int, City>> loadWidgetCities() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getString(widgetCitiesKey);
+    if (stored == null) return {};
+    try {
+      return {
+        for (final MapEntry(:key, :value)
+            in (jsonDecode(stored) as Map<String, dynamic>).entries)
+          int.parse(key): City.fromJson(value as Map<String, dynamic>),
+      };
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> saveWidgetCity(int widgetId, City city) async {
+    await _saveWidgetCities({...await loadWidgetCities(), widgetId: city});
+  }
+
+  Future<void> removeWidgetCities(Iterable<int> widgetIds) async {
+    final cities = await loadWidgetCities()
+      ..removeWhere((id, _) => widgetIds.contains(id));
+    await _saveWidgetCities(cities);
+  }
+
+  Future<void> _saveWidgetCities(Map<int, City> cities) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(widgetCitiesKey, jsonEncode({
+      for (final MapEntry(:key, :value) in cities.entries)
+        '$key': value.toJson(),
+    }));
   }
 
   /// Returns the stored selection, or `null` if there is none or it is broken.

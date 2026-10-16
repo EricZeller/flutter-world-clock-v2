@@ -93,5 +93,6 @@
   "reorderCity": "Arrastra para ordenar",
   "cityAddedAt": "{city} añadida · {time}",
   "cityRemovedAt": "{city} quitada · {time}",
-  "cityPosition": "Ciudad {index} de {count}"
+  "cityPosition": "Ciudad {index} de {count}",
+  "widgetCity": "Ciudad del widget"
 }

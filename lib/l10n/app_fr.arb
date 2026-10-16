@@ -107,5 +107,6 @@
   "reorderCity": "Faites glisser pour trier",
   "cityAddedAt": "{city} ajoutée · {time}",
   "cityRemovedAt": "{city} retirée · {time}",
-  "cityPosition": "Ville {index} sur {count}"
+  "cityPosition": "Ville {index} sur {count}",
+  "widgetCity": "Ville du widget"
 }
