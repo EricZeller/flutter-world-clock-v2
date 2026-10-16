@@ -23,8 +23,10 @@ class HomeWidgetSync {
   static void resetQueue() => _queue = Future.value();
 
   /// Reads all context-dependent values right away; the work itself runs
-  /// after any sync that is still in progress.
-  Future<void> sync(BuildContext context, SettingsProvider settings) {
+  /// after any sync that is still in progress. Without [download] only
+  /// cached weather is used, which never waits for the network.
+  Future<void> sync(BuildContext context, SettingsProvider settings,
+      {bool download = true}) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final language = Localizations.localeOf(context).languageCode;
@@ -34,6 +36,7 @@ class HomeWidgetSync {
           // wttr.in translates the descriptions; English is its default.
           lang: language == 'en' ? null : language,
           settings: settings,
+          download: download,
         ));
   }
 
@@ -42,6 +45,7 @@ class HomeWidgetSync {
     required ColorScheme colorScheme,
     required String? lang,
     required SettingsProvider settings,
+    required bool download,
   }) async {
     try {
       var widgetCities = await cities.loadWidgetCities();
@@ -59,11 +63,12 @@ class HomeWidgetSync {
       }
 
       final defaultCity = (await cities.loadFavorites()).first;
-      final entries = <WidgetCity>[
-        await _entry(null, defaultCity, l10n, lang, settings),
+      // In parallel, so a slow network delays the widgets only once.
+      final entries = await Future.wait([
+        _entry(null, defaultCity, l10n, lang, settings, download),
         for (final MapEntry(:key, :value) in widgetCities.entries)
-          await _entry(key, value, l10n, lang, settings),
-      ];
+          _entry(key, value, l10n, lang, settings, download),
+      ]);
       await HomeWidgetService.update(
         cities: entries,
         removedWidgetIds: removed,
@@ -76,12 +81,20 @@ class HomeWidgetSync {
   }
 
   Future<WidgetCity> _entry(int? widgetId, City city, AppLocalizations l10n,
-      String? lang, SettingsProvider settings) async {
-    final result = await weather.current(
-      server: settings.wttrServer,
-      zone: city.weatherZone,
-      lang: lang,
-    );
+      String? lang, SettingsProvider settings, bool download) async {
+    final result = download
+        ? await weather.current(
+            server: settings.wttrServer,
+            zone: city.weatherZone,
+            lang: lang,
+          )
+        : WeatherResult(
+            report: await weather.loadCached(
+              server: settings.wttrServer,
+              zone: city.weatherZone,
+              lang: lang,
+            ),
+          );
     final report = result.report;
     final fahrenheit = settings.useFahrenheit;
     return (
@@ -89,8 +102,9 @@ class HomeWidgetSync {
       city: city,
       // Without a report the widget shows the same status as the app.
       weather: report?.summary(fahrenheit: fahrenheit) ??
-          weatherStatusText(l10n, failure: result.failure, isLoading: false),
-      weatherIcon: report?.current.symbol ?? '🛜',
+          weatherStatusText(l10n,
+              failure: result.failure, isLoading: !download),
+      weatherIcon: report?.current.symbol ?? (download ? '🛜' : '🛰️'),
       temperature:
           report == null ? '' : '${report.current.temperature(fahrenheit)}°',
     );

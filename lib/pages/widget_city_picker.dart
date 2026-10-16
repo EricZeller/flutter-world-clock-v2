@@ -18,6 +18,9 @@ class WidgetCityPickerPage extends StatefulWidget {
 
   final int widgetId;
 
+  /// How long fresh weather may take before the configuration ends anyway.
+  static const downloadLimit = Duration(seconds: 5);
+
   @override
   State<WidgetCityPickerPage> createState() => _WidgetCityPickerPageState();
 }
@@ -59,10 +62,18 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
     });
     await _repository.saveWidgetCity(widget.widgetId, city);
     if (!mounted) return;
-    await HomeWidgetSync(
+    final sync = HomeWidgetSync(
       cities: _repository,
       weather: context.read<WeatherService>(),
-    ).sync(context, context.read<SettingsProvider>());
+    );
+    final settings = context.read<SettingsProvider>();
+    // First from the cache, so the widget shows the chosen city even if the
+    // download below is cut short when the configuration ends.
+    await sync.sync(context, settings, download: false);
+    if (!mounted) return;
+    await sync
+        .sync(context, settings)
+        .timeout(WidgetCityPickerPage.downloadLimit, onTimeout: () {});
     await HomeWidgetService.finishConfigure();
   }
 
@@ -123,6 +134,12 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
           ),
         ),
         backgroundColor: colorScheme.primaryContainer,
+        bottom: _saving
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(4),
+                child: LinearProgressIndicator(),
+              )
+            : null,
       ),
       body: Column(
         children: [

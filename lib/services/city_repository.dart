@@ -93,6 +93,9 @@ class CityRepository {
   /// Android widget ID. Other widgets show the first favorite.
   Future<Map<int, City>> loadWidgetCities() async {
     final prefs = await SharedPreferences.getInstance();
+    // Android configures a widget in a second instance of the app, whose
+    // writes this instance's cached preferences would not see.
+    await prefs.reload();
     final stored = prefs.getString(widgetCitiesKey);
     if (stored == null) return {};
     try {

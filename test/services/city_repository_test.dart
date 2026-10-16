@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 
@@ -118,6 +119,19 @@ void main() {
           {CityRepository.widgetCitiesKey: '{"x": 1}'});
 
       expect(await repository.loadWidgetCities(), isEmpty);
+    });
+
+    test('include those saved by another instance of the app', () async {
+      expect(await repository.loadWidgetCities(), isEmpty);
+
+      // Android runs the widget configuration in a second instance, which
+      // writes to the platform behind this instance's cache.
+      await SharedPreferencesStorePlatform.instance.setValue(
+          'String',
+          'flutter.${CityRepository.widgetCitiesKey}',
+          jsonEncode({'5': custom.toJson()}));
+
+      expect(await repository.loadWidgetCities(), {5: custom});
     });
   });
 }
