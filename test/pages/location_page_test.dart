@@ -275,6 +275,7 @@ void main() {
     });
     final repository = FakeCityRepository();
     await repository.saveFavorites([custom, City.berlin]);
+    await repository.saveWidgetCity(7, custom);
     await pumpPage(tester, const LocationPage(),
         settings: await loadSettings(), cities: repository);
 
@@ -293,6 +294,8 @@ void main() {
     expect(favoriteNames(tester), ['Zuhause', 'Berlin']);
     final favorites = await repository.loadFavorites();
     expect(favorites.first.flag, 'jp.png');
+    expect((await repository.loadWidgetCities())[7]!.flag, 'jp.png',
+        reason: 'the widget shows the edited city');
   });
 
   testWidgets('editing a custom city does not make it a favorite',
@@ -339,6 +342,8 @@ void main() {
       CityRepository.selectedCityKey: jsonEncode(custom.toJson()),
     });
     final repository = FakeCityRepository();
+    await repository.saveWidgetCity(7, custom);
+    await repository.saveWidgetCity(9, tokyo);
     await pumpPage(tester, const LocationPage(),
         settings: await loadSettings(), cities: repository);
 
@@ -351,5 +356,7 @@ void main() {
     expect(favoriteNames(tester), ['Berlin']);
     expect(await repository.loadCustomCities(), isEmpty);
     expect(await repository.loadFavorites(), [City.berlin]);
+    expect(await repository.loadWidgetCities(), {9: tokyo},
+        reason: 'widget 7 falls back to the first favorite');
   });
 }

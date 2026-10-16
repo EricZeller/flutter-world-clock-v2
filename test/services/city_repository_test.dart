@@ -114,6 +114,28 @@ void main() {
       expect(await repository.loadWidgetCities(), {7: City.berlin});
     });
 
+    test('follow an edited or deleted custom city', () async {
+      const renamed = City(
+        name: 'Daheim',
+        country: '',
+        timeZone: 'Asia/Tokyo',
+        flag: '',
+        utc: '+09:00',
+        weatherZone: 'Daheim',
+        isCustom: true,
+      );
+      await repository.saveWidgetCity(7, custom);
+      await repository.saveWidgetCity(8, custom);
+      await repository.saveWidgetCity(9, City.berlin);
+
+      await repository.replaceWidgetCity(custom, renamed);
+      expect(await repository.loadWidgetCities(),
+          {7: renamed, 8: renamed, 9: City.berlin});
+
+      await repository.replaceWidgetCity(renamed, null);
+      expect(await repository.loadWidgetCities(), {9: City.berlin});
+    });
+
     test('ignore broken data', () async {
       SharedPreferences.setMockInitialValues(
           {CityRepository.widgetCitiesKey: '{"x": 1}'});

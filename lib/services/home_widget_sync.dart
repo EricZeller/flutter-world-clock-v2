@@ -61,6 +61,12 @@ class HomeWidgetSync {
             if (!removed.contains(key)) key: value,
         };
       }
+      // Widgets that lost their own city, e.g. a deleted custom city, must
+      // drop its keys to show the first favorite again.
+      final cleared = [
+        ...removed,
+        ...?installed?.where((id) => !widgetCities.containsKey(id)),
+      ];
 
       final defaultCity = (await cities.loadFavorites()).first;
       // In parallel, so a slow network delays the widgets only once.
@@ -71,7 +77,7 @@ class HomeWidgetSync {
       ]);
       await HomeWidgetService.update(
         cities: entries,
-        removedWidgetIds: removed,
+        removedWidgetIds: cleared,
         colorScheme: colorScheme,
         settings: settings,
       );

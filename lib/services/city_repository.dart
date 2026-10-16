@@ -119,6 +119,25 @@ class CityRepository {
     await _saveWidgetCities(cities);
   }
 
+  /// Gives widgets that show [city] its edited version [replacement], or
+  /// without one returns them to the first favorite.
+  Future<void> replaceWidgetCity(City city, City? replacement) async {
+    final cities = await loadWidgetCities();
+    final ids = [
+      for (final MapEntry(:key, :value) in cities.entries)
+        if (value == city) key,
+    ];
+    if (ids.isEmpty) return;
+    for (final id in ids) {
+      if (replacement == null) {
+        cities.remove(id);
+      } else {
+        cities[id] = replacement;
+      }
+    }
+    await _saveWidgetCities(cities);
+  }
+
   Future<void> _saveWidgetCities(Map<int, City> cities) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(widgetCitiesKey, jsonEncode({

@@ -60,8 +60,19 @@ void main() {
     expect(widget.current['timeZone_7'], 'Asia/Tokyo');
     expect(widget.current['weather_icon_7'], '☁️');
     expect(widget.current['weather_temp_7'], '20°');
-    expect(widget.current.containsKey('city_8'), isFalse,
+    expect(widget.current['city_8'], isNull,
         reason: 'widget 8 follows the first favorite');
+  });
+
+  testWidgets('a widget that lost its own city shows the first favorite',
+      (tester) async {
+    final widget = HomeWidgetRecorder.install()..installedWidgetIds = [7];
+
+    await sync(tester);
+
+    expect(widget.valuesOf('city_7'), [null]);
+    expect(widget.valuesOf('timeZone_7'), [null]);
+    expect(widget.current['city'], 'Berlin');
   });
 
   testWidgets('removed widgets are forgotten', (tester) async {

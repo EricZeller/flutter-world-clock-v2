@@ -128,6 +128,7 @@ class _LocationPageState extends State<LocationPage> {
     // The favorites first: the home page reloads them as soon as this closes.
     await _repository.saveFavorites(_favorites);
     await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
+    if (editing != null) await _repository.replaceWidgetCity(editing, city);
   }
 
   Future<void> _deleteCustomCity(City city) async {
@@ -138,6 +139,8 @@ class _LocationPageState extends State<LocationPage> {
     });
     await _repository.saveFavorites(_favorites);
     await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
+    // The home page syncs the widgets as soon as this page closes.
+    await _repository.replaceWidgetCity(city, null);
   }
 
   void _close() {
