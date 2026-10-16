@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
@@ -61,7 +61,7 @@ bool isLabelVisible(City city, {required bool isSelected, required double scale}
 class MarkerPainter extends CustomPainter {
   MarkerPainter({
     required this.cities,
-    required this.selectedCity,
+    required this.selectedCities,
     required this.scale,
     required this.markerColor,
     required this.labelBackground,
@@ -69,7 +69,7 @@ class MarkerPainter extends CustomPainter {
   });
 
   final List<City> cities;
-  final City selectedCity;
+  final Set<City> selectedCities;
   final double scale;
   final Color markerColor;
   final Color labelBackground;
@@ -78,13 +78,13 @@ class MarkerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final projection = MapProjection(size);
-    // Draw the selected city last so it is on top.
+    // Draw the selected cities last so they are on top.
     final ordered = [
-      ...cities.where((city) => city != selectedCity),
-      ...cities.where((city) => city == selectedCity),
+      ...cities.where((city) => !selectedCities.contains(city)),
+      ...cities.where(selectedCities.contains),
     ];
     for (final city in ordered) {
-      final isSelected = city == selectedCity;
+      final isSelected = selectedCities.contains(city);
       final point = projection.project(cityPosition(city));
       _paintMarker(canvas, point, city, isSelected);
       if (isLabelVisible(city, isSelected: isSelected, scale: scale)) {
@@ -146,7 +146,7 @@ class MarkerPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant MarkerPainter oldDelegate) =>
       oldDelegate.cities != cities ||
-      oldDelegate.selectedCity != selectedCity ||
+      !setEquals(oldDelegate.selectedCities, selectedCities) ||
       oldDelegate.scale != scale ||
       oldDelegate.markerColor != markerColor ||
       oldDelegate.labelBackground != labelBackground ||

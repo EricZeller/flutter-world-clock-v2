@@ -61,6 +61,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.1
+  shared_preferences_platform_interface: ^2.4.2
 
 flutter_launcher_icons:
   linux: true

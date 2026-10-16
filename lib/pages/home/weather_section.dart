@@ -6,18 +6,8 @@ import 'package:world_clock_v2/models/weather.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
+import 'package:world_clock_v2/utils/weather_status.dart';
 import 'package:world_clock_v2/widgets/info_chip.dart';
-
-/// Text shown instead of the weather while there is no report.
-String weatherStatusText(
-  AppLocalizations l10n, {
-  required WeatherFailure? failure,
-  required bool isLoading,
-}) {
-  if (isLoading) return l10n.weatherLoading;
-  if (failure == WeatherFailure.server) return l10n.apiError;
-  return l10n.connectionError;
-}
 
 /// Weather summary on the home screen. Tapping it opens the forecast.
 class WeatherSection extends StatelessWidget {

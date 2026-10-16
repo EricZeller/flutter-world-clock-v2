@@ -4,8 +4,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/pages/home/forecast_sheet.dart';
 import 'package:world_clock_v2/pages/home/home_page.dart';
+import 'package:world_clock_v2/services/city_repository.dart';
 
 import '../helpers/fake_wttr.dart';
 import '../helpers/home_widget_recorder.dart';
@@ -98,10 +100,24 @@ void main() {
     expect(find.text('☁️ Cloudy +20°C'), findsOneWidget);
   });
 
-  testWidgets('shows cached weather while offline', (tester) async {
+  testWidgets('shows recent cached weather without downloading',
+      (tester) async {
     final wttr = FakeWttr();
     await wttr.service.refresh(server: 'https://wttr.in', zone: 'Berlin');
-    wttr.offline = true;
+
+    await pumpPage(tester, const HomePage(),
+        settings: await loadSettings(), weather: wttr.service);
+
+    expect(find.text('☁️ Cloudy +20°C'), findsOneWidget);
+    expect(wttr.requests, hasLength(1), reason: 'only the seeding request');
+  });
+
+  testWidgets('shows outdated cached weather while offline', (tester) async {
+    final hourAgo = DateTime.now().subtract(const Duration(hours: 1));
+    await FakeWttr(clock: () => hourAgo)
+        .service
+        .refresh(server: 'https://wttr.in', zone: 'Berlin');
+    final wttr = FakeWttr(offline: true);
 
     await pumpPage(tester, const HomePage(),
         settings: await loadSettings(), weather: wttr.service);
@@ -220,10 +236,9 @@ void main() {
 
       // Switch to a city without cached weather while offline.
       wttr.offline = true;
-      await tester.tap(find.text('Change city'));
+      await tester.tap(find.text('Manage cities'));
       await tester.pumpAndSettle();
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('selectedOption', jsonEncode(tokyo.toJson()));
+      await CityRepository().saveFavorites([tokyo]);
       tester.state<NavigatorState>(find.byType(Navigator)).pop();
       await tester.pumpAndSettle();
       await flushWidgetUpdates(tester);
@@ -296,6 +311,145 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+    });
+  });
+
+  group('multiple cities', () {
+    const newYork = City(
+      name: 'New York',
+      country: 'United States',
+      timeZone: 'America/New_York',
+      flag: 'us.png',
+      utc: '-04:00',
+      weatherZone: 'New York',
+    );
+
+    Future<void> storeFavorites(List<City> favorites, {int index = 0}) async {
+      SharedPreferences.setMockInitialValues({
+        CityRepository.favoritesKey:
+            jsonEncode(favorites.map((city) => city.toJson()).toList()),
+        CityRepository.currentIndexKey: index,
+      });
+    }
+
+    testWidgets('migrates the single city of older versions', (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'selectedOption': jsonEncode(tokyo.toJson()),
+      });
+
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+
+      expect(find.text('Tokyo'), findsOneWidget);
+      expect(find.bySemanticsLabel(RegExp('City 1 of')), findsNothing,
+          reason: 'no page dots for a single city');
+    });
+
+    testWidgets('swiping shows the next city and loads its weather',
+        (tester) async {
+      await storeFavorites([City.berlin, tokyo, newYork]);
+      final wttr = FakeWttr();
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+      expect(find.text('Berlin'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 1 of 3'), findsOneWidget);
+
+      await tester.fling(find.byType(PageView), const Offset(-300, 0), 1000);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tokyo'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 2 of 3'), findsOneWidget);
+      expect(wttr.requests.map((uri) => uri.path), ['/Berlin', '/Tokyo']);
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt(CityRepository.currentIndexKey), 1);
+    });
+
+    testWidgets('opens the city shown last', (tester) async {
+      await storeFavorites([City.berlin, tokyo, newYork], index: 2);
+
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+
+      expect(find.text('New York'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 3 of 3'), findsOneWidget);
+    });
+
+    testWidgets('the widget shows the first city, not the one on screen',
+        (tester) async {
+      await storeFavorites([tokyo, City.berlin], index: 1);
+      final widget = HomeWidgetRecorder.install();
+
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+      await tester.pump(const Duration(seconds: 2));
+
+      expect(find.text('Berlin'), findsOneWidget);
+      expect(widget.valuesOf('city'), everyElement('Tokyo'));
+    });
+
+    testWidgets('keeps showing the same city after the list changed',
+        (tester) async {
+      await storeFavorites([City.berlin, tokyo], index: 1);
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+      expect(find.text('Tokyo'), findsOneWidget);
+
+      await tester.tap(find.text('Manage cities'));
+      await tester.pumpAndSettle();
+      await CityRepository().saveFavorites([newYork, tokyo, City.berlin]);
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tokyo'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 2 of 3'), findsOneWidget);
+    });
+  });
+
+  group('cached weather', () {
+    Future<void> storeFavorites(List<City> favorites) async {
+      SharedPreferences.setMockInitialValues({
+        CityRepository.favoritesKey:
+            jsonEncode(favorites.map((city) => city.toJson()).toList()),
+      });
+    }
+
+    testWidgets('other cities load from a new server once they are shown',
+        (tester) async {
+      await storeFavorites([City.berlin, tokyo]);
+      final wttr = FakeWttr();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+      Future<void> swipe(double dx) async {
+        await tester.fling(find.byType(PageView), Offset(dx, 0), 1000);
+        await tester.pumpAndSettle();
+      }
+
+      // Tokyo is cached from the default server.
+      await swipe(-300);
+      await swipe(300);
+      expect(wttr.requests.map((uri) => '${uri.host}${uri.path}'),
+          ['wttr.in/Berlin', 'wttr.in/Tokyo']);
+
+      await tester.tap(find.byType(FloatingActionButton));
+      await tester.pumpAndSettle();
+      await settings.setWttrServer('https://example.org');
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+      await swipe(-300);
+
+      expect(wttr.requests.map((uri) => '${uri.host}${uri.path}').skip(2),
+          ['example.org/Berlin', 'example.org/Tokyo']);
+    });
+
+    testWidgets('a recent report in another language is not reused',
+        (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final wttr = FakeWttr();
+      await wttr.service
+          .refresh(server: 'https://wttr.in', zone: 'Berlin', lang: 'de');
+
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+
+      expect(find.text('☁️ Cloudy +20°C'), findsOneWidget);
+      expect(wttr.requests.last.queryParameters['lang'], isNull);
     });
   });
 }

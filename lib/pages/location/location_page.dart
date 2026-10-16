@@ -7,10 +7,13 @@ import 'package:world_clock_v2/pages/location/city_tile.dart';
 import 'package:world_clock_v2/pages/location/custom_city_dialog.dart';
 import 'package:world_clock_v2/pages/location/sort_menu.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
+import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
 import 'package:world_clock_v2/utils/city_sorting.dart';
+import 'package:world_clock_v2/utils/time_utils.dart';
 import 'package:world_clock_v2/widgets/world_map/world_map.dart';
 
+/// Manages the favorite cities shown on the home screen.
 class LocationPage extends StatefulWidget {
   const LocationPage({super.key});
 
@@ -20,10 +23,10 @@ class LocationPage extends StatefulWidget {
 
 class _LocationPageState extends State<LocationPage> {
   List<City> _cities = [];
+  List<City> _favorites = [City.berlin];
   String _query = '';
   CitySort _sort = CitySort.city;
   bool _showMap = false;
-  City _selected = City.berlin;
 
   // Read once, so saving after an await never needs this page's context.
   late final CityRepository _repository;
@@ -37,17 +40,59 @@ class _LocationPageState extends State<LocationPage> {
 
   Future<void> _loadCities() async {
     final cities = await _repository.loadAllCities();
-    final selected = await _repository.loadSelectedCity();
+    final favorites = await _repository.loadFavorites();
     if (!mounted) return;
     setState(() {
       _cities = cities;
-      _selected = selected ?? City.berlin;
+      _favorites = favorites;
     });
   }
 
-  void _select(City city) {
-    setState(() => _selected = city);
-    _repository.saveSelectedCity(city);
+  void _showMessage(String text) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(text)));
+  }
+
+  /// Adds or removes [city]; returns whether it is a favorite afterwards.
+  bool _toggleFavorite(City city) {
+    final isFavorite = _favorites.contains(city);
+    if (isFavorite && _favorites.length == 1) {
+      _showMessage(AppLocalizations.of(context)!.keepOneCity);
+      return true;
+    }
+    HapticFeedback.lightImpact();
+    setState(() {
+      _favorites = isFavorite
+          ? _favorites.where((item) => item != city).toList()
+          : [..._favorites, city];
+    });
+    _repository.saveFavorites(_favorites);
+    return !isFavorite;
+  }
+
+  void _onMapTap(City city) {
+    final l10n = AppLocalizations.of(context)!;
+    final wasFavorite = _favorites.contains(city);
+    final isFavorite = _toggleFavorite(city);
+    if (wasFavorite == isFavorite) return;
+    final time = formatTimeInZone(
+      city.timeZone,
+      use24hr: context.read<SettingsProvider>().use24hr,
+      showSeconds: false,
+    );
+    _showMessage(isFavorite
+        ? l10n.cityAddedAt(city.name, time)
+        : l10n.cityRemovedAt(city.name, time));
+  }
+
+  void _reorder(int oldIndex, int newIndex) {
+    setState(() {
+      final favorites = [..._favorites];
+      favorites.insert(newIndex, favorites.removeAt(oldIndex));
+      _favorites = favorites;
+    });
+    _repository.saveFavorites(_favorites);
   }
 
   Future<void> _editCustomCity({City? editing}) async {
@@ -65,25 +110,55 @@ class _LocationPageState extends State<LocationPage> {
       } else {
         _cities.add(city);
       }
-      _selected = city;
+      // A new city is shown right away; an edited one keeps its place and
+      // stays a favorite only if it was one.
+      final favoriteIndex = editing == null ? -1 : _favorites.indexOf(editing);
+      if (favoriteIndex >= 0) {
+        _favorites = [
+          for (final (index, item) in _favorites.indexed)
+            if (index == favoriteIndex)
+              city
+            else if (item != city)
+              item,
+        ];
+      } else if (editing == null) {
+        _favorites = [..._favorites.where((item) => item != city), city];
+      }
     });
-    // The selection first: the home page reloads it as soon as this closes.
-    await _repository.saveSelectedCity(city);
+    // The favorites first: the home page reloads them as soon as this closes.
+    await _repository.saveFavorites(_favorites);
     await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
+    if (editing != null) await _repository.replaceWidgetCity(editing, city);
   }
 
   Future<void> _deleteCustomCity(City city) async {
     setState(() {
       _cities.removeWhere((item) => identical(item, city));
-      if (_selected == city) _selected = City.berlin;
+      final favorites = _favorites.where((item) => item != city).toList();
+      _favorites = favorites.isEmpty ? [City.berlin] : favorites;
     });
-    await _repository.saveSelectedCity(_selected);
+    await _repository.saveFavorites(_favorites);
     await _repository.saveCustomCities(_cities.where((item) => item.isCustom));
+    // The home page syncs the widgets as soon as this page closes.
+    await _repository.replaceWidgetCity(city, null);
   }
 
   void _close() {
     HapticFeedback.lightImpact();
-    Navigator.pop(context, _selected);
+    Navigator.pop(context);
+  }
+
+  Widget _header(String text) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+    );
   }
 
   @override
@@ -91,6 +166,7 @@ class _LocationPageState extends State<LocationPage> {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final visibleCities = sortCities(filterCities(_cities, _query), _sort);
+    final showFavorites = _query.trim().isEmpty;
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
@@ -100,7 +176,7 @@ class _LocationPageState extends State<LocationPage> {
         ],
         centerTitle: true,
         title: Text(
-          l10n.chooseCity,
+          l10n.manageCities,
           style: TextStyle(
             fontFamily: AppTheme.accentFontFamily,
             fontSize: 24,
@@ -116,15 +192,8 @@ class _LocationPageState extends State<LocationPage> {
       body: _showMap
           ? WorldMap(
               cities: _cities,
-              selectedCity: _selected,
-              onCityTap: (city) {
-                _select(city);
-                ScaffoldMessenger.of(context)
-                  ..hideCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(content: Text(l10n.citySelected(city.name))),
-                  );
-              },
+              selectedCities: _favorites,
+              onCityTap: _onMapTap,
             )
           : Column(
               children: [
@@ -141,24 +210,37 @@ class _LocationPageState extends State<LocationPage> {
                   ),
                 ),
                 Expanded(
-                  child: RadioGroup<City>(
-                    groupValue: _selected,
-                    onChanged: (city) {
-                      if (city == null) return;
-                      HapticFeedback.lightImpact();
-                      _select(city);
-                    },
-                    child: ListView.builder(
-                      itemCount: visibleCities.length,
-                      itemBuilder: (context, index) {
-                        final city = visibleCities[index];
-                        return CityTile(
-                          city: city,
-                          onEdit: () => _editCustomCity(editing: city),
-                          onDelete: () => _deleteCustomCity(city),
-                        );
-                      },
-                    ),
+                  child: CustomScrollView(
+                    slivers: [
+                      if (showFavorites) ...[
+                        SliverToBoxAdapter(child: _header(l10n.favorites)),
+                        SliverReorderableList(
+                          itemCount: _favorites.length,
+                          onReorderItem: _reorder,
+                          itemBuilder: (context, index) => FavoriteTile(
+                            key: ValueKey(_favorites[index]),
+                            city: _favorites[index],
+                            index: index,
+                            onRemove: () => _toggleFavorite(_favorites[index]),
+                          ),
+                        ),
+                        SliverToBoxAdapter(child: _header(l10n.allCities)),
+                      ],
+                      SliverList.builder(
+                        itemCount: visibleCities.length,
+                        itemBuilder: (context, index) {
+                          final city = visibleCities[index];
+                          return CityTile(
+                            city: city,
+                            isFavorite: _favorites.contains(city),
+                            onToggleFavorite: () => _toggleFavorite(city),
+                            onEdit: () => _editCustomCity(editing: city),
+                            onDelete: () => _deleteCustomCity(city),
+                          );
+                        },
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 240)),
+                    ],
                   ),
                 ),
               ],
