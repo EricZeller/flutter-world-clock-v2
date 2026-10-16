@@ -62,7 +62,28 @@ jobs:
           elif [ ${{ matrix.os }} = macos-latest ]; then
             npm install -g appdmg
             flutter build macos --release
-            sudo codesign -s - --force --deep --timestamp --options runtime "build/macos/Build/Products/Release/World Clock v2.app"
+            APP="build/macos/Build/Products/Release/World Clock v2.app"
+            # Ad-hoc signing from the inside out. --deep would drop the
+            # entitlements, so every bundle keeps the ones Xcode signed it with
+            # (e.g. the sandbox), minus the debugger entitlement. No hardened
+            # runtime: it only matters for notarization, and its library
+            # validation rejects ad-hoc signed frameworks at launch.
+            sign() {
+              ENTITLEMENTS="$RUNNER_TEMP/entitlements.plist"
+              codesign -d --entitlements - --xml "$1" > "$ENTITLEMENTS" 2>/dev/null
+              if [ -s "$ENTITLEMENTS" ]; then
+                /usr/libexec/PlistBuddy -c "Delete :com.apple.security.get-task-allow" "$ENTITLEMENTS" 2>/dev/null || true
+                codesign -s - --force --entitlements "$ENTITLEMENTS" "$1"
+              else
+                codesign -s - --force "$1"
+              fi
+            }
+            for nested in "$APP"/Contents/Frameworks/*.framework "$APP"/Contents/PlugIns/*.appex; do
+              [ -e "$nested" ] || continue
+              sign "$nested"
+            done
+            sign "$APP"
+            codesign --verify --deep --strict "$APP"
             appdmg installers/macos/config.json build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
 
