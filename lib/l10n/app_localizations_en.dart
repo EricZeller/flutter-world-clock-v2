@@ -18,9 +18,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
-  String get changeCity => 'Change city';
-
-  @override
   String get sourceCode => 'Source Code';
 
   @override
@@ -48,9 +45,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get searchCity => 'Search for city';
-
-  @override
-  String get chooseCity => 'Choose city';
 
   @override
   String get aboutThisApp => 'About this app';
@@ -207,11 +201,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete => 'Delete';
 
   @override
-  String citySelected(Object city) {
-    return '$city selected';
-  }
-
-  @override
   String get themeSystem => 'System';
 
   @override
@@ -268,4 +257,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showForecast => 'Show forecast';
+
+  @override
+  String get manageCities => 'Manage cities';
+
+  @override
+  String get favorites => 'Your cities';
+
+  @override
+  String get allCities => 'All cities';
+
+  @override
+  String get keepOneCity => 'At least one city must stay';
+
+  @override
+  String get removeFromFavorites => 'Remove';
+
+  @override
+  String get reorderCity => 'Drag to reorder';
+
+  @override
+  String cityAddedAt(String city, String time) {
+    return '$city added · $time';
+  }
+
+  @override
+  String cityRemovedAt(String city, String time) {
+    return '$city removed · $time';
+  }
+
+  @override
+  String cityPosition(int index, int count) {
+    return 'City $index of $count';
+  }
 }

@@ -18,9 +18,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get about => 'Acerca de';
 
   @override
-  String get changeCity => 'Cambiar ciudad';
-
-  @override
   String get sourceCode => 'Código fuente';
 
   @override
@@ -48,9 +45,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get searchCity => 'Buscar ciudad';
-
-  @override
-  String get chooseCity => 'Elegir ciudad';
 
   @override
   String get aboutThisApp => 'Acerca de esta aplicación';
@@ -208,11 +202,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get delete => 'Eliminar';
 
   @override
-  String citySelected(Object city) {
-    return '$city seleccionada';
-  }
-
-  @override
   String get themeSystem => 'Sistema';
 
   @override
@@ -269,4 +258,37 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get showForecast => 'Mostrar pronóstico';
+
+  @override
+  String get manageCities => 'Gestionar ciudades';
+
+  @override
+  String get favorites => 'Tus ciudades';
+
+  @override
+  String get allCities => 'Todas las ciudades';
+
+  @override
+  String get keepOneCity => 'Debe quedar al menos una ciudad';
+
+  @override
+  String get removeFromFavorites => 'Quitar';
+
+  @override
+  String get reorderCity => 'Arrastra para ordenar';
+
+  @override
+  String cityAddedAt(String city, String time) {
+    return '$city añadida · $time';
+  }
+
+  @override
+  String cityRemovedAt(String city, String time) {
+    return '$city quitada · $time';
+  }
+
+  @override
+  String cityPosition(int index, int count) {
+    return 'Ciudad $index de $count';
+  }
 }

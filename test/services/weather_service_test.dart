@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -120,6 +121,37 @@ void main() {
           {WeatherService.cacheKey: 'not json'});
 
       expect(await FakeWttr().service.loadCached('Berlin'), isNull);
+    });
+  });
+
+  group('sharing', () {
+    test('concurrent refreshes of the same place share one download',
+        () async {
+      final wttr = FakeWttr()..hold = Completer();
+      final first = wttr.service.refresh(server: server, zone: 'Berlin');
+      final second = wttr.service.refresh(server: server, zone: 'Berlin');
+      final other = wttr.service.refresh(server: server, zone: 'Tokyo');
+      wttr.hold!.complete();
+      await Future.wait([first, second, other]);
+
+      expect(wttr.requests.map((uri) => uri.path), ['/Berlin', '/Tokyo']);
+      await wttr.service.refresh(server: server, zone: 'Berlin');
+      expect(wttr.requests, hasLength(3), reason: 'a later refresh downloads');
+    });
+
+    test('current() uses a recent cache and refreshes an old one', () async {
+      final wttr = FakeWttr();
+      await wttr.service.refresh(server: server, zone: 'Berlin');
+      await wttr.service.current(server: server, zone: 'Berlin');
+      expect(wttr.requests, hasLength(1));
+
+      final hourAgo = DateTime.now().subtract(const Duration(hours: 1));
+      await FakeWttr(clock: () => hourAgo)
+          .service
+          .refresh(server: server, zone: 'Tokyo');
+      final result = await wttr.service.current(server: server, zone: 'Tokyo');
+      expect(wttr.requests.last.path, '/Tokyo');
+      expect(result.isFresh, isTrue);
     });
   });
 }

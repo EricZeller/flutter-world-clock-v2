@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
@@ -56,5 +58,44 @@ void main() {
 
     expect(await repository.loadSelectedCity(), isNull);
     expect(await repository.loadCustomCities(), isEmpty);
+  });
+
+  group('favorites', () {
+    test('start with Berlin on a fresh install', () async {
+      expect(await repository.loadFavorites(), [City.berlin]);
+    });
+
+    test('take over the single city of older versions', () async {
+      await repository.saveSelectedCity(custom);
+
+      expect(await repository.loadFavorites(), [custom]);
+    });
+
+    test('are stored in order and keep the first as selection', () async {
+      await repository.saveFavorites([custom, City.berlin]);
+
+      expect(await repository.loadFavorites(), [custom, City.berlin]);
+      expect(await repository.loadSelectedCity(), custom);
+    });
+
+    test('ignore duplicates and fall back on broken data', () async {
+      SharedPreferences.setMockInitialValues({
+        CityRepository.favoritesKey: jsonEncode(
+            [City.berlin.toJson(), custom.toJson(), City.berlin.toJson()]),
+      });
+      expect(await repository.loadFavorites(), [City.berlin, custom]);
+
+      SharedPreferences.setMockInitialValues({
+        CityRepository.favoritesKey: '[]',
+        CityRepository.selectedCityKey: jsonEncode(custom.toJson()),
+      });
+      expect(await repository.loadFavorites(), [custom]);
+    });
+
+    test('remember the city shown last', () async {
+      expect(await repository.loadCurrentIndex(), 0);
+      await repository.saveCurrentIndex(2);
+      expect(await repository.loadCurrentIndex(), 2);
+    });
   });
 }

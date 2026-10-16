@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/pages/location/city_tile.dart';
 import 'package:world_clock_v2/pages/location/location_page.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 
@@ -39,20 +40,20 @@ List<String> menuEntries() => find
     .toList();
 
 void main() {
-  RadioListTile<City> tileFor(WidgetTester tester, String name) =>
-      tester.widget<RadioListTile<City>>(
-        find.ancestor(
-          of: find.text(name),
-          matching: find.byType(RadioListTile<City>),
-        ),
-      );
+  /// Whether the check box of [name] in the list of all cities is set.
+  bool isFavorite(WidgetTester tester, String name) => tester
+      .widget<CheckboxListTile>(find.ancestor(
+        of: find.text(name).last,
+        matching: find.byType(CheckboxListTile),
+      ))
+      .value!;
 
-  bool isSelected(WidgetTester tester, String name) {
-    final group = tester.widget<RadioGroup<City>>(find.byType(RadioGroup<City>));
-    return group.groupValue == tileFor(tester, name).value;
-  }
+  List<String> favoriteNames(WidgetTester tester) => tester
+      .widgetList<FavoriteTile>(find.byType(FavoriteTile))
+      .map((tile) => tile.city.name)
+      .toList();
 
-  testWidgets('marks the stored city as selected', (tester) async {
+  testWidgets('shows the stored city as favorite', (tester) async {
     SharedPreferences.setMockInitialValues({
       'selectedOption': jsonEncode(tokyo.toJson()),
     });
@@ -60,22 +61,67 @@ void main() {
     await pumpPage(tester, const LocationPage(),
         settings: await loadSettings());
 
-    expect(isSelected(tester, 'Tokyo'), isTrue);
-    expect(isSelected(tester, 'Berlin'), isFalse);
+    expect(favoriteNames(tester), ['Tokyo']);
+    expect(isFavorite(tester, 'Tokyo'), isTrue);
+    expect(isFavorite(tester, 'Berlin'), isFalse);
   });
 
-  testWidgets('selecting a city stores it', (tester) async {
+  testWidgets('checking cities adds and removes favorites', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final repository = FakeCityRepository();
     await pumpPage(tester, const LocationPage(),
         settings: await loadSettings(), cities: repository);
-    expect(isSelected(tester, 'Berlin'), isTrue);
+    expect(favoriteNames(tester), ['Berlin']);
 
-    await tester.tap(find.text('Tokyo'));
+    await tester.tap(find.text('Tokyo').last);
+    await tester.pumpAndSettle();
+    expect(favoriteNames(tester), ['Berlin', 'Tokyo']);
+    expect(await repository.loadFavorites(), [City.berlin, tokyo]);
+
+    await tester.tap(find.text('Berlin').last);
+    await tester.pumpAndSettle();
+    expect(favoriteNames(tester), ['Tokyo']);
+    expect(await repository.loadFavorites(), [tokyo]);
+    expect(await repository.loadSelectedCity(), tokyo,
+        reason: 'older versions read the first favorite');
+  });
+
+  testWidgets('the last city cannot be removed', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = FakeCityRepository();
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+
+    await tester.tap(find.byTooltip('Remove'));
+    await tester.pump();
+
+    expect(find.text('At least one city must stay'), findsOneWidget);
+    expect(favoriteNames(tester), ['Berlin']);
+  });
+
+  testWidgets('favorites can be removed and reordered', (tester) async {
+    final repository = FakeCityRepository([City.berlin, tokyo, newYork]);
+    SharedPreferences.setMockInitialValues({});
+    await repository.saveFavorites([City.berlin, tokyo, newYork]);
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+
+    await tester.tap(find.byTooltip('Remove').at(1));
+    await tester.pumpAndSettle();
+    expect(favoriteNames(tester), ['Berlin', 'New York']);
+
+    final handle = find.byIcon(Icons.drag_handle).last;
+    final gesture = await tester.startGesture(tester.getCenter(handle));
+    await tester.pump(const Duration(milliseconds: 100));
+    for (var i = 0; i < 10; i++) {
+      await gesture.moveBy(const Offset(0, -20));
+      await tester.pump();
+    }
+    await gesture.up();
     await tester.pumpAndSettle();
 
-    expect(isSelected(tester, 'Tokyo'), isTrue);
-    expect(await repository.loadSelectedCity(), tokyo);
+    expect(favoriteNames(tester), ['New York', 'Berlin']);
+    expect(await repository.loadFavorites(), [newYork, City.berlin]);
   });
 
   testWidgets('search filters the list', (tester) async {
@@ -92,7 +138,7 @@ void main() {
     expect(find.text('Tokyo'), findsOneWidget);
   });
 
-  testWidgets('adds a custom city and selects it', (tester) async {
+  testWidgets('adds a custom city to the favorites', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final repository = FakeCityRepository();
     await pumpPage(tester, const LocationPage(),
@@ -109,13 +155,15 @@ void main() {
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Zuhause'), findsOneWidget);
-    expect(isSelected(tester, 'Zuhause'), isTrue);
+    expect(find.text('Zuhause'), findsNWidgets(2),
+        reason: 'in the favorites and in the list');
+    expect(isFavorite(tester, 'Zuhause'), isTrue);
+    expect(favoriteNames(tester), ['Berlin', 'Zuhause']);
     final custom = await repository.loadCustomCities();
     expect(custom.single.name, 'Zuhause');
     expect(custom.single.timeZone, 'Asia/Tokyo');
     expect(custom.single.isCustom, isTrue);
-    expect(await repository.loadSelectedCity(), custom.single);
+    expect(await repository.loadFavorites(), [City.berlin, custom.single]);
   });
 
   testWidgets('time zones can be found by city or country', (tester) async {
@@ -236,8 +284,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Zuhause'), findsNothing);
-    expect(isSelected(tester, 'Berlin'), isTrue);
+    expect(favoriteNames(tester), ['Berlin']);
     expect(await repository.loadCustomCities(), isEmpty);
-    expect(await repository.loadSelectedCity(), City.berlin);
+    expect(await repository.loadFavorites(), [City.berlin]);
   });
 }

@@ -3,7 +3,6 @@
   "appTitle": "Horloge Mondiale v2",
   "settings": "Paramètres",
   "about": "À propos",
-  "changeCity": "Changer de ville",
   "sourceCode": "Code source",
   "reportBug": "Signaler un bug",
   "localTime": "Heure locale : {time}",
@@ -20,7 +19,6 @@
   "connectionError": "🛜 Erreur de connexion",
   "apiError": "🛜 Impossible de se connecter à l'API",
   "searchCity": "Rechercher une ville",
-  "chooseCity": "Choisir une ville",
   "aboutThisApp": "À propos de cette application",
   "license": "Licence",
   "contact": "Contact",
@@ -76,7 +74,6 @@
   "editCustomCity": "Modifier la ville personnalisée",
   "edit": "Modifier",
   "delete": "Supprimer",
-  "citySelected": "{city} sélectionnée",
   "@searchHint": {
     "placeholders": {
       "count": {
@@ -101,5 +98,14 @@
   "humidity": "Humidité",
   "wind": "Vent",
   "chanceOfRain": "Risque de pluie",
-  "showForecast": "Afficher les prévisions"
+  "showForecast": "Afficher les prévisions",
+  "manageCities": "Gérer les villes",
+  "favorites": "Vos villes",
+  "allCities": "Toutes les villes",
+  "keepOneCity": "Au moins une ville doit rester",
+  "removeFromFavorites": "Retirer",
+  "reorderCity": "Faites glisser pour trier",
+  "cityAddedAt": "{city} ajoutée · {time}",
+  "cityRemovedAt": "{city} retirée · {time}",
+  "cityPosition": "Ville {index} sur {count}"
 }

@@ -23,8 +23,9 @@ class _WidgetSettingsPageState extends State<WidgetSettingsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<CityRepository>().loadSelectedCity().then((city) {
-      if (mounted && city != null) setState(() => _city = city);
+    // Like the widget: the first favorite.
+    context.read<CityRepository>().loadFavorites().then((favorites) {
+      if (mounted) setState(() => _city = favorites.first);
     });
   }
 

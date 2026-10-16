@@ -3,7 +3,6 @@
   "appTitle": "World Clock v2",
   "settings": "Settings",
   "about": "About",
-  "changeCity": "Change city",
   "sourceCode": "Source Code",
   "reportBug": "Report a bug",
   "localTime": "Local time: {time}",
@@ -20,7 +19,6 @@
   "connectionError": "🛜 Connection error",
   "apiError": "🛜 Couldn't connect to API",
   "searchCity": "Search for city",
-  "chooseCity": "Choose city",
   "aboutThisApp": "About this app",
   "license": "License",
   "contact": "Contact",
@@ -76,7 +74,6 @@
   "editCustomCity": "Edit custom city",
   "edit": "Edit",
   "delete": "Delete",
-  "citySelected": "{city} selected",
   "@searchHint": {
     "placeholders": {
       "count": {
@@ -115,5 +112,44 @@
   "humidity": "Humidity",
   "wind": "Wind",
   "chanceOfRain": "Chance of rain",
-  "showForecast": "Show forecast"
+  "showForecast": "Show forecast",
+  "manageCities": "Manage cities",
+  "favorites": "Your cities",
+  "allCities": "All cities",
+  "keepOneCity": "At least one city must stay",
+  "removeFromFavorites": "Remove",
+  "reorderCity": "Drag to reorder",
+  "cityAddedAt": "{city} added · {time}",
+  "@cityAddedAt": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cityRemovedAt": "{city} removed · {time}",
+  "@cityRemovedAt": {
+    "placeholders": {
+      "city": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cityPosition": "City {index} of {count}",
+  "@cityPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

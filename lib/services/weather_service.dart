@@ -40,20 +40,25 @@ class WeatherException implements Exception {
 /// location so it can be shown while offline.
 class WeatherService {
   WeatherService({http.Client? client, DateTime Function()? clock})
-      : _client = client ?? http.Client(),
-        _clock = clock ?? DateTime.now;
+    : _client = client ?? http.Client(),
+      _clock = clock ?? DateTime.now;
 
   static const cacheKey = 'weatherCache';
   static const maxCachedLocations = 10;
+
+  /// How long a report counts as current.
+  static const refreshInterval = Duration(minutes: 15);
   static const _timeout = Duration(seconds: 15);
 
   final http.Client _client;
   final DateTime Function() _clock;
+  // Requests that are running, so callers asking for the same place share one.
+  final _inFlight = <String, Future<WeatherResult>>{};
 
   static Uri buildUri(String server, String zone, {String? lang}) {
-    return Uri.parse('$server/${Uri.encodeComponent(zone)}').replace(
-      queryParameters: {'format': 'j1', 'lang': ?lang},
-    );
+    return Uri.parse(
+      '$server/${Uri.encodeComponent(zone)}',
+    ).replace(queryParameters: {'format': 'j1', 'lang': ?lang});
   }
 
   /// Fetches a fresh report, throwing a [WeatherException] on failure.
@@ -74,7 +79,9 @@ class WeatherService {
     }
     if (response.statusCode != 200) {
       throw WeatherException(
-          WeatherFailure.server, 'HTTP ${response.statusCode}');
+        WeatherFailure.server,
+        'HTTP ${response.statusCode}',
+      );
     }
     try {
       final json = jsonDecode(utf8.decode(response.bodyBytes));
@@ -85,8 +92,37 @@ class WeatherService {
   }
 
   /// Fetches a fresh report and caches it; falls back to the cached report.
-  /// Never throws.
+  /// Concurrent calls for the same request share one download. Never throws.
   Future<WeatherResult> refresh({
+    required String server,
+    required String zone,
+    String? lang,
+  }) {
+    final key = '$server|$zone|$lang';
+    return _inFlight[key] ??= _refresh(server: server, zone: zone, lang: lang)
+        // A block, not `=>`: returning the removed future would make
+        // whenComplete wait for itself.
+        .whenComplete(() {
+          _inFlight.remove(key);
+        });
+  }
+
+  /// The cached report while it is younger than [refreshInterval], otherwise
+  /// a [refresh]. Never throws.
+  Future<WeatherResult> current({
+    required String server,
+    required String zone,
+    String? lang,
+  }) async {
+    final cached = await loadCached(zone);
+    if (cached != null &&
+        _clock().difference(cached.fetchedAt) < refreshInterval) {
+      return WeatherResult(report: cached);
+    }
+    return refresh(server: server, zone: zone, lang: lang);
+  }
+
+  Future<WeatherResult> _refresh({
     required String server,
     required String zone,
     String? lang,
