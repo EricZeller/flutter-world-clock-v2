@@ -122,12 +122,6 @@ abstract class AppLocalizations {
   /// **'About'**
   String get about;
 
-  /// No description provided for @changeCity.
-  ///
-  /// In en, this message translates to:
-  /// **'Change city'**
-  String get changeCity;
-
   /// No description provided for @sourceCode.
   ///
   /// In en, this message translates to:
@@ -181,12 +175,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search for city'**
   String get searchCity;
-
-  /// No description provided for @chooseCity.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose city'**
-  String get chooseCity;
 
   /// No description provided for @aboutThisApp.
   ///
@@ -476,12 +464,6 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
-  /// No description provided for @citySelected.
-  ///
-  /// In en, this message translates to:
-  /// **'{city} selected'**
-  String citySelected(Object city);
-
   /// No description provided for @themeSystem.
   ///
   /// In en, this message translates to:
@@ -589,6 +571,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show forecast'**
   String get showForecast;
+
+  /// No description provided for @manageCities.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage cities'**
+  String get manageCities;
+
+  /// No description provided for @favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cities'**
+  String get favorites;
+
+  /// No description provided for @allCities.
+  ///
+  /// In en, this message translates to:
+  /// **'All cities'**
+  String get allCities;
+
+  /// No description provided for @keepOneCity.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one city must stay'**
+  String get keepOneCity;
+
+  /// No description provided for @removeFromFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeFromFavorites;
+
+  /// No description provided for @reorderCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder'**
+  String get reorderCity;
+
+  /// No description provided for @cityAddedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{city} added · {time}'**
+  String cityAddedAt(String city, String time);
+
+  /// No description provided for @cityRemovedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'{city} removed · {time}'**
+  String cityRemovedAt(String city, String time);
+
+  /// No description provided for @cityPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'City {index} of {count}'**
+  String cityPosition(int index, int count);
+
+  /// No description provided for @widgetCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City for this widget'**
+  String get widgetCity;
+
+  /// No description provided for @offsetChangeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocks change today: {change}'**
+  String offsetChangeToday(String change);
+
+  /// No description provided for @offsetChangeTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocks change tomorrow: {change}'**
+  String offsetChangeTomorrow(String change);
+
+  /// No description provided for @offsetChangeInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocks change in {days} days: {change}'**
+  String offsetChangeInDays(int days, String change);
+
+  /// No description provided for @offsetChangeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Daylight saving time change in this city'**
+  String get offsetChangeTooltip;
 }
 
 class _AppLocalizationsDelegate

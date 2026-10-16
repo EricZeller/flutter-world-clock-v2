@@ -18,9 +18,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get about => 'À propos';
 
   @override
-  String get changeCity => 'Changer de ville';
-
-  @override
   String get sourceCode => 'Code source';
 
   @override
@@ -48,9 +45,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get searchCity => 'Rechercher une ville';
-
-  @override
-  String get chooseCity => 'Choisir une ville';
 
   @override
   String get aboutThisApp => 'À propos de cette application';
@@ -208,11 +202,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get delete => 'Supprimer';
 
   @override
-  String citySelected(Object city) {
-    return '$city sélectionnée';
-  }
-
-  @override
   String get themeSystem => 'Système';
 
   @override
@@ -269,4 +258,58 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get showForecast => 'Afficher les prévisions';
+
+  @override
+  String get manageCities => 'Gérer les villes';
+
+  @override
+  String get favorites => 'Vos villes';
+
+  @override
+  String get allCities => 'Toutes les villes';
+
+  @override
+  String get keepOneCity => 'Au moins une ville doit rester';
+
+  @override
+  String get removeFromFavorites => 'Retirer';
+
+  @override
+  String get reorderCity => 'Faites glisser pour trier';
+
+  @override
+  String cityAddedAt(String city, String time) {
+    return '$city ajoutée · $time';
+  }
+
+  @override
+  String cityRemovedAt(String city, String time) {
+    return '$city retirée · $time';
+  }
+
+  @override
+  String cityPosition(int index, int count) {
+    return 'Ville $index sur $count';
+  }
+
+  @override
+  String get widgetCity => 'Ville du widget';
+
+  @override
+  String offsetChangeToday(String change) {
+    return 'Changement d\'heure aujourd\'hui : $change';
+  }
+
+  @override
+  String offsetChangeTomorrow(String change) {
+    return 'Changement d\'heure demain : $change';
+  }
+
+  @override
+  String offsetChangeInDays(int days, String change) {
+    return 'Changement d\'heure dans $days jours : $change';
+  }
+
+  @override
+  String get offsetChangeTooltip => 'Changement d\'heure dans cette ville';
 }

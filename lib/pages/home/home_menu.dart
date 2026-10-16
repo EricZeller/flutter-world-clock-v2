@@ -40,7 +40,7 @@ class HomeMenu extends StatelessWidget {
       icon: const Icon(Icons.more_vert),
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
         _item('settings', l10n.settings, Icons.settings),
-        _item('changeCity', l10n.changeCity, Icons.edit_location_alt),
+        _item('changeCity', l10n.manageCities, Icons.edit_location_alt),
         _item('about', l10n.about, Icons.info),
         _item('source_code', l10n.sourceCode, Icons.code),
         _item('bug_report', l10n.reportBug, Icons.bug_report),

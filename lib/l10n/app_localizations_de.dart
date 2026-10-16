@@ -18,9 +18,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get about => 'Über';
 
   @override
-  String get changeCity => 'Stadt ändern';
-
-  @override
   String get sourceCode => 'Quellcode';
 
   @override
@@ -48,9 +45,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get searchCity => 'Stadt suchen';
-
-  @override
-  String get chooseCity => 'Stadt wählen';
 
   @override
   String get aboutThisApp => 'Über diese App';
@@ -207,11 +201,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get delete => 'Löschen';
 
   @override
-  String citySelected(Object city) {
-    return '$city ausgewählt';
-  }
-
-  @override
   String get themeSystem => 'System';
 
   @override
@@ -268,4 +257,58 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get showForecast => 'Vorhersage anzeigen';
+
+  @override
+  String get manageCities => 'Städte verwalten';
+
+  @override
+  String get favorites => 'Deine Städte';
+
+  @override
+  String get allCities => 'Alle Städte';
+
+  @override
+  String get keepOneCity => 'Mindestens eine Stadt muss bleiben';
+
+  @override
+  String get removeFromFavorites => 'Entfernen';
+
+  @override
+  String get reorderCity => 'Zum Sortieren ziehen';
+
+  @override
+  String cityAddedAt(String city, String time) {
+    return '$city hinzugefügt · $time';
+  }
+
+  @override
+  String cityRemovedAt(String city, String time) {
+    return '$city entfernt · $time';
+  }
+
+  @override
+  String cityPosition(int index, int count) {
+    return 'Stadt $index von $count';
+  }
+
+  @override
+  String get widgetCity => 'Stadt für dieses Widget';
+
+  @override
+  String offsetChangeToday(String change) {
+    return 'Zeitumstellung heute: $change';
+  }
+
+  @override
+  String offsetChangeTomorrow(String change) {
+    return 'Zeitumstellung morgen: $change';
+  }
+
+  @override
+  String offsetChangeInDays(int days, String change) {
+    return 'Zeitumstellung in $days Tagen: $change';
+  }
+
+  @override
+  String get offsetChangeTooltip => 'Zeitumstellung in dieser Stadt';
 }

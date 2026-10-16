@@ -28,7 +28,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: WorldMap(
         cities: cities,
-        selectedCity: selected,
+        selectedCities: [selected],
         onCityTap: tapped.add,
       ),
     ));
@@ -90,7 +90,7 @@ void main() {
     await tester.pumpWidget(MaterialApp(
       home: WorldMap(
         cities: cities,
-        selectedCity: tokyo,
+        selectedCities: const [tokyo],
         onCityTap: (_) {},
       ),
     ));

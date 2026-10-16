@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/app.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
+import 'package:world_clock_v2/services/home_widget_service.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   // Load settings before the first frame so the app never flashes defaults.
   final settings = SettingsProvider();
   await settings.load();
+  final configureWidgetId = await HomeWidgetService.configureRequest();
 
   runApp(
     MultiProvider(
@@ -26,7 +28,7 @@ Future<void> main() async {
           dispose: (_, service) => service.dispose(),
         ),
       ],
-      child: const WorldClockApp(),
+      child: WorldClockApp(configureWidgetId: configureWidgetId),
     ),
   );
 }

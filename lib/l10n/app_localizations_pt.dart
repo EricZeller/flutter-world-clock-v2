@@ -18,9 +18,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get about => 'Sobre';
 
   @override
-  String get changeCity => 'Alterar cidade';
-
-  @override
   String get sourceCode => 'Código-fonte';
 
   @override
@@ -48,9 +45,6 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get searchCity => 'Pesquisar cidade';
-
-  @override
-  String get chooseCity => 'Escolher cidade';
 
   @override
   String get aboutThisApp => 'Sobre este aplicativo';
@@ -208,11 +202,6 @@ class AppLocalizationsPt extends AppLocalizations {
   String get delete => 'Excluir';
 
   @override
-  String citySelected(Object city) {
-    return '$city selecionada';
-  }
-
-  @override
   String get themeSystem => 'Sistema';
 
   @override
@@ -269,4 +258,58 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get showForecast => 'Mostrar previsão';
+
+  @override
+  String get manageCities => 'Gerenciar cidades';
+
+  @override
+  String get favorites => 'Suas cidades';
+
+  @override
+  String get allCities => 'Todas as cidades';
+
+  @override
+  String get keepOneCity => 'Pelo menos uma cidade deve ficar';
+
+  @override
+  String get removeFromFavorites => 'Remover';
+
+  @override
+  String get reorderCity => 'Arraste para ordenar';
+
+  @override
+  String cityAddedAt(String city, String time) {
+    return '$city adicionada · $time';
+  }
+
+  @override
+  String cityRemovedAt(String city, String time) {
+    return '$city removida · $time';
+  }
+
+  @override
+  String cityPosition(int index, int count) {
+    return 'Cidade $index de $count';
+  }
+
+  @override
+  String get widgetCity => 'Cidade do widget';
+
+  @override
+  String offsetChangeToday(String change) {
+    return 'Mudança de horário hoje: $change';
+  }
+
+  @override
+  String offsetChangeTomorrow(String change) {
+    return 'Mudança de horário amanhã: $change';
+  }
+
+  @override
+  String offsetChangeInDays(int days, String change) {
+    return 'Mudança de horário em $days dias: $change';
+  }
+
+  @override
+  String get offsetChangeTooltip => 'Mudança de horário de verão nesta cidade';
 }

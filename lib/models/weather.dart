@@ -1,3 +1,4 @@
+import 'package:world_clock_v2/utils/sun.dart';
 import 'package:world_clock_v2/utils/weather_symbols.dart';
 
 /// Formats a temperature like wttr.in does, e.g. `+18°C` or `-3°F`.
@@ -49,8 +50,17 @@ class WeatherReport {
     String? lang,
   }) {
     final current = (json['current_condition'] as List).first;
+    final area = (json['nearest_area'] as List?)?.firstOrNull;
+    final latitude = double.tryParse('${area?['latitude'] ?? ''}');
+    final longitude = double.tryParse('${area?['longitude'] ?? ''}');
     return WeatherReport(
-      current: CurrentWeather.fromWttr(current, lang),
+      current: CurrentWeather.fromWttr(
+        current,
+        lang,
+        location: latitude == null || longitude == null
+            ? null
+            : (latitude: latitude, longitude: longitude),
+      ),
       days: [
         for (final day in json['weather'] as List? ?? const [])
           DailyForecast.fromWttr(day, lang),
@@ -85,6 +95,7 @@ class CurrentWeather {
     required this.humidity,
     required this.windKmph,
     required this.windMph,
+    this.location,
   });
 
   final int code;
@@ -97,12 +108,24 @@ class CurrentWeather {
   final int windKmph;
   final int windMph;
 
-  String get symbol => weatherSymbol(code);
+  /// Where wttr.in found the weather; tells whether it is night there.
+  final LatLng? location;
+
+  /// Symbol for right now; a clear sky shows the moon after sunset.
+  String get symbol => symbolAt(DateTime.now());
+
+  String symbolAt(DateTime time) {
+    final location = this.location;
+    return weatherSymbol(code,
+        night: location != null && isNightAt(location, time));
+  }
   int temperature(bool fahrenheit) => fahrenheit ? tempF : tempC;
   int feelsLike(bool fahrenheit) => fahrenheit ? feelsLikeF : feelsLikeC;
 
-  factory CurrentWeather.fromWttr(Map<String, dynamic> json, String? lang) =>
+  factory CurrentWeather.fromWttr(Map<String, dynamic> json, String? lang,
+          {LatLng? location}) =>
       CurrentWeather(
+        location: location,
         code: _int(json['weatherCode']),
         description: _description(json, lang),
         tempC: _int(json['temp_C']),
@@ -124,6 +147,12 @@ class CurrentWeather {
         humidity: json['humidity'],
         windKmph: json['windKmph'],
         windMph: json['windMph'],
+        location: json['latitude'] == null || json['longitude'] == null
+            ? null
+            : (
+                latitude: (json['latitude'] as num).toDouble(),
+                longitude: (json['longitude'] as num).toDouble(),
+              ),
       );
 
   Map<String, dynamic> toJson() => {
@@ -136,6 +165,8 @@ class CurrentWeather {
         'humidity': humidity,
         'windKmph': windKmph,
         'windMph': windMph,
+        'latitude': location?.latitude,
+        'longitude': location?.longitude,
       };
 }
 
@@ -190,7 +221,7 @@ class DailyForecast {
         for (final hour in json['hourly'] as List? ?? const [])
           HourlyForecast.fromWttr(hour, lang),
       ],
-    );
+    ).._markNight();
   }
 
   factory DailyForecast.fromJson(Map<String, dynamic> json) => DailyForecast(
@@ -204,7 +235,18 @@ class DailyForecast {
         hours: [
           for (final hour in json['hours'] as List) HourlyForecast.fromJson(hour),
         ],
-      );
+      ).._markNight();
+
+  /// Marks the hours before sunrise and after sunset of this day.
+  void _markNight() {
+    final sunrise = _minutesOfDay(this.sunrise);
+    final sunset = _minutesOfDay(this.sunset);
+    if (sunrise == null || sunset == null) return; // Polar day or night.
+    for (final hour in hours) {
+      final minutes = hour.hour * 60;
+      hour.isNight = minutes < sunrise || minutes >= sunset;
+    }
+  }
 
   Map<String, dynamic> toJson() => {
         'date': date.toIso8601String(),
@@ -219,7 +261,7 @@ class DailyForecast {
 }
 
 class HourlyForecast {
-  const HourlyForecast({
+  HourlyForecast({
     required this.hour,
     required this.code,
     required this.description,
@@ -236,7 +278,10 @@ class HourlyForecast {
   final int tempF;
   final int chanceOfRain;
 
-  String get symbol => weatherSymbol(code);
+  /// Set by the day from its sunrise and sunset.
+  bool isNight = false;
+
+  String get symbol => weatherSymbol(code, night: isNight);
   int temperature(bool fahrenheit) => fahrenheit ? tempF : tempC;
 
   factory HourlyForecast.fromWttr(Map<String, dynamic> json, String? lang) =>
@@ -277,4 +322,12 @@ String _description(Map<String, dynamic> json, String? lang) {
   final values = translated ?? json['weatherDesc'] as List? ?? const [];
   final value = values.isEmpty ? '' : '${values.first['value'] ?? ''}';
   return value.trim();
+}
+
+/// Minutes since midnight of a wttr.in time like `07:11 AM`, or `null`.
+int? _minutesOfDay(String raw) {
+  final match = RegExp(r'^(\d{1,2}):(\d{2}) ([AP]M)$').firstMatch(raw.trim());
+  if (match == null) return null;
+  final hour = int.parse(match.group(1)!) % 12 + (match.group(3) == 'PM' ? 12 : 0);
+  return hour * 60 + int.parse(match.group(2)!);
 }

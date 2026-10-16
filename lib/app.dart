@@ -6,12 +6,17 @@ import 'package:world_clock_v2/pages/about.dart';
 import 'package:world_clock_v2/pages/home/home_page.dart';
 import 'package:world_clock_v2/pages/location/location_page.dart';
 import 'package:world_clock_v2/pages/settings/settings_page.dart';
+import 'package:world_clock_v2/pages/widget_city_picker.dart';
 import 'package:world_clock_v2/pages/widget_settings.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
 
 class WorldClockApp extends StatelessWidget {
-  const WorldClockApp({super.key});
+  const WorldClockApp({super.key, this.configureWidgetId});
+
+  /// Set when Android opened the app to choose the city of a home screen
+  /// widget; the app then only shows that choice.
+  final int? configureWidgetId;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +39,10 @@ class WorldClockApp extends StatelessWidget {
         theme: AppTheme.themeData(scheme(Brightness.light, lightDynamic)),
         darkTheme: AppTheme.themeData(scheme(Brightness.dark, darkDynamic)),
         themeMode: settings.themeMode,
-        initialRoute: '/home',
+        initialRoute: configureWidgetId == null ? '/home' : null,
+        home: configureWidgetId == null
+            ? null
+            : WidgetCityPickerPage(widgetId: configureWidgetId!),
         routes: {
           '/home': (context) => const HomePage(),
           '/about': (context) => const AboutPage(),
