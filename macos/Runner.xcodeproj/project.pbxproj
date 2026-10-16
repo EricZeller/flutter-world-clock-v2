@@ -21,15 +21,23 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0A8372E7CBAEA38ADC30F498 /* City.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967F679206D8C39E0C1FB54B /* City.swift */; };
 		331C80D8294CF71000263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C80D7294CF71000263BE5 /* RunnerTests.swift */; };
 		335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335BBD1A22A9A15E00E9071D /* GeneratedPluginRegistrant.swift */; };
 		33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC10F02044A3C60003C045 /* AppDelegate.swift */; };
 		33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F22044A3C60003C045 /* Assets.xcassets */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
+		33CF6C59E7FF4B82308D1BB9 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8862265A34BE588AABA42487 /* Weather.swift */; };
+		4786CDE53B3ADF64944F3DC1 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4E98004F550DE68A76E0E2EE /* Localizable.strings */; };
 		5184608F547A5EDAF7B1857B /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E433D7F535AA0A517ECB848 /* Pods_RunnerTests.framework */; };
+		52700A66D66C528D3B4BFCCF /* WorldClockWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = AFAADA8830B46B18DE00A0B7 /* WorldClockWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7786CFA76E5156C3477EC903 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B6946DC158DECAF5A151258 /* Pods_Runner.framework */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		8A8CFD2658DE4D9BBCD6DC5C /* cities.json in Resources */ = {isa = PBXBuildFile; fileRef = 12BE4282B4DB5399845D2D72 /* cities.json */; };
+		CEE3CC3104CBF4FD69D59B53 /* SelectCityIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EA2A4FD3A756542375ADBE4 /* SelectCityIntent.swift */; };
+		E9948EA33C05954A423165BB /* Provider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B572F30181940AB3A78E1F26 /* Provider.swift */; };
+		F02CD6197138B95DA6CC5E55 /* WorldClockWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD2F8802002567FC753E18FB /* WorldClockWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,6 +55,13 @@
 			remoteGlobalIDString = 33CC111A2044C6BA0003C045;
 			remoteInfo = FLX;
 		};
+		CE03C5243B1B7E65F73BE399 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 33CC10E52044A3C60003C045 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 152B169B0B749D6836223383;
+			remoteInfo = WorldClockWidget;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -60,9 +75,21 @@
 			name = "Bundle Framework";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C700FEC92CD7D83BC191F479 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				52700A66D66C528D3B4BFCCF /* WorldClockWidget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		12BE4282B4DB5399845D2D72 /* cities.json */ = {isa = PBXFileReference; includeInIndex = 1; name = cities.json; path = ../assets/data/cities.json; sourceTree = SOURCE_ROOT; };
 		1B6946DC158DECAF5A151258 /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E9EE6772333E544090CE4F4 /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		331C80D5294CF71000263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,12 +108,25 @@
 		33E51913231747F40026EE4D /* DebugProfile.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DebugProfile.entitlements; sourceTree = "<group>"; };
 		33E51914231749380026EE4D /* Release.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Release.entitlements; sourceTree = "<group>"; };
 		33E5194F232828860026EE4D /* AppInfo.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = AppInfo.xcconfig; sourceTree = "<group>"; };
+		37427AC27351C388EDBFE1E6 /* WorldClockWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WorldClockWidget.entitlements; sourceTree = "<group>"; };
+		43821DF79841A0B3A7529CDF /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		48ABADB4E120331174DECD33 /* pt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5E433D7F535AA0A517ECB848 /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		60FAF2D73F1BCFA2E70ADAFE /* es */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6FAFE8DE08B4DA66ECB494D7 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		7B8E96A5B775426CBC4D0C34 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		8862265A34BE588AABA42487 /* Weather.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
+		8EA2A4FD3A756542375ADBE4 /* SelectCityIntent.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SelectCityIntent.swift; sourceTree = "<group>"; };
 		903EFC33A6776D2571A5422F /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
+		908560E6A0CE996AEDDAD8A0 /* en */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		967F679206D8C39E0C1FB54B /* City.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = City.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		AFAADA8830B46B18DE00A0B7 /* WorldClockWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WorldClockWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		B572F30181940AB3A78E1F26 /* Provider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Provider.swift; sourceTree = "<group>"; };
+		BD2F8802002567FC753E18FB /* WorldClockWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorldClockWidget.swift; sourceTree = "<group>"; };
+		CB23FC08B26F3AC91B5C9507 /* de */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CDBECF4933B415EC07936298 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
 		D3D544529AC6030006BAC297 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		F35C4E3312C5D0AB011A0DA9 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -98,6 +138,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5184608F547A5EDAF7B1857B /* Pods_RunnerTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		33BFF8FB7EF39E99EAACD447 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -141,6 +188,7 @@
 				33CC10EE2044A3C60003C045 /* Products */,
 				D73912EC22F37F3D000D13A0 /* Frameworks */,
 				760A28DE663B7172ED6EA7B4 /* Pods */,
+				C52E6388975A525C4B5C3029 /* WorldClockWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -149,6 +197,7 @@
 			children = (
 				33CC10ED2044A3C60003C045 /* World Clock v2.app */,
 				331C80D5294CF71000263BE5 /* RunnerTests.xctest */,
+				AFAADA8830B46B18DE00A0B7 /* WorldClockWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -202,6 +251,22 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		C52E6388975A525C4B5C3029 /* WorldClockWidget */ = {
+			isa = PBXGroup;
+			children = (
+				967F679206D8C39E0C1FB54B /* City.swift */,
+				8EA2A4FD3A756542375ADBE4 /* SelectCityIntent.swift */,
+				8862265A34BE588AABA42487 /* Weather.swift */,
+				B572F30181940AB3A78E1F26 /* Provider.swift */,
+				BD2F8802002567FC753E18FB /* WorldClockWidget.swift */,
+				43821DF79841A0B3A7529CDF /* Info.plist */,
+				37427AC27351C388EDBFE1E6 /* WorldClockWidget.entitlements */,
+				4E98004F550DE68A76E0E2EE /* Localizable.strings */,
+				12BE4282B4DB5399845D2D72 /* cities.json */,
+			);
+			path = WorldClockWidget;
+			sourceTree = "<group>";
+		};
 		D73912EC22F37F3D000D13A0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -214,6 +279,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		152B169B0B749D6836223383 /* WorldClockWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 24C4572A30B4475433EEEEF7 /* Build configuration list for PBXNativeTarget "WorldClockWidget" */;
+			buildPhases = (
+				A0D57C9047D39A2FA7E3B1AD /* Sources */,
+				33BFF8FB7EF39E99EAACD447 /* Frameworks */,
+				60A8C8B30117C4DEC10D2981 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WorldClockWidget;
+			productName = WorldClockWidget;
+			productReference = AFAADA8830B46B18DE00A0B7 /* WorldClockWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		331C80D4294CF70F00263BE5 /* RunnerTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */;
@@ -242,12 +324,14 @@
 				33CC10EA2044A3C60003C045 /* Frameworks */,
 				33CC10EB2044A3C60003C045 /* Resources */,
 				33CC110E2044A8840003C045 /* Bundle Framework */,
+				C700FEC92CD7D83BC191F479 /* Embed App Extensions */,
 				3399D490228B24CF009A79C7 /* ShellScript */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				33CC11202044C79F0003C045 /* PBXTargetDependency */,
+				9611712174A8A460125E1460 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -268,6 +352,10 @@
 				LastUpgradeCheck = 1510;
 				ORGANIZATIONNAME = "";
 				TargetAttributes = {
+					152B169B0B749D6836223383 = {
+						CreatedOnToolsVersion = 15.0;
+						ProvisioningStyle = Manual;
+					};
 					331C80D4294CF70F00263BE5 = {
 						CreatedOnToolsVersion = 14.0;
 						TestTargetID = 33CC10EC2044A3C60003C045;
@@ -295,6 +383,10 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
+				es,
+				fr,
+				pt,
 			);
 			mainGroup = 33CC10E42044A3C60003C045;
 			packageReferences = (
@@ -307,6 +399,7 @@
 				33CC10EC2044A3C60003C045 /* Runner */,
 				331C80D4294CF70F00263BE5 /* RunnerTests */,
 				33CC111A2044C6BA0003C045 /* Flutter Assemble */,
+				152B169B0B749D6836223383 /* WorldClockWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -325,6 +418,15 @@
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60A8C8B30117C4DEC10D2981 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4786CDE53B3ADF64944F3DC1 /* Localizable.strings in Resources */,
+				8A8CFD2658DE4D9BBCD6DC5C /* cities.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -434,6 +536,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A0D57C9047D39A2FA7E3B1AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0A8372E7CBAEA38ADC30F498 /* City.swift in Sources */,
+				CEE3CC3104CBF4FD69D59B53 /* SelectCityIntent.swift in Sources */,
+				33CF6C59E7FF4B82308D1BB9 /* Weather.swift in Sources */,
+				E9948EA33C05954A423165BB /* Provider.swift in Sources */,
+				F02CD6197138B95DA6CC5E55 /* WorldClockWidget.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -447,6 +561,12 @@
 			target = 33CC111A2044C6BA0003C045 /* Flutter Assemble */;
 			targetProxy = 33CC111F2044C79F0003C045 /* PBXContainerItemProxy */;
 		};
+		9611712174A8A460125E1460 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WorldClockWidget;
+			target = 152B169B0B749D6836223383 /* WorldClockWidget */;
+			targetProxy = CE03C5243B1B7E65F73BE399 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -457,6 +577,18 @@
 			);
 			name = MainMenu.xib;
 			path = Runner;
+			sourceTree = "<group>";
+		};
+		4E98004F550DE68A76E0E2EE /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				908560E6A0CE996AEDDAD8A0 /* en */,
+				CB23FC08B26F3AC91B5C9507 /* de */,
+				60FAF2D73F1BCFA2E70ADAFE /* es */,
+				6FAFE8DE08B4DA66ECB494D7 /* fr */,
+				48ABADB4E120331174DECD33 /* pt */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -743,9 +875,102 @@
 			};
 			name = Release;
 		};
+		60F282E74A773C07A92AF4D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WorldClockWidget/WorldClockWidget.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WorldClockWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				OTHER_LDFLAGS = "";
+				OTHER_SWIFT_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.ericz.worldClockV2.WorldClockWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C2CCDF03EEA69B0A860E6D58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WorldClockWidget/WorldClockWidget.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WorldClockWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				OTHER_LDFLAGS = "";
+				OTHER_SWIFT_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.ericz.worldClockV2.WorldClockWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D2969BD09F4A2A5709B599D1 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WorldClockWidget/WorldClockWidget.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = WorldClockWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = "$(FLUTTER_BUILD_NAME)";
+				OTHER_LDFLAGS = "";
+				OTHER_SWIFT_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.ericz.worldClockV2.WorldClockWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		24C4572A30B4475433EEEEF7 /* Build configuration list for PBXNativeTarget "WorldClockWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60F282E74A773C07A92AF4D1 /* Release */,
+				C2CCDF03EEA69B0A860E6D58 /* Debug */,
+				D2969BD09F4A2A5709B599D1 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		331C80DE294CF71000263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

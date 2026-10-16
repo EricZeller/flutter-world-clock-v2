@@ -81,6 +81,10 @@ After moving it from the `.dmg` to *Applications*, either
 
 This is only needed once per installed version.
 
+On macOS 14 or later, the app also brings a desktop widget with the time and weather of a city.
+Start the app once, then right-click the desktop, choose **Edit Widgets…** and search for *World Clock*.
+Each widget shows Berlin until you pick another city: right-click the widget and choose **Edit "World Clock"**.
+
 ### Build from source
 
 To install and run the app locally, follow these steps:
