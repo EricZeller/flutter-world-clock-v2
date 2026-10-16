@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:world_clock_v2/services/home_widget_service.dart';
+import 'package:world_clock_v2/services/home_widget_sync.dart';
 
 /// Records the data the app writes to the home screen widget.
 class HomeWidgetRecorder {
@@ -20,6 +21,7 @@ class HomeWidgetRecorder {
 
   static HomeWidgetRecorder install() {
     HomeWidgetService.resetQueue();
+    HomeWidgetSync.resetQueue();
     final recorder = HomeWidgetRecorder._();
     final messenger =
         TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;

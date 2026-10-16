@@ -4,12 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
 
-/// Loads the bundled city list and persists custom cities and the selection.
+/// Loads the bundled city list and persists custom cities and the favorites.
 class CityRepository {
   CityRepository({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
 
+  /// The single city of versions before 1.11; kept equal to the first
+  /// favorite so a downgrade still finds a city.
   static const selectedCityKey = 'selectedOption';
   static const customCitiesKey = 'customCities';
+  static const favoritesKey = 'favoriteCities';
+  static const currentIndexKey = 'currentCityIndex';
 
   final AssetBundle _bundle;
 
@@ -41,6 +45,47 @@ class CityRepository {
       customCitiesKey,
       jsonEncode(cities.map((city) => city.toJson()).toList()),
     );
+  }
+
+  /// The cities shown on the home screen, never empty. Older versions stored
+  /// a single city, which becomes the first favorite.
+  Future<List<City>> loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final stored = prefs.getString(favoritesKey);
+    if (stored != null) {
+      try {
+        final favorites = <City>[];
+        for (final json in jsonDecode(stored) as List) {
+          final city = City.fromJson(json as Map<String, dynamic>);
+          if (!favorites.contains(city)) favorites.add(city);
+        }
+        if (favorites.isNotEmpty) return favorites;
+      } catch (_) {
+        // Fall back to the migration below.
+      }
+    }
+    return [await loadSelectedCity() ?? City.berlin];
+  }
+
+  Future<void> saveFavorites(List<City> favorites) async {
+    assert(favorites.isNotEmpty, 'at least one city must stay');
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      favoritesKey,
+      jsonEncode(favorites.map((city) => city.toJson()).toList()),
+    );
+    await saveSelectedCity(favorites.first);
+  }
+
+  /// Index of the favorite shown last on the home screen.
+  Future<int> loadCurrentIndex() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(currentIndexKey) ?? 0;
+  }
+
+  Future<void> saveCurrentIndex(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(currentIndexKey, index);
   }
 
   /// Returns the stored selection, or `null` if there is none or it is broken.

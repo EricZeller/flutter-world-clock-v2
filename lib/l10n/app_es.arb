@@ -3,7 +3,6 @@
   "appTitle": "World Clock v2",
   "settings": "Ajustes",
   "about": "Acerca de",
-  "changeCity": "Cambiar ciudad",
   "sourceCode": "Código fuente",
   "reportBug": "Reportar un error",
   "localTime": "Hora local: {time}",
@@ -13,7 +12,6 @@
   "connectionError": "🛜 Error de conexión",
   "apiError": "🛜 No se pudo conectar a la API",
   "searchCity": "Buscar ciudad",
-  "chooseCity": "Elegir ciudad",
   "aboutThisApp": "Acerca de esta aplicación",
   "license": "Licencia",
   "contact": "Contacto",
@@ -62,7 +60,6 @@
   "editCustomCity": "Editar ciudad personalizada",
   "edit": "Editar",
   "delete": "Eliminar",
-  "citySelected": "{city} seleccionada",
   "@searchHint": {
     "placeholders": {
       "count": {
@@ -87,5 +84,14 @@
   "humidity": "Humedad",
   "wind": "Viento",
   "chanceOfRain": "Probabilidad de lluvia",
-  "showForecast": "Mostrar pronóstico"
+  "showForecast": "Mostrar pronóstico",
+  "manageCities": "Gestionar ciudades",
+  "favorites": "Tus ciudades",
+  "allCities": "Todas las ciudades",
+  "keepOneCity": "Debe quedar al menos una ciudad",
+  "removeFromFavorites": "Quitar",
+  "reorderCity": "Arrastra para ordenar",
+  "cityAddedAt": "{city} añadida · {time}",
+  "cityRemovedAt": "{city} quitada · {time}",
+  "cityPosition": "Ciudad {index} de {count}"
 }

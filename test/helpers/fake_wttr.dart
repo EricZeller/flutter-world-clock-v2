@@ -12,7 +12,10 @@ final wttrBerlinFixture =
 
 /// In-memory stand-in for a wttr.in server.
 class FakeWttr {
-  FakeWttr({this.statusCode = 200, this.offline = false});
+  FakeWttr({this.statusCode = 200, this.offline = false, this.clock});
+
+  /// Time stamp for downloaded reports, e.g. to seed an outdated cache.
+  final DateTime Function()? clock;
 
   int statusCode;
   bool offline;
@@ -22,6 +25,7 @@ class FakeWttr {
   final requests = <Uri>[];
 
   late final WeatherService service = WeatherService(
+    clock: clock,
     client: MockClient((request) async {
       requests.add(request.url);
       await hold?.future;
