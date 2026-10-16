@@ -63,15 +63,26 @@ jobs:
             npm install -g appdmg
             flutter build macos --release
             APP="build/macos/Build/Products/Release/World Clock v2.app"
-            # Ad-hoc signing from the inside out: --deep would drop the
-            # entitlements of bundled extensions (e.g. a widget needs its
-            # sandbox). The app itself stays unsandboxed as in all earlier
-            # releases, so the stored settings remain where they are.
-            for ext in "$APP"/Contents/PlugIns/*.appex; do
-              [ -e "$ext" ] || continue
-              codesign -s - --force --options runtime --preserve-metadata=entitlements "$ext"
+            # Ad-hoc signing from the inside out. --deep would drop the
+            # entitlements, so every bundle keeps the ones Xcode signed it with
+            # (e.g. the sandbox), minus the debugger entitlement. No hardened
+            # runtime: it only matters for notarization, and its library
+            # validation rejects ad-hoc signed frameworks at launch.
+            sign() {
+              ENTITLEMENTS="$RUNNER_TEMP/entitlements.plist"
+              codesign -d --entitlements - --xml "$1" > "$ENTITLEMENTS" 2>/dev/null
+              if [ -s "$ENTITLEMENTS" ]; then
+                /usr/libexec/PlistBuddy -c "Delete :com.apple.security.get-task-allow" "$ENTITLEMENTS" 2>/dev/null || true
+                codesign -s - --force --entitlements "$ENTITLEMENTS" "$1"
+              else
+                codesign -s - --force "$1"
+              fi
+            }
+            for nested in "$APP"/Contents/Frameworks/*.framework "$APP"/Contents/PlugIns/*.appex; do
+              [ -e "$nested" ] || continue
+              sign "$nested"
             done
-            codesign -s - --force --options runtime "$APP"
+            sign "$APP"
             codesign --verify --deep --strict "$APP"
             appdmg installers/macos/config.json build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
