@@ -294,4 +294,23 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get widgetCity => 'Ciudad del widget';
+
+  @override
+  String offsetChangeToday(String change) {
+    return 'Cambio de hora hoy: $change';
+  }
+
+  @override
+  String offsetChangeTomorrow(String change) {
+    return 'Cambio de hora mañana: $change';
+  }
+
+  @override
+  String offsetChangeInDays(int days, String change) {
+    return 'Cambio de hora en $days días: $change';
+  }
+
+  @override
+  String get offsetChangeTooltip =>
+      'Cambio de horario de verano en esta ciudad';
 }

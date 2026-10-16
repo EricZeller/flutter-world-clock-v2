@@ -631,6 +631,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'City for this widget'**
   String get widgetCity;
+
+  /// No description provided for @offsetChangeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocks change today: {change}'**
+  String offsetChangeToday(String change);
+
+  /// No description provided for @offsetChangeTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocks change tomorrow: {change}'**
+  String offsetChangeTomorrow(String change);
+
+  /// No description provided for @offsetChangeInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Clocks change in {days} days: {change}'**
+  String offsetChangeInDays(int days, String change);
+
+  /// No description provided for @offsetChangeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Daylight saving time change in this city'**
+  String get offsetChangeTooltip;
 }
 
 class _AppLocalizationsDelegate

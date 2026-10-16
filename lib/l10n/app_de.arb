@@ -94,5 +94,9 @@
   "cityAddedAt": "{city} hinzugefügt · {time}",
   "cityRemovedAt": "{city} entfernt · {time}",
   "cityPosition": "Stadt {index} von {count}",
-  "widgetCity": "Stadt für dieses Widget"
+  "widgetCity": "Stadt für dieses Widget",
+  "offsetChangeToday": "Zeitumstellung heute: {change}",
+  "offsetChangeTomorrow": "Zeitumstellung morgen: {change}",
+  "offsetChangeInDays": "Zeitumstellung in {days} Tagen: {change}",
+  "offsetChangeTooltip": "Zeitumstellung in dieser Stadt"
 }

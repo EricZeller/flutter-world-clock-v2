@@ -120,3 +120,28 @@ int calendarDaysBetween(DateTime from, DateTime to) {
       .difference(DateTime.utc(from.year, from.month, from.day))
       .inDays;
 }
+
+/// The next change of the UTC offset of [timeZone] (daylight saving time)
+/// within [within] from [now], or `null` if there is none.
+({DateTime at, Duration change})? nextOffsetChange(
+  String timeZone, {
+  DateTime? now,
+  Duration within = const Duration(days: 14),
+}) {
+  final location = findLocation(timeZone);
+  final start = (now ?? DateTime.now()).millisecondsSinceEpoch;
+  final end = start + within.inMilliseconds;
+  final before = location.timeZone(start).offset;
+  for (final transition in location.transitionAt) {
+    if (transition <= start) continue;
+    if (transition > end) break;
+    final after = location.timeZone(transition).offset;
+    if (after != before) {
+      return (
+        at: DateTime.fromMillisecondsSinceEpoch(transition, isUtc: true),
+        change: after - before,
+      );
+    }
+  }
+  return null;
+}

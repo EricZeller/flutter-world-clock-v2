@@ -152,5 +152,33 @@
       }
     }
   },
-  "widgetCity": "City for this widget"
+  "widgetCity": "City for this widget",
+  "offsetChangeToday": "Clocks change today: {change}",
+  "@offsetChangeToday": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "offsetChangeTomorrow": "Clocks change tomorrow: {change}",
+  "@offsetChangeTomorrow": {
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "offsetChangeInDays": "Clocks change in {days} days: {change}",
+  "@offsetChangeInDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "offsetChangeTooltip": "Daylight saving time change in this city"
 }

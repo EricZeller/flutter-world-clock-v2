@@ -94,5 +94,9 @@
   "cityAddedAt": "{city} añadida · {time}",
   "cityRemovedAt": "{city} quitada · {time}",
   "cityPosition": "Ciudad {index} de {count}",
-  "widgetCity": "Ciudad del widget"
+  "widgetCity": "Ciudad del widget",
+  "offsetChangeToday": "Cambio de hora hoy: {change}",
+  "offsetChangeTomorrow": "Cambio de hora mañana: {change}",
+  "offsetChangeInDays": "Cambio de hora en {days} días: {change}",
+  "offsetChangeTooltip": "Cambio de horario de verano en esta ciudad"
 }
