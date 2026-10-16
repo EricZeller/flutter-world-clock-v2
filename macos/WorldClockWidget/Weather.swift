@@ -26,16 +26,18 @@ struct Weather: Codable, Sendable {
 
     /// The weather symbol; after sunset no symbol shows the sun.
     func symbol(at date: Date) -> String {
-        let night = latitude.flatMap { latitude in
-            longitude.map { Sun.isNight(latitude: latitude, longitude: $0, at: date) }
-        } ?? false
-        return WeatherSymbols.symbol(code: code, night: night)
+        WeatherSymbols.symbol(code: code, night: isNight(at: date) ?? false)
     }
 
     /// Whether the sun is down, or `nil` without a known location.
     func isNight(at date: Date) -> Bool? {
         guard let latitude, let longitude else { return nil }
         return Sun.isNight(latitude: latitude, longitude: longitude, at: date)
+    }
+
+    /// Whether the report is too old to be shown at [date].
+    func isStale(at date: Date) -> Bool {
+        date.timeIntervalSince(fetchedAt) >= WeatherLoader.staleAfter
     }
 
     init(code: Int, description: String, tempC: Int, tempF: Int,
@@ -77,10 +79,18 @@ struct Weather: Codable, Sendable {
     }
 }
 
+/// A report from `WeatherLoader.load`. Not fresh means the download failed
+/// and the weather is an older cached report or missing.
+struct WeatherResult: Sendable {
+    let weather: Weather?
+    let isFresh: Bool
+}
+
 /// Loads the weather from wttr.in and keeps the last report of each place,
 /// so a widget still shows it for a while when offline.
 enum WeatherLoader {
     static let server = "https://wttr.in"
+    private static let downloads = Downloads()
     /// Younger reports are reused, e.g. by several widgets of one city.
     static let maxAge: TimeInterval = 15 * 60
     /// Older reports are not shown at all.
@@ -104,21 +114,23 @@ enum WeatherLoader {
         return URL(string: "\(server)/\(path)?\(query)")
     }
 
-    /// A fresh or cached report, or `nil` if there is none. Never throws.
-    static func load(zone: String, now: Date = Date()) async -> Weather? {
+    /// A fresh or cached report, or none. Never throws.
+    static func load(zone: String, now: Date = Date()) async -> WeatherResult {
         let lang = language
         let key = "weather|\(server)|\(zone)|\(lang ?? "en")"
         let cached = cached(key: key)
         if let cached, now.timeIntervalSince(cached.fetchedAt) < maxAge {
-            return cached
+            return WeatherResult(weather: cached, isFresh: true)
         }
-        if let fresh = await fetch(zone: zone, lang: lang, now: now) {
-            store(fresh, key: key)
+        let fresh = await downloads.weather(key: key) {
+            let fresh = await fetch(zone: zone, lang: lang, now: now)
+            if let fresh { store(fresh, key: key) }
             return fresh
         }
-        guard let cached, now.timeIntervalSince(cached.fetchedAt) < staleAfter
-        else { return nil }
-        return cached
+        if let fresh { return WeatherResult(weather: fresh, isFresh: true) }
+        guard let cached, !cached.isStale(at: now)
+        else { return WeatherResult(weather: nil, isFresh: false) }
+        return WeatherResult(weather: cached, isFresh: false)
     }
 
     /// The cached report for the gallery preview, if any.
@@ -144,6 +156,21 @@ enum WeatherLoader {
     private static func store(_ weather: Weather, key: String) {
         guard let data = try? JSONEncoder().encode(weather) else { return }
         UserDefaults.standard.set(data, forKey: key)
+    }
+}
+
+/// Shares one download per place, so several widgets of one city that
+/// reload at the same time fetch the weather only once.
+private actor Downloads {
+    private var running: [String: Task<Weather?, Never>] = [:]
+
+    func weather(key: String, fetch: @escaping @Sendable () async -> Weather?) async -> Weather? {
+        if let task = running[key] { return await task.value }
+        let task = Task { await fetch() }
+        running[key] = task
+        let weather = await task.value
+        running[key] = nil
+        return weather
     }
 }
 

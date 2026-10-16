@@ -53,6 +53,12 @@ struct SmallClockView: View {
                 if let weather = entry.weather {
                     Text(weather.symbol(at: entry.date))
                         .font(.system(size: 24))
+                } else {
+                    Image(systemName: "wifi.slash")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.75))
+                        .padding(.top, 2)
+                        .accessibilityLabel(Text("Weather unavailable"))
                 }
             }
             Spacer(minLength: 0)

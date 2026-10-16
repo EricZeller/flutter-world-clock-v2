@@ -9,8 +9,9 @@ struct CityEntity: AppEntity {
     let id: String
     let city: City
 
-    init(_ city: City) {
-        id = city.name
+    /// Keeps the ID a widget asked for, even if it found a renamed city.
+    init(_ city: City, id: String? = nil) {
+        self.id = id ?? city.id
         self.city = city
     }
 
@@ -21,7 +22,7 @@ struct CityEntity: AppEntity {
 
 struct CityQuery: EntityStringQuery {
     func entities(for identifiers: [CityEntity.ID]) async throws -> [CityEntity] {
-        identifiers.compactMap(City.named).map(CityEntity.init)
+        identifiers.compactMap { id in City.with(id: id).map { CityEntity($0, id: id) } }
     }
 
     /// Search by city or country name.
@@ -31,11 +32,11 @@ struct CityQuery: EntityStringQuery {
                 $0.name.localizedStandardContains(string)
                     || $0.country.localizedStandardContains(string)
             }
-            .map(CityEntity.init)
+            .map { CityEntity($0) }
     }
 
     func suggestedEntities() async throws -> [CityEntity] {
-        City.all.map(CityEntity.init)
+        City.all.map { CityEntity($0) }
     }
 
     func defaultResult() async -> CityEntity? {

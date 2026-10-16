@@ -33,6 +33,19 @@ struct City: Decodable, Hashable, Sendable {
         all.first { $0.name == name }
     }
 
+    /// Finds the city of a widget by its ID, `name|timeZone` (older IDs are
+    /// just the name). A renamed city is found by its time zone instead of
+    /// the widget silently showing Berlin.
+    static func with(id: String) -> City? {
+        let parts = id.split(separator: "|", maxSplits: 1).map(String.init)
+        if let city = named(parts.first ?? id) { return city }
+        guard parts.count == 2 else { return nil }
+        return all.first { $0.timeZone == parts[1] }
+    }
+
+    /// The ID a widget stores for the city, see `with(id:)`.
+    var id: String { "\(name)|\(timeZone)" }
+
     /// An unknown zone falls back to UTC instead of breaking the widget.
     var zone: TimeZone {
         TimeZone(identifier: timeZone) ?? TimeZone(secondsFromGMT: 0)!

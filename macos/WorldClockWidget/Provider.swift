@@ -9,6 +9,9 @@ struct ClockEntry: TimelineEntry {
 struct Provider: AppIntentTimelineProvider {
     /// One timeline covers this many minutes; reloading it refreshes the weather.
     static let timelineMinutes = 60
+    /// Without a fresh report (e.g. the Mac woke before the network was
+    /// back), the weather is tried again this much sooner.
+    static let retryMinutes = 15
 
     func placeholder(in context: Context) -> ClockEntry {
         ClockEntry(date: Date(), city: .berlin, weather: .sample)
@@ -25,7 +28,7 @@ struct Provider: AppIntentTimelineProvider {
         }
         return ClockEntry(
             date: Date(), city: city,
-            weather: await WeatherLoader.load(zone: city.weatherZone)
+            weather: await WeatherLoader.load(zone: city.weatherZone).weather
         )
     }
 
@@ -33,16 +36,25 @@ struct Provider: AppIntentTimelineProvider {
     /// macOS 15) the time stay current without reloading the timeline.
     func timeline(for configuration: SelectCityIntent, in context: Context) async -> Timeline<ClockEntry> {
         let city = configuration.selectedCity
-        let weather = await WeatherLoader.load(zone: city.weatherZone)
+        let result = await WeatherLoader.load(zone: city.weatherZone)
+        let minutes = result.isFresh ? Self.timelineMinutes : Self.retryMinutes
         let now = Date()
         let calendar = Calendar(identifier: .gregorian)
         let minute = calendar.dateInterval(of: .minute, for: now)?.start ?? now
-        var entries = [ClockEntry(date: now, city: city, weather: weather)]
-        for offset in 1...Self.timelineMinutes {
+        var dates = [now]
+        for offset in 1...minutes {
             if let date = calendar.date(byAdding: .minute, value: offset, to: minute) {
-                entries.append(ClockEntry(date: date, city: city, weather: weather))
+                dates.append(date)
             }
         }
+        // A cached report disappears once it gets too old, not only on reload.
+        let entries = dates.map { date in
+            ClockEntry(
+                date: date, city: city,
+                weather: result.weather.flatMap { $0.isStale(at: date) ? nil : $0 }
+            )
+        }
+        // Reloads after the last entry, which also fetches the weather again.
         return Timeline(entries: entries, policy: .atEnd)
     }
 }
