@@ -139,7 +139,9 @@ void main() {
       expect(weatherSymbol(113, night: true), '🌙');
       expect(weatherSymbol(116, night: true), '☁️');
       expect(weatherSymbol(119, night: true), '☁️');
-      expect(weatherSymbol(176, night: true), '🌦');
+      expect(weatherSymbol(176, night: true), '🌧');
+      expect(weatherSymbol(266, night: true), '🌧');
+      expect(weatherSymbol(176), '🌦');
       expect(weatherSymbol(113), '☀️');
     });
 
