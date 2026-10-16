@@ -475,5 +475,11 @@
     }
    ]
   }
+ ],
+ "nearest_area": [
+  {
+   "latitude": "52.517",
+   "longitude": "13.400"
+  }
  ]
 }

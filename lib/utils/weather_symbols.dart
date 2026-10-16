@@ -1,6 +1,14 @@
 /// Maps WorldWeatherOnline condition codes (as returned by wttr.in) to the
-/// same emoji wttr.in uses for its `%c` format.
-String weatherSymbol(int code) => _symbols[_conditions[code]] ?? '✨';
+/// same emoji wttr.in uses for its `%c` format. At [night] a clear sky shows
+/// the moon instead of the sun.
+String weatherSymbol(int code, {bool night = false}) {
+  final condition = _conditions[code];
+  if (night) {
+    if (condition == 'Sunny') return '🌙';
+    if (condition == 'PartlyCloudy') return '☁️';
+  }
+  return _symbols[condition] ?? '✨';
+}
 
 const _conditions = {
   113: 'Sunny',

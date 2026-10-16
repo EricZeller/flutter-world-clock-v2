@@ -101,5 +101,9 @@
   "humidity": "Humidité",
   "wind": "Vent",
   "chanceOfRain": "Risque de pluie",
-  "showForecast": "Afficher les prévisions"
+  "showForecast": "Afficher les prévisions",
+  "offsetChangeToday": "Changement d'heure aujourd'hui : {change}",
+  "offsetChangeTomorrow": "Changement d'heure demain : {change}",
+  "offsetChangeInDays": "Changement d'heure dans {days} jours : {change}",
+  "offsetChangeTooltip": "Changement d'heure dans cette ville"
 }

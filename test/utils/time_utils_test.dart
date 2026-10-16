@@ -161,4 +161,37 @@ void main() {
           1);
     });
   });
+
+  group('nextOffsetChange', () {
+    test('finds the end of daylight saving time in Berlin', () {
+      final next = nextOffsetChange('Europe/Berlin',
+          now: DateTime.utc(2026, 10, 16, 12));
+
+      expect(next?.at, DateTime.utc(2026, 10, 25, 1));
+      expect(next?.change, const Duration(hours: -1));
+    });
+
+    test('finds the start of daylight saving time in New York', () {
+      final next = nextOffsetChange('America/New_York',
+          now: DateTime.utc(2026, 3, 1));
+
+      expect(next?.at, DateTime.utc(2026, 3, 8, 7));
+      expect(next?.change, const Duration(hours: 1));
+    });
+
+    test('ignores changes beyond the window', () {
+      final now = DateTime.utc(2026, 10, 1);
+
+      expect(nextOffsetChange('Europe/Berlin', now: now), isNull);
+      expect(
+          nextOffsetChange('Europe/Berlin',
+              now: now, within: const Duration(days: 30)),
+          isNotNull);
+    });
+
+    test('returns null for zones without daylight saving time', () {
+      expect(nextOffsetChange('Asia/Tokyo', now: DateTime.utc(2026, 10, 16)),
+          isNull);
+    });
+  });
 }

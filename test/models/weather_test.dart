@@ -129,4 +129,63 @@ void main() {
       expect(weatherSymbol(999), '✨');
     });
   });
+
+  group('night', () {
+    // Berlin, 2026-10-03: sunrise 07:11, sunset 18:39 local time (UTC+2).
+    final noon = DateTime.utc(2026, 10, 3, 10);
+    final midnight = DateTime.utc(2026, 10, 3, 22);
+
+    test('a clear sky shows the moon at night', () {
+      expect(weatherSymbol(113, night: true), '🌙');
+      expect(weatherSymbol(116, night: true), '☁️');
+      expect(weatherSymbol(119, night: true), '☁️');
+      expect(weatherSymbol(176, night: true), '🌦');
+      expect(weatherSymbol(113), '☀️');
+    });
+
+    test('the current symbol follows the sun at the weather location', () {
+      final json = jsonDecode(wttrBerlinFixture) as Map<String, dynamic>;
+      (json['current_condition'] as List).first['weatherCode'] = '113';
+      final current = WeatherReport.fromWttr(json, fetchedAt: fetchedAt).current;
+
+      expect(current.location, (latitude: 52.517, longitude: 13.4));
+      expect(current.symbolAt(noon), '☀️');
+      expect(current.symbolAt(midnight), '🌙');
+    });
+
+    test('without a location the sun is assumed', () {
+      final report = WeatherReport.fromWttr({
+        'current_condition': [
+          {'weatherCode': '113'}
+        ],
+      }, fetchedAt: fetchedAt);
+
+      expect(report.current.symbolAt(midnight), '☀️');
+    });
+
+    test('hours before sunrise and after sunset are night', () {
+      final today = parse().today!;
+
+      expect([for (final hour in today.hours) hour.isNight],
+          [true, true, true, false, false, false, false, true]);
+    });
+
+    test('survives the cache', () {
+      final report = parse();
+      final restored =
+          WeatherReport.fromJson(jsonDecode(jsonEncode(report.toJson())));
+
+      expect(restored.current.location, report.current.location);
+      expect(restored.today!.hours.first.isNight, isTrue);
+      expect(restored.today!.hours[4].isNight, isFalse);
+    });
+
+    test('older caches without a location still load', () {
+      final json = parse().toJson();
+      (json['current'] as Map).remove('latitude');
+      (json['current'] as Map).remove('longitude');
+
+      expect(WeatherReport.fromJson(json).current.location, isNull);
+    });
+  });
 }

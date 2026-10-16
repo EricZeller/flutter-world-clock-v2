@@ -87,5 +87,9 @@
   "humidity": "Luftfeuchtigkeit",
   "wind": "Wind",
   "chanceOfRain": "Regenwahrscheinlichkeit",
-  "showForecast": "Vorhersage anzeigen"
+  "showForecast": "Vorhersage anzeigen",
+  "offsetChangeToday": "Zeitumstellung heute: {change}",
+  "offsetChangeTomorrow": "Zeitumstellung morgen: {change}",
+  "offsetChangeInDays": "Zeitumstellung in {days} Tagen: {change}",
+  "offsetChangeTooltip": "Zeitumstellung in dieser Stadt"
 }

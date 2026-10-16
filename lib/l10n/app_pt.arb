@@ -87,5 +87,9 @@
   "humidity": "Umidade",
   "wind": "Vento",
   "chanceOfRain": "Chance de chuva",
-  "showForecast": "Mostrar previsão"
+  "showForecast": "Mostrar previsão",
+  "offsetChangeToday": "Mudança de horário hoje: {change}",
+  "offsetChangeTomorrow": "Mudança de horário amanhã: {change}",
+  "offsetChangeInDays": "Mudança de horário em {days} dias: {change}",
+  "offsetChangeTooltip": "Mudança de horário de verão nesta cidade"
 }

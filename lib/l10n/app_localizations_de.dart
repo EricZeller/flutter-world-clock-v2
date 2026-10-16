@@ -268,4 +268,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get showForecast => 'Vorhersage anzeigen';
+
+  @override
+  String offsetChangeToday(String change) {
+    return 'Zeitumstellung heute: $change';
+  }
+
+  @override
+  String offsetChangeTomorrow(String change) {
+    return 'Zeitumstellung morgen: $change';
+  }
+
+  @override
+  String offsetChangeInDays(int days, String change) {
+    return 'Zeitumstellung in $days Tagen: $change';
+  }
+
+  @override
+  String get offsetChangeTooltip => 'Zeitumstellung in dieser Stadt';
 }

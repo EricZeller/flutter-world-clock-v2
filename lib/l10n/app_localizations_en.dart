@@ -268,4 +268,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showForecast => 'Show forecast';
+
+  @override
+  String offsetChangeToday(String change) {
+    return 'Clocks change today: $change';
+  }
+
+  @override
+  String offsetChangeTomorrow(String change) {
+    return 'Clocks change tomorrow: $change';
+  }
+
+  @override
+  String offsetChangeInDays(int days, String change) {
+    return 'Clocks change in $days days: $change';
+  }
+
+  @override
+  String get offsetChangeTooltip => 'Daylight saving time change in this city';
 }
