@@ -625,6 +625,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'City {index} of {count}'**
   String cityPosition(int index, int count);
+
+  /// No description provided for @widgetCity.
+  ///
+  /// In en, this message translates to:
+  /// **'City for this widget'**
+  String get widgetCity;
 }
 
 class _AppLocalizationsDelegate

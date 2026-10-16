@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 
@@ -96,6 +97,63 @@ void main() {
       expect(await repository.loadCurrentIndex(), 0);
       await repository.saveCurrentIndex(2);
       expect(await repository.loadCurrentIndex(), 2);
+    });
+  });
+
+  group('widget cities', () {
+    test('are stored per widget and can be removed', () async {
+      expect(await repository.loadWidgetCities(), isEmpty);
+
+      await repository.saveWidgetCity(7, custom);
+      await repository.saveWidgetCity(9, City.berlin);
+      await repository.saveWidgetCity(7, City.berlin);
+      expect(await repository.loadWidgetCities(),
+          {7: City.berlin, 9: City.berlin});
+
+      await repository.removeWidgetCities([9, 42]);
+      expect(await repository.loadWidgetCities(), {7: City.berlin});
+    });
+
+    test('follow an edited or deleted custom city', () async {
+      const renamed = City(
+        name: 'Daheim',
+        country: '',
+        timeZone: 'Asia/Tokyo',
+        flag: '',
+        utc: '+09:00',
+        weatherZone: 'Daheim',
+        isCustom: true,
+      );
+      await repository.saveWidgetCity(7, custom);
+      await repository.saveWidgetCity(8, custom);
+      await repository.saveWidgetCity(9, City.berlin);
+
+      await repository.replaceWidgetCity(custom, renamed);
+      expect(await repository.loadWidgetCities(),
+          {7: renamed, 8: renamed, 9: City.berlin});
+
+      await repository.replaceWidgetCity(renamed, null);
+      expect(await repository.loadWidgetCities(), {9: City.berlin});
+    });
+
+    test('ignore broken data', () async {
+      SharedPreferences.setMockInitialValues(
+          {CityRepository.widgetCitiesKey: '{"x": 1}'});
+
+      expect(await repository.loadWidgetCities(), isEmpty);
+    });
+
+    test('include those saved by another instance of the app', () async {
+      expect(await repository.loadWidgetCities(), isEmpty);
+
+      // Android runs the widget configuration in a second instance, which
+      // writes to the platform behind this instance's cache.
+      await SharedPreferencesStorePlatform.instance.setValue(
+          'String',
+          'flutter.${CityRepository.widgetCitiesKey}',
+          jsonEncode({'5': custom.toJson()}));
+
+      expect(await repository.loadWidgetCities(), {5: custom});
     });
   });
 }

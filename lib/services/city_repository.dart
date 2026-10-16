@@ -14,6 +14,7 @@ class CityRepository {
   static const customCitiesKey = 'customCities';
   static const favoritesKey = 'favoriteCities';
   static const currentIndexKey = 'currentCityIndex';
+  static const widgetCitiesKey = 'widgetCities';
 
   final AssetBundle _bundle;
 
@@ -86,6 +87,63 @@ class CityRepository {
   Future<void> saveCurrentIndex(int index) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(currentIndexKey, index);
+  }
+
+  /// Cities of home screen widgets that were given their own city, by
+  /// Android widget ID. Other widgets show the first favorite.
+  Future<Map<int, City>> loadWidgetCities() async {
+    final prefs = await SharedPreferences.getInstance();
+    // Android configures a widget in a second instance of the app, whose
+    // writes this instance's cached preferences would not see.
+    await prefs.reload();
+    final stored = prefs.getString(widgetCitiesKey);
+    if (stored == null) return {};
+    try {
+      return {
+        for (final MapEntry(:key, :value)
+            in (jsonDecode(stored) as Map<String, dynamic>).entries)
+          int.parse(key): City.fromJson(value as Map<String, dynamic>),
+      };
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> saveWidgetCity(int widgetId, City city) async {
+    await _saveWidgetCities({...await loadWidgetCities(), widgetId: city});
+  }
+
+  Future<void> removeWidgetCities(Iterable<int> widgetIds) async {
+    final cities = await loadWidgetCities()
+      ..removeWhere((id, _) => widgetIds.contains(id));
+    await _saveWidgetCities(cities);
+  }
+
+  /// Gives widgets that show [city] its edited version [replacement], or
+  /// without one returns them to the first favorite.
+  Future<void> replaceWidgetCity(City city, City? replacement) async {
+    final cities = await loadWidgetCities();
+    final ids = [
+      for (final MapEntry(:key, :value) in cities.entries)
+        if (value == city) key,
+    ];
+    if (ids.isEmpty) return;
+    for (final id in ids) {
+      if (replacement == null) {
+        cities.remove(id);
+      } else {
+        cities[id] = replacement;
+      }
+    }
+    await _saveWidgetCities(cities);
+  }
+
+  Future<void> _saveWidgetCities(Map<int, City> cities) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(widgetCitiesKey, jsonEncode({
+      for (final MapEntry(:key, :value) in cities.entries)
+        '$key': value.toJson(),
+    }));
   }
 
   /// Returns the stored selection, or `null` if there is none or it is broken.

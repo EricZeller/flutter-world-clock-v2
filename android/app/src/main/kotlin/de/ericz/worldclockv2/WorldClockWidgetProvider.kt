@@ -29,12 +29,19 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
         }
 
         for (appWidgetId in appWidgetIds) {
+            // A widget with its own city has keys like "city_42"; all others
+            // show the app's first city from the plain keys.
+            val ownCity = data.contains("city_$appWidgetId")
+            fun cityValue(key: String, default: String): String =
+                (if (ownCity) data.getString("${key}_$appWidgetId", null) else null)
+                    ?: data.getString(key, null)
+                    ?: default
             val views = RemoteViews(context.packageName, R.layout.world_clock_widget).apply {
-                val city = data.getString("city", null)?.ifBlank { null } ?: "Berlin"
-                val weather = data.getString("weather", "") ?: ""
-                val weatherIcon = data.getString("weather_icon", "☀️") ?: "☀️"
-                val temperature = data.getString("weather_temp", "") ?: ""
-                val timeZone = data.getString("timeZone", "Europe/Berlin")
+                val city = cityValue("city", "Berlin").ifBlank { "Berlin" }
+                val weather = cityValue("weather", "")
+                val weatherIcon = cityValue("weather_icon", "☀️")
+                val temperature = cityValue("weather_temp", "")
+                val timeZone = cityValue("timeZone", "Europe/Berlin")
 
                 // Settings
                 val widgetOpacity = getFloatPreference(data, "widgetOpacity", 0.8f)
@@ -132,6 +139,15 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
         }
     }
 
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        super.onDeleted(context, appWidgetIds)
+        val editor = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+        for (appWidgetId in appWidgetIds) {
+            for (key in CITY_KEYS) editor.remove("${key}_$appWidgetId")
+        }
+        editor.apply()
+    }
+
     private fun getFloatPreference(
         data: android.content.SharedPreferences,
         key: String,
@@ -199,6 +215,9 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
 
     private companion object {
         const val REFERENCE_TEXT = "ÅHlgjy"
+        const val PREFERENCES = "HomeWidgetPreferences"
+        // Keep in sync with HomeWidgetService.cityKeys.
+        val CITY_KEYS = listOf("city", "weather", "weather_icon", "weather_temp", "timeZone")
         const val MAX_BITMAP_WIDTH = 1200f
     }
 }
