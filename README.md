@@ -66,7 +66,22 @@ Used (keyless) weather API: [wttr.in](https://github.com/chubin/wttr.in) by [@ch
 
 ## Installation
 
-Head to the releases for installation candidates.
+Head to the [releases](https://github.com/EricZeller/flutter-world-clock-v2/releases) for installation candidates.
+
+### macOS
+
+The macOS app is not notarized by Apple, so Gatekeeper blocks it on the first start ("Apple could not verify …").
+After moving it from the `.dmg` to *Applications*, either
+
+- try to open it once, then go to **System Settings → Privacy & Security** and click **Open Anyway**, or
+- remove the quarantine flag in the Terminal:
+  ```bash
+  xattr -dr com.apple.quarantine "/Applications/World Clock v2.app"
+  ```
+
+This is only needed once per installed version.
+
+### Build from source
 
 To install and run the app locally, follow these steps:
 

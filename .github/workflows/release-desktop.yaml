@@ -62,7 +62,17 @@ jobs:
           elif [ ${{ matrix.os }} = macos-latest ]; then
             npm install -g appdmg
             flutter build macos --release
-            sudo codesign -s - --force --deep --timestamp --options runtime "build/macos/Build/Products/Release/World Clock v2.app"
+            APP="build/macos/Build/Products/Release/World Clock v2.app"
+            # Ad-hoc signing from the inside out: --deep would drop the
+            # entitlements of bundled extensions (e.g. a widget needs its
+            # sandbox). The app itself stays unsandboxed as in all earlier
+            # releases, so the stored settings remain where they are.
+            for ext in "$APP"/Contents/PlugIns/*.appex; do
+              [ -e "$ext" ] || continue
+              codesign -s - --force --options runtime --preserve-metadata=entitlements "$ext"
+            done
+            codesign -s - --force --options runtime "$APP"
+            codesign --verify --deep --strict "$APP"
             appdmg installers/macos/config.json build/worldclockv2_v${{ steps.version.outputs.version }}_macos_x64.dmg
           fi
 
