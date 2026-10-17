@@ -302,7 +302,27 @@ void main() {
       expect(widget.current['weather_5'], '☁️ Cloudy +20°C');
     });
 
-    testWidgets('syncs on resume share a running download', (tester) async {
+    testWidgets('resuming downloads outdated weather again', (tester) async {
+      final hourAgo = DateTime.now().subtract(const Duration(hours: 1));
+      await FakeWttr(clock: () => hourAgo)
+          .service
+          .refresh(server: 'https://wttr.in', zone: 'Tokyo');
+      final wttr = FakeWttr();
+      final widget = HomeWidgetRecorder.install()..installedWidgetIds = [5];
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+      await flushWidgetUpdates(tester);
+
+      await CityRepository().saveWidgetCity(5, tokyo);
+      await resumeApp(tester);
+      await flushWidgetUpdates(tester);
+
+      expect(wttr.requests.map((uri) => uri.path), ['/Berlin', '/Tokyo']);
+      expect(widget.current['weather_5'], '☁️ Cloudy +20°C');
+    });
+
+    testWidgets('repeated resumes during a download fetch each city once',
+        (tester) async {
       final wttr = FakeWttr();
       final widget = HomeWidgetRecorder.install()..installedWidgetIds = [5];
       await pumpPage(tester, const HomePage(),
