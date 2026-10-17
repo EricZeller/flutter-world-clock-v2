@@ -8,7 +8,7 @@ void main() {
         'name': 'Berlin',
         'country': 'Germany',
         'timeZone': 'Europe/Berlin',
-        'flag': 'de.png',
+        'flag': 'de.webp',
         'utc': '+02:00',
         'weatherZone': 'Berlin'
       };
@@ -18,11 +18,21 @@ void main() {
       expect(city.name, equals('Berlin'));
       expect(city.country, equals('Germany'));
       expect(city.timeZone, equals('Europe/Berlin'));
-      expect(city.flag, equals('de.png'));
+      expect(city.flag, equals('de.webp'));
       expect(city.utc, equals('+02:00'));
       expect(city.weatherZone, equals('Berlin'));
       expect(city.latitude, isNull);
       expect(city.isCustom, isFalse);
+    });
+
+    test('maps flags of older versions to the bundled WebP files', () {
+      expect(City.migrateFlag('de.png'), 'de.webp');
+      expect(City.migrateFlag('de.webp'), 'de.webp');
+      expect(City.migrateFlag(''), '');
+
+      final legacy = City.fromJson({...City.berlin.toJson(), 'flag': 'de.png'});
+      expect(legacy.flag, 'de.webp');
+      expect(legacy.toJson()['flag'], 'de.webp');
     });
 
     test('is converted to JSON', () {
@@ -31,7 +41,7 @@ void main() {
       expect(json['name'], equals('Berlin'));
       expect(json['country'], equals('Germany'));
       expect(json['timeZone'], equals('Europe/Berlin'));
-      expect(json['flag'], equals('de.png'));
+      expect(json['flag'], equals('de.webp'));
       expect(json['utc'], equals('+02:00'));
       expect(json['weatherZone'], equals('Berlin'));
     });
@@ -63,7 +73,7 @@ void main() {
         name: 'Berlin',
         country: 'Germany',
         timeZone: 'Europe/Berlin',
-        flag: 'de.png',
+        flag: 'de.webp',
         utc: '+02:00',
         weatherZone: 'Berlin',
         isCustom: true,

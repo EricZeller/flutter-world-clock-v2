@@ -14,7 +14,7 @@ const newYork = City(
   name: 'New York',
   country: 'United States',
   timeZone: 'America/New_York',
-  flag: 'us.png',
+  flag: 'us.webp',
   utc: '-04:00',
   weatherZone: 'New York',
 );
@@ -197,7 +197,7 @@ void main() {
       name: 'Zuhause',
       country: '',
       timeZone: 'Asia/Tokyo',
-      flag: 'jp.png',
+      flag: 'jp.webp',
       utc: '+09:00',
       weatherZone: 'Zuhause',
       isCustom: true,
@@ -256,7 +256,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final custom = await repository.loadCustomCities();
-    expect(custom.single.flag, 'jp.png');
+    expect(custom.single.flag, 'jp.webp');
   });
 
   testWidgets('editing a favorite custom city keeps its place',
@@ -293,8 +293,8 @@ void main() {
 
     expect(favoriteNames(tester), ['Zuhause', 'Berlin']);
     final favorites = await repository.loadFavorites();
-    expect(favorites.first.flag, 'jp.png');
-    expect((await repository.loadWidgetCities())[7]!.flag, 'jp.png',
+    expect(favorites.first.flag, 'jp.webp');
+    expect((await repository.loadWidgetCities())[7]!.flag, 'jp.webp',
         reason: 'the widget shows the edited city');
   });
 
