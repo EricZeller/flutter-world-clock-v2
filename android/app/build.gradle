@@ -105,6 +105,14 @@ android {
         }
     }
 
+    androidResources {
+        // Only package Android resource translations for the languages the
+        // app itself supports (see res/xml/locale_config.xml and lib/l10n).
+        // AndroidX libraries ship strings for ~90 locales that would otherwise
+        // never be shown next to an English fallback UI.
+        localeFilters += ['en', 'de', 'es', 'fr', 'pt']
+    }
+
     android {
         dependenciesInfo {
             // Disables dependency metadata when building APKs.
