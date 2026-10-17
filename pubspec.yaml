@@ -44,7 +44,6 @@ dependencies:
   provider: ^6.1.2
   url_launcher: ^6.2.6
   flutter_native_splash: ^2.4.0
-  sqflite: ^2.3.3+1
   colornames: ^0.2.0
   home_widget: ^0.9.4
 
