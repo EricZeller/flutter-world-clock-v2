@@ -1,0 +1,6 @@
+• Varias ciudades: deslízalas y ordénalas
+• Una ciudad para cada widget
+• Luna en lugar de sol en el tiempo de noche
+• Aviso antes del cambio de hora
+• Tocar el mapa muestra la hora local
+• App más pequeña, correcciones

@@ -1,0 +1,6 @@
+• Plusieurs villes : balayez entre elles et triez-les
+• Une ville pour chaque widget
+• La lune au lieu du soleil dans la météo la nuit
+• Avis avant le changement d'heure
+• Toucher la carte affiche l'heure locale
+• Application plus légère, corrections
