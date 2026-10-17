@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
@@ -122,6 +123,125 @@ void main() {
 
     expect(favoriteNames(tester), ['New York', 'Berlin']);
     expect(await repository.loadFavorites(), [newYork, City.berlin]);
+  });
+
+  group('the tapped city keeps its place', () {
+    // Enough cities to scroll the favorites out of sight.
+    final cities = [
+      City.berlin,
+      for (var i = 1; i <= 30; i++)
+        City(
+          name: 'City ${i.toString().padLeft(2, '0')}',
+          country: 'Country',
+          timeZone: 'Europe/Berlin',
+          flag: '',
+          utc: '+02:00',
+          weatherZone: 'City $i',
+        ),
+    ];
+
+    ScrollPosition listPosition(WidgetTester tester) => tester
+        .state<ScrollableState>(find.descendant(
+          of: find.byType(CustomScrollView),
+          matching: find.byType(Scrollable),
+        ))
+        .position;
+
+    Finder cityTile(String name) =>
+        find.widgetWithText(CheckboxListTile, name);
+
+    Future<FakeCityRepository> pumpCities(
+        WidgetTester tester, List<City> favorites) async {
+      SharedPreferences.setMockInitialValues({});
+      final repository = FakeCityRepository(cities);
+      await repository.saveFavorites(favorites);
+      await pumpPage(tester, const LocationPage(),
+          settings: await loadSettings(), cities: repository);
+      return repository;
+    }
+
+    testWidgets('when it becomes a favorite', (tester) async {
+      await pumpCities(tester, [City.berlin]);
+      listPosition(tester).jumpTo(800);
+      await tester.pumpAndSettle();
+      final before = tester.getTopLeft(cityTile('City 15'));
+
+      await tester.tap(cityTile('City 15'));
+      await tester.pump();
+      expect(tester.getTopLeft(cityTile('City 15')).dy,
+          moreOrLessEquals(before.dy, epsilon: 1),
+          reason: 'not even a single frame shows the shifted list');
+      await tester.pumpAndSettle();
+
+      expect(tester.getTopLeft(cityTile('City 15')).dy,
+          moreOrLessEquals(before.dy, epsilon: 1));
+      expect(listPosition(tester).pixels, greaterThan(800));
+      expect(favoriteNames(tester), isNot(contains('Berlin')),
+          reason: 'the favorites are still out of sight');
+      expect(isFavorite(tester, 'City 15'), isTrue);
+
+      listPosition(tester).jumpTo(0);
+      await tester.pumpAndSettle();
+      expect(favoriteNames(tester), ['Berlin', 'City 15']);
+    },
+        // Clamping and bouncing scroll physics.
+        variant: TargetPlatformVariant(
+            {TargetPlatform.android, TargetPlatform.iOS}));
+
+    testWidgets('when it is no favorite anymore', (tester) async {
+      final repository = await pumpCities(
+          tester, [City.berlin, cities[3], cities[20], cities[5]]);
+      listPosition(tester).jumpTo(1500);
+      await tester.pumpAndSettle();
+      final before = tester.getTopLeft(cityTile('City 20'));
+
+      await tester.tap(cityTile('City 20'));
+      await tester.pump();
+      expect(tester.getTopLeft(cityTile('City 20')).dy,
+          moreOrLessEquals(before.dy, epsilon: 1));
+      await tester.pumpAndSettle();
+
+      expect(tester.getTopLeft(cityTile('City 20')).dy,
+          moreOrLessEquals(before.dy, epsilon: 1));
+      expect(listPosition(tester).pixels, lessThan(1500));
+      expect(isFavorite(tester, 'City 20'), isFalse);
+      expect(await repository.loadFavorites(),
+          [City.berlin, cities[3], cities[5]]);
+    });
+
+    testWidgets('but not at the top of the list', (tester) async {
+      await pumpCities(tester, [City.berlin]);
+      expect(listPosition(tester).pixels, 0);
+      final before = tester.getTopLeft(cityTile('City 03'));
+
+      await tester.tap(cityTile('City 03'));
+      await tester.pumpAndSettle();
+
+      expect(listPosition(tester).pixels, 0);
+      expect(favoriteNames(tester), ['Berlin', 'City 03'],
+          reason: 'the new favorite is in sight');
+      expect(tester.getTopLeft(cityTile('City 03')).dy, greaterThan(before.dy),
+          reason: 'the new favorite pushes the list down');
+    });
+
+    testWidgets('and a tap on the status bar still scrolls to the top',
+        (tester) async {
+      await pumpCities(tester, [City.berlin]);
+      tester.view.padding = const FakeViewPadding(top: 80);
+      listPosition(tester).jumpTo(800);
+      await tester.pumpAndSettle();
+
+      // What iOS sends when the status bar is tapped.
+      await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        'flutter/status_bar',
+        const JSONMethodCodec()
+            .encodeMethodCall(const MethodCall('handleScrollToTop')),
+        (_) {},
+      );
+      await tester.pumpAndSettle();
+
+      expect(listPosition(tester).pixels, 0);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
   });
 
   testWidgets('search filters the list', (tester) async {
