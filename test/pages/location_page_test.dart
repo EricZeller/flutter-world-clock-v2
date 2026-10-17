@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
@@ -182,7 +183,10 @@ void main() {
       listPosition(tester).jumpTo(0);
       await tester.pumpAndSettle();
       expect(favoriteNames(tester), ['Berlin', 'City 15']);
-    });
+    },
+        // Clamping and bouncing scroll physics.
+        variant: TargetPlatformVariant(
+            {TargetPlatform.android, TargetPlatform.iOS}));
 
     testWidgets('when it is no favorite anymore', (tester) async {
       final repository = await pumpCities(
@@ -219,6 +223,25 @@ void main() {
       expect(tester.getTopLeft(cityTile('City 03')).dy, greaterThan(before.dy),
           reason: 'the new favorite pushes the list down');
     });
+
+    testWidgets('and a tap on the status bar still scrolls to the top',
+        (tester) async {
+      await pumpCities(tester, [City.berlin]);
+      tester.view.padding = const FakeViewPadding(top: 80);
+      listPosition(tester).jumpTo(800);
+      await tester.pumpAndSettle();
+
+      // What iOS sends when the status bar is tapped.
+      await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        'flutter/status_bar',
+        const JSONMethodCodec()
+            .encodeMethodCall(const MethodCall('handleScrollToTop')),
+        (_) {},
+      );
+      await tester.pumpAndSettle();
+
+      expect(listPosition(tester).pixels, 0);
+    }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
   });
 
   testWidgets('search filters the list', (tester) async {
