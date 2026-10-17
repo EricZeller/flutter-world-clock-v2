@@ -249,6 +249,77 @@ void main() {
       expect(widget.current['weather_icon'], '🛜');
       expect(widget.current['weather_temp'], '');
     });
+
+    // Sends the app to the background and back, one step at a time.
+    Future<void> resumeApp(WidgetTester tester) async {
+      for (final state in const [
+        AppLifecycleState.inactive,
+        AppLifecycleState.hidden,
+        AppLifecycleState.paused,
+        AppLifecycleState.hidden,
+        AppLifecycleState.inactive,
+        AppLifecycleState.resumed,
+      ]) {
+        tester.binding.handleAppLifecycleStateChanged(state);
+      }
+      await tester.pump();
+    }
+
+    testWidgets('a city chosen in the background gets its weather on resume',
+        (tester) async {
+      final wttr = FakeWttr();
+      final widget = HomeWidgetRecorder.install()..installedWidgetIds = [5];
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+      await flushWidgetUpdates(tester);
+
+      // Chosen in the widget configuration, which runs in its own instance.
+      await CityRepository().saveWidgetCity(5, tokyo);
+      await resumeApp(tester);
+      await flushWidgetUpdates(tester);
+
+      expect(widget.current['city_5'], 'Tokyo');
+      expect(widget.current['weather_5'], '☁️ Cloudy +20°C');
+      expect(widget.current['weather_icon_5'], '☁️');
+      expect(wttr.requests.map((uri) => uri.path), ['/Berlin', '/Tokyo']);
+    });
+
+    testWidgets('resuming downloads weather only when it is outdated',
+        (tester) async {
+      final wttr = FakeWttr();
+      final widget = HomeWidgetRecorder.install()..installedWidgetIds = [5];
+      await CityRepository().saveWidgetCity(5, tokyo);
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+      await flushWidgetUpdates(tester);
+      expect(wttr.requests.map((uri) => uri.path), ['/Berlin', '/Tokyo']);
+
+      await resumeApp(tester);
+      await resumeApp(tester);
+      await flushWidgetUpdates(tester);
+
+      expect(wttr.requests, hasLength(2));
+      expect(widget.current['weather_5'], '☁️ Cloudy +20°C');
+    });
+
+    testWidgets('syncs on resume share a running download', (tester) async {
+      final wttr = FakeWttr();
+      final widget = HomeWidgetRecorder.install()..installedWidgetIds = [5];
+      await pumpPage(tester, const HomePage(),
+          settings: await loadSettings(), weather: wttr.service);
+      await flushWidgetUpdates(tester);
+
+      wttr.hold = Completer();
+      await CityRepository().saveWidgetCity(5, tokyo);
+      await resumeApp(tester);
+      await resumeApp(tester);
+      await flushWidgetUpdates(tester);
+      wttr.hold!.complete();
+      await flushWidgetUpdates(tester);
+
+      expect(wttr.requests.map((uri) => uri.path), ['/Berlin', '/Tokyo']);
+      expect(widget.current['weather_5'], '☁️ Cloudy +20°C');
+    });
   });
 
   group('weather requests', () {
