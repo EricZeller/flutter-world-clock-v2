@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/pages/location/anchored_scroll_controller.dart';
 import 'package:world_clock_v2/pages/location/city_tile.dart';
 import 'package:world_clock_v2/pages/location/custom_city_dialog.dart';
 import 'package:world_clock_v2/pages/location/sort_menu.dart';
@@ -27,6 +28,7 @@ class _LocationPageState extends State<LocationPage> {
   String _query = '';
   CitySort _sort = CitySort.city;
   bool _showMap = false;
+  final _scrollController = AnchoredScrollController();
 
   // Read once, so saving after an await never needs this page's context.
   late final CityRepository _repository;
@@ -36,6 +38,12 @@ class _LocationPageState extends State<LocationPage> {
     super.initState();
     _repository = context.read<CityRepository>();
     _loadCities();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCities() async {
@@ -55,13 +63,20 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   /// Adds or removes [city]; returns whether it is a favorite afterwards.
-  bool _toggleFavorite(City city) {
+  ///
+  /// The list entry [tapped] keeps its place on screen although the
+  /// favorites above it grow or shrink.
+  bool _toggleFavorite(City city, {BuildContext? tapped}) {
     final isFavorite = _favorites.contains(city);
     if (isFavorite && _favorites.length == 1) {
       _showMessage(AppLocalizations.of(context)!.keepOneCity);
       return true;
     }
     HapticFeedback.lightImpact();
+    // While searching, the favorites are hidden and nothing moves.
+    if (tapped != null && _query.trim().isEmpty) {
+      _scrollController.keepInPlace(tapped);
+    }
     setState(() {
       _favorites = isFavorite
           ? _favorites.where((item) => item != city).toList()
@@ -163,6 +178,15 @@ class _LocationPageState extends State<LocationPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Above the scaffold, so a tap on the iOS status bar still scrolls the
+    // list to the top.
+    return PrimaryScrollController(
+      controller: _scrollController,
+      child: _buildScaffold(context),
+    );
+  }
+
+  Widget _buildScaffold(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final visibleCities = sortCities(filterCities(_cities, _query), _sort);
@@ -211,6 +235,7 @@ class _LocationPageState extends State<LocationPage> {
                 ),
                 Expanded(
                   child: CustomScrollView(
+                    primary: true,
                     slivers: [
                       if (showFavorites) ...[
                         SliverToBoxAdapter(child: _header(l10n.favorites)),
@@ -230,12 +255,15 @@ class _LocationPageState extends State<LocationPage> {
                         itemCount: visibleCities.length,
                         itemBuilder: (context, index) {
                           final city = visibleCities[index];
-                          return CityTile(
-                            city: city,
-                            isFavorite: _favorites.contains(city),
-                            onToggleFavorite: () => _toggleFavorite(city),
-                            onEdit: () => _editCustomCity(editing: city),
-                            onDelete: () => _deleteCustomCity(city),
+                          return Builder(
+                            builder: (tile) => CityTile(
+                              city: city,
+                              isFavorite: _favorites.contains(city),
+                              onToggleFavorite: () =>
+                                  _toggleFavorite(city, tapped: tile),
+                              onEdit: () => _editCustomCity(editing: city),
+                              onDelete: () => _deleteCustomCity(city),
+                            ),
                           );
                         },
                       ),
