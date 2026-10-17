@@ -137,6 +137,24 @@ void main() {
       );
     });
 
+    test('keeps reports that finish downloading together', () async {
+      final wttr = FakeWttr();
+
+      await Future.wait([
+        wttr.service.refresh(server: server, zone: 'Berlin'),
+        wttr.service.refresh(server: server, zone: 'Tokyo'),
+      ]);
+
+      expect(
+        await wttr.service.loadCached(server: server, zone: 'Berlin'),
+        isNotNull,
+      );
+      expect(
+        await wttr.service.loadCached(server: server, zone: 'Tokyo'),
+        isNotNull,
+      );
+    });
+
     test('ignores a corrupted cache', () async {
       SharedPreferences.setMockInitialValues({
         WeatherService.cacheKey: 'not json',

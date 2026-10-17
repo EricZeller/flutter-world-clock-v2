@@ -24,11 +24,16 @@ class _HomePageState extends State<HomePage> {
   int _index = 0;
   PageController? _controller;
   int _refreshGeneration = 0;
+  late final AppLifecycleListener _lifecycle;
 
   @override
   void initState() {
     super.initState();
     _loadFavorites();
+    // A widget may have got its own city while the app was in the
+    // background, e.g. one whose weather is not cached yet; the city pages
+    // only sync once their own weather is due again.
+    _lifecycle = AppLifecycleListener(onResume: _syncHomeWidget);
   }
 
   @override
@@ -40,6 +45,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _lifecycle.dispose();
     _controller?.dispose();
     super.dispose();
   }
