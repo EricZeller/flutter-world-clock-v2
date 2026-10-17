@@ -33,18 +33,21 @@ struct City: Decodable, Hashable, Sendable {
         all.first { $0.name == name }
     }
 
-    /// Finds the city of a widget by its ID, `name|timeZone` (older IDs are
-    /// just the name). A renamed city is found by its time zone instead of
-    /// the widget silently showing Berlin.
-    static func with(id: String) -> City? {
-        let parts = id.split(separator: "|", maxSplits: 1).map(String.init)
-        if let city = named(parts.first ?? id) { return city }
-        guard parts.count == 2 else { return nil }
-        return all.first { $0.timeZone == parts[1] }
-    }
+    /// The value a widget stores for the city, e.g. "Berlin, Germany".
+    var label: String { "\(name), \(country)" }
 
-    /// The ID a widget stores for the city, see `with(id:)`.
-    var id: String { "\(name)|\(timeZone)" }
+    /// Finds the city of a widget by its `label`. A city whose country was
+    /// renamed is still found by its name (names can contain a comma, e.g.
+    /// "Washington, D.C.", so the longest matching name wins). Widgets set up
+    /// with an older version may still hold an ID like "Berlin|Europe/Berlin".
+    static func labeled(_ label: String) -> City? {
+        if let city = all.first(where: { $0.label == label }) { return city }
+        let name = label.split(separator: "|", maxSplits: 1).first.map(String.init) ?? label
+        if let city = named(name) { return city }
+        return all
+            .filter { label.hasPrefix("\($0.name), ") }
+            .max { $0.name.count < $1.name.count }
+    }
 
     /// An unknown zone falls back to UTC instead of breaking the widget.
     var zone: TimeZone {
