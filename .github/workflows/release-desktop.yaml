@@ -97,6 +97,8 @@ jobs:
             build/worldclockv2*.dmg
             
       - name: Get latest release tag
+        # A manual run only builds artifacts to test; releases get the uploads.
+        if: github.event_name == 'release'
         id: tag
         run: |
           TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
@@ -105,6 +107,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifacts to Release
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
