@@ -96,18 +96,12 @@ jobs:
             build/worldclockv2*.tar.xz
             build/worldclockv2*.dmg
             
-      - name: Get latest release tag
-        id: tag
-        run: |
-          TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName')
-          echo "tag=${TAG}" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      # A manual run only builds artifacts to test; releases get the uploads.
       - name: Upload artifacts to Release
+        if: github.event_name == 'release'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ steps.tag.outputs.tag }}
+          tag_name: ${{ github.event.release.tag_name }}
           files: |
             build/worldclockv2_v${{ steps.version.outputs.version }}_linux_x64.tar.xz
             build/worldclockv2_v${{ steps.version.outputs.version }}_windows_x64.zip
