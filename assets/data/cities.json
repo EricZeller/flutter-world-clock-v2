@@ -4,7 +4,7 @@
         "country": "Afghanistan",
         "timeZone": "Asia/Kabul",
         "utc": "+04:30",
-        "flag": "af.png",
+        "flag": "af.webp",
         "weatherZone": "Kabul"
     },
     {
@@ -12,7 +12,7 @@
         "country": "Albania",
         "timeZone": "Europe/Tirane",
         "utc": "+02:00",
-        "flag": "al.png",
+        "flag": "al.webp",
         "weatherZone": "Tirana"
     },
     {
@@ -20,7 +20,7 @@
         "country": "Algeria",
         "timeZone": "Africa/Algiers",
         "utc": "+01:00",
-        "flag": "dz.png",
+        "flag": "dz.webp",
         "weatherZone": "Algiers"
     },
     {
@@ -28,7 +28,7 @@
         "country": "Andorra",
         "timeZone": "Europe/Andorra",
         "utc": "+02:00",
-        "flag": "ad.png",
+        "flag": "ad.webp",
         "weatherZone": "Andorra la Vella"
     },
     {
@@ -36,7 +36,7 @@
         "country": "Argentina",
         "timeZone": "America/Argentina/Buenos_Aires",
         "utc": "-03:00",
-        "flag": "ar.png",
+        "flag": "ar.webp",
         "weatherZone": "Buenos Aires"
     },
     {
@@ -44,7 +44,7 @@
         "country": "Australia",
         "timeZone": "Australia/Sydney",
         "utc": "+10:00",
-        "flag": "au.png",
+        "flag": "au.webp",
         "weatherZone": "Canberra"
     },
     {
@@ -52,7 +52,7 @@
         "country": "Austria",
         "timeZone": "Europe/Vienna",
         "utc": "+02:00",
-        "flag": "at.png",
+        "flag": "at.webp",
         "weatherZone": "Vienna"
     },
     {
@@ -60,7 +60,7 @@
         "country": "Belgium",
         "timeZone": "Europe/Brussels",
         "utc": "+02:00",
-        "flag": "be.png",
+        "flag": "be.webp",
         "weatherZone": "Brussels"
     },
     {
@@ -68,7 +68,7 @@
         "country": "Brazil",
         "timeZone": "America/Sao_Paulo",
         "utc": "-03:00",
-        "flag": "br.png",
+        "flag": "br.webp",
         "weatherZone": "Brasilia"
     },
     {
@@ -76,7 +76,7 @@
         "country": "Canada",
         "timeZone": "America/Toronto",
         "utc": "-04:00",
-        "flag": "ca.png",
+        "flag": "ca.webp",
         "weatherZone": "Ottawa"
     },
     {
@@ -84,7 +84,7 @@
         "country": "China",
         "timeZone": "Asia/Shanghai",
         "utc": "+08:00",
-        "flag": "cn.png",
+        "flag": "cn.webp",
         "weatherZone": "Beijing"
     },
     {
@@ -92,7 +92,7 @@
         "country": "Colombia",
         "timeZone": "America/Bogota",
         "utc": "-05:00",
-        "flag": "co.png",
+        "flag": "co.webp",
         "weatherZone": "Bogota"
     },
     {
@@ -100,7 +100,7 @@
         "country": "Egypt",
         "timeZone": "Africa/Cairo",
         "utc": "+02:00",
-        "flag": "eg.png",
+        "flag": "eg.webp",
         "weatherZone": "Cairo"
     },
     {
@@ -108,7 +108,7 @@
         "country": "France",
         "timeZone": "Europe/Paris",
         "utc": "+02:00",
-        "flag": "fr.png",
+        "flag": "fr.webp",
         "weatherZone": "Paris"
     },
     {
@@ -116,7 +116,7 @@
         "country": "Germany",
         "timeZone": "Europe/Berlin",
         "utc": "+02:00",
-        "flag": "de.png",
+        "flag": "de.webp",
         "weatherZone": "Berlin"
     },
     {
@@ -124,7 +124,7 @@
         "country": "Greece",
         "timeZone": "Europe/Athens",
         "utc": "+03:00",
-        "flag": "gr.png",
+        "flag": "gr.webp",
         "weatherZone": "Athens"
     },
     {
@@ -132,7 +132,7 @@
         "country": "India",
         "timeZone": "Asia/Kolkata",
         "utc": "+05:30",
-        "flag": "in.png",
+        "flag": "in.webp",
         "weatherZone": "New Delhi"
     },
     {
@@ -140,7 +140,7 @@
         "country": "Indonesia",
         "timeZone": "Asia/Jakarta",
         "utc": "+07:00",
-        "flag": "id.png",
+        "flag": "id.webp",
         "weatherZone": "Jakarta"
     },
     {
@@ -148,7 +148,7 @@
         "country": "Italy",
         "timeZone": "Europe/Rome",
         "utc": "+02:00",
-        "flag": "it.png",
+        "flag": "it.webp",
         "weatherZone": "Rome"
     },
     {
@@ -156,7 +156,7 @@
         "country": "Japan",
         "timeZone": "Asia/Tokyo",
         "utc": "+09:00",
-        "flag": "jp.png",
+        "flag": "jp.webp",
         "weatherZone": "Tokyo"
     },
     {
@@ -164,7 +164,7 @@
         "country": "South Korea",
         "timeZone": "Asia/Seoul",
         "utc": "+09:00",
-        "flag": "kr.png",
+        "flag": "kr.webp",
         "weatherZone": "Seoul"
     },
     {
@@ -172,7 +172,7 @@
         "country": "Mexico",
         "timeZone": "America/Mexico_City",
         "utc": "-05:00",
-        "flag": "mx.png",
+        "flag": "mx.webp",
         "weatherZone": "Mexico City"
     },
     {
@@ -180,7 +180,7 @@
         "country": "Spain",
         "timeZone": "Europe/Madrid",
         "utc": "+02:00",
-        "flag": "es.png",
+        "flag": "es.webp",
         "weatherZone": "Madrid"
     },
     {
@@ -188,7 +188,7 @@
         "country": "Sweden",
         "timeZone": "Europe/Stockholm",
         "utc": "+02:00",
-        "flag": "se.png",
+        "flag": "se.webp",
         "weatherZone": "Stockholm"
     },
     {
@@ -196,7 +196,7 @@
         "country": "Finland",
         "timeZone": "Europe/Helsinki",
         "utc": "+02:00",
-        "flag": "fi.png",
+        "flag": "fi.webp",
         "weatherZone": "Helsinki"
     },
     {
@@ -204,7 +204,7 @@
         "country": "Switzerland",
         "timeZone": "Europe/Zurich",
         "utc": "+02:00",
-        "flag": "ch.png",
+        "flag": "ch.webp",
         "weatherZone": "Bern"
     },
     {
@@ -212,7 +212,7 @@
         "country": "United Kingdom",
         "timeZone": "Europe/London",
         "utc": "+01:00",
-        "flag": "gb.png",
+        "flag": "gb.webp",
         "weatherZone": "London"
     },
     {
@@ -220,7 +220,7 @@
         "country": "United States",
         "timeZone": "America/New_York",
         "utc": "-04:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "Washington, D.C."
     },
     {
@@ -228,7 +228,7 @@
         "country": "Venezuela",
         "timeZone": "America/Caracas",
         "utc": "-04:00",
-        "flag": "ve.png",
+        "flag": "ve.webp",
         "weatherZone": "Caracas"
     },
     {
@@ -236,7 +236,7 @@
         "country": "Vietnam",
         "timeZone": "Asia/Ho_Chi_Minh",
         "utc": "+07:00",
-        "flag": "vn.png",
+        "flag": "vn.webp",
         "weatherZone": "Hanoi"
     },
     {
@@ -244,7 +244,7 @@
         "country": "Zimbabwe",
         "timeZone": "Africa/Harare",
         "utc": "+02:00",
-        "flag": "zw.png",
+        "flag": "zw.webp",
         "weatherZone": "Harare"
     },
     {
@@ -252,7 +252,7 @@
         "country": "Australia",
         "timeZone": "Australia/Sydney",
         "utc": "+10:00",
-        "flag": "au.png",
+        "flag": "au.webp",
         "weatherZone": "Sydney"
     },
     {
@@ -260,7 +260,7 @@
         "country": "United States",
         "timeZone": "America/Los_Angeles",
         "utc": "-07:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "Los Angeles"
     },
     {
@@ -268,7 +268,7 @@
         "country": "United States",
         "timeZone": "America/New_York",
         "utc": "-04:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "New York"
     },
     {
@@ -276,7 +276,7 @@
         "country": "United States",
         "timeZone": "America/Los_Angeles",
         "utc": "-07:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "Seattle"
     },
     {
@@ -284,7 +284,7 @@
         "country": "United States",
         "timeZone": "America/Chicago",
         "utc": "-05:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "Dallas"
     },    
     {
@@ -292,7 +292,7 @@
         "country": "United Arab Emirates",
         "timeZone": "Asia/Dubai",
         "utc": "+04:00",
-        "flag": "ae.png",
+        "flag": "ae.webp",
         "weatherZone": "Dubai"
     },
     {
@@ -300,7 +300,7 @@
         "country": "Netherlands",
         "timeZone": "Europe/Amsterdam",
         "utc": "+02:00",
-        "flag": "nl.png",
+        "flag": "nl.webp",
         "weatherZone": "Amsterdam"
     },
     {
@@ -308,7 +308,7 @@
         "country": "New Zealand",
         "timeZone": "Pacific/Auckland",
         "utc": "+12:00",
-        "flag": "nz.png",
+        "flag": "nz.webp",
         "weatherZone": "Wellington"
     },
     {
@@ -316,7 +316,7 @@
         "country": "Peru",
         "timeZone": "America/Lima",
         "utc": "-05:00",
-        "flag": "pe.png",
+        "flag": "pe.webp",
         "weatherZone": "Lima"
     },
     {
@@ -324,7 +324,7 @@
         "country": "Portugal",
         "timeZone": "Europe/Lisbon",
         "utc": "+01:00",
-        "flag": "pt.png",
+        "flag": "pt.webp",
         "weatherZone": "Lisbon"
     },
     {
@@ -332,7 +332,7 @@
         "country": "Turkey",
         "timeZone": "Europe/Istanbul",
         "utc": "+03:00",
-        "flag": "tr.png",
+        "flag": "tr.webp",
         "weatherZone": "Ankara"
     },
     {
@@ -340,7 +340,7 @@
         "country": "Ukraine",
         "timeZone": "Europe/Kiev",
         "utc": "+03:00",
-        "flag": "ua.png",
+        "flag": "ua.webp",
         "weatherZone": "Kyiv"
     },
     {
@@ -348,7 +348,7 @@
         "country": "Turkey",
         "timeZone": "Europe/Istanbul",
         "utc": "+03:00",
-        "flag": "tr.png",
+        "flag": "tr.webp",
         "weatherZone": "Istanbul"
     },
     {
@@ -356,7 +356,7 @@
         "country": "Germany",
         "timeZone": "Europe/Berlin",
         "utc": "+02:00",
-        "flag": "de.png",
+        "flag": "de.webp",
         "weatherZone": "Munich"
     },
     {
@@ -364,7 +364,7 @@
         "country": "Spain",
         "timeZone": "Europe/Madrid",
         "utc": "+02:00",
-        "flag": "es.png",
+        "flag": "es.webp",
         "weatherZone": "Barcelona"
     },
     {
@@ -372,7 +372,7 @@
         "country": "United States",
         "timeZone": "America/Los_Angeles",
         "utc": "-07:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "San Francisco"
     },
     {
@@ -380,7 +380,7 @@
         "country": "Canada",
         "timeZone": "America/Toronto",
         "utc": "-04:00",
-        "flag": "ca.png",
+        "flag": "ca.webp",
         "weatherZone": "Toronto"
     },
     {
@@ -388,7 +388,7 @@
         "country": "China",
         "timeZone": "Asia/Hong_Kong",
         "utc": "+08:00",
-        "flag": "hk.png",
+        "flag": "hk.webp",
         "weatherZone": "Hong Kong"
     },
     {
@@ -396,7 +396,7 @@
         "country": "Angola",
         "timeZone": "Africa/Luanda",
         "utc": "+01:00",
-        "flag": "ao.png",
+        "flag": "ao.webp",
         "weatherZone": "Luanda"
     },
     {
@@ -404,7 +404,7 @@
         "country": "Armenia",
         "timeZone": "Asia/Yerevan",
         "utc": "+04:00",
-        "flag": "am.png",
+        "flag": "am.webp",
         "weatherZone": "Yerevan"
     },
     {
@@ -412,7 +412,7 @@
         "country": "Azerbaijan",
         "timeZone": "Asia/Baku",
         "utc": "+04:00",
-        "flag": "az.png",
+        "flag": "az.webp",
         "weatherZone": "Baku"
     },
     {
@@ -420,7 +420,7 @@
         "country": "Bahrain",
         "timeZone": "Asia/Bahrain",
         "utc": "+03:00",
-        "flag": "bh.png",
+        "flag": "bh.webp",
         "weatherZone": "Manama"
     },
     {
@@ -428,7 +428,7 @@
         "country": "Bangladesh",
         "timeZone": "Asia/Dhaka",
         "utc": "+06:00",
-        "flag": "bd.png",
+        "flag": "bd.webp",
         "weatherZone": "Dhaka"
     },
     {
@@ -436,7 +436,7 @@
         "country": "Belarus",
         "timeZone": "Europe/Minsk",
         "utc": "+03:00",
-        "flag": "by.png",
+        "flag": "by.webp",
         "weatherZone": "Minsk"
     },
     {
@@ -444,7 +444,7 @@
         "country": "Bhutan",
         "timeZone": "Asia/Thimphu",
         "utc": "+06:00",
-        "flag": "bt.png",
+        "flag": "bt.webp",
         "weatherZone": "Thimphu"
     },
     {
@@ -452,7 +452,7 @@
         "country": "Botswana",
         "timeZone": "Africa/Gaborone",
         "utc": "+02:00",
-        "flag": "bw.png",
+        "flag": "bw.webp",
         "weatherZone": "Gaborone"
     },
     {
@@ -460,7 +460,7 @@
         "country": "Bulgaria",
         "timeZone": "Europe/Sofia",
         "utc": "+03:00",
-        "flag": "bg.png",
+        "flag": "bg.webp",
         "weatherZone": "Sofia"
     },
     {
@@ -468,7 +468,7 @@
         "country": "Burkina Faso",
         "timeZone": "Africa/Ouagadougou",
         "utc": "+00:00",
-        "flag": "bf.png",
+        "flag": "bf.webp",
         "weatherZone": "Ouagadougou"
     },
     {
@@ -476,7 +476,7 @@
         "country": "Burundi",
         "timeZone": "Africa/Bujumbura",
         "utc": "+02:00",
-        "flag": "bi.png",
+        "flag": "bi.webp",
         "weatherZone": "Bujumbura"
     },
     {
@@ -484,7 +484,7 @@
         "country": "Cameroon",
         "timeZone": "Africa/Douala",
         "utc": "+01:00",
-        "flag": "cm.png",
+        "flag": "cm.webp",
         "weatherZone": "Yaoundé"
     },
     {
@@ -492,7 +492,7 @@
         "country": "Cape Verde",
         "timeZone": "Atlantic/Cape_Verde",
         "utc": "-01:00",
-        "flag": "cv.png",
+        "flag": "cv.webp",
         "weatherZone": "Praia"
     },
     {
@@ -500,7 +500,7 @@
         "country": "Central African Republic",
         "timeZone": "Africa/Bangui",
         "utc": "+01:00",
-        "flag": "cf.png",
+        "flag": "cf.webp",
         "weatherZone": "Bangui"
     },
     {
@@ -508,7 +508,7 @@
         "country": "Chad",
         "timeZone": "Africa/Ndjamena",
         "utc": "+01:00",
-        "flag": "td.png",
+        "flag": "td.webp",
         "weatherZone": "N'Djamena"
     },
     {
@@ -516,7 +516,7 @@
         "country": "Chile",
         "timeZone": "America/Santiago",
         "utc": "-04:00",
-        "flag": "cl.png",
+        "flag": "cl.webp",
         "weatherZone": "Santiago"
     },
     {
@@ -524,7 +524,7 @@
         "country": "Comoros",
         "timeZone": "Indian/Comoro",
         "utc": "+03:00",
-        "flag": "km.png",
+        "flag": "km.webp",
         "weatherZone": "Moroni"
     },
     {
@@ -532,7 +532,7 @@
         "country": "Congo (DRC)",
         "timeZone": "Africa/Kinshasa",
         "utc": "+01:00",
-        "flag": "cd.png",
+        "flag": "cd.webp",
         "weatherZone": "Kinshasa"
     },
     {
@@ -540,7 +540,7 @@
         "country": "Congo (Republic)",
         "timeZone": "Africa/Brazzaville",
         "utc": "+01:00",
-        "flag": "cg.png",
+        "flag": "cg.webp",
         "weatherZone": "Brazzaville"
     },
     {
@@ -548,7 +548,7 @@
         "country": "Costa Rica",
         "timeZone": "America/Costa_Rica",
         "utc": "-06:00",
-        "flag": "cr.png",
+        "flag": "cr.webp",
         "weatherZone": "San José"
     },
     {
@@ -556,7 +556,7 @@
         "country": "Croatia",
         "timeZone": "Europe/Zagreb",
         "utc": "+02:00",
-        "flag": "hr.png",
+        "flag": "hr.webp",
         "weatherZone": "Zagreb"
     },
     {
@@ -564,7 +564,7 @@
         "country": "Cuba",
         "timeZone": "America/Havana",
         "utc": "-04:00",
-        "flag": "cu.png",
+        "flag": "cu.webp",
         "weatherZone": "Havana"
     },
     {
@@ -572,7 +572,7 @@
         "country": "Cyprus",
         "timeZone": "Asia/Nicosia",
         "utc": "+03:00",
-        "flag": "cy.png",
+        "flag": "cy.webp",
         "weatherZone": "Nicosia"
     },
     {
@@ -580,7 +580,7 @@
         "country": "Czech Republic",
         "timeZone": "Europe/Prague",
         "utc": "+02:00",
-        "flag": "cz.png",
+        "flag": "cz.webp",
         "weatherZone": "Prague"
     },
     {
@@ -588,7 +588,7 @@
         "country": "Denmark",
         "timeZone": "Europe/Copenhagen",
         "utc": "+02:00",
-        "flag": "dk.png",
+        "flag": "dk.webp",
         "weatherZone": "Copenhagen"
     },
     {
@@ -596,7 +596,7 @@
         "country": "Djibouti",
         "timeZone": "Africa/Djibouti",
         "utc": "+03:00",
-        "flag": "dj.png",
+        "flag": "dj.webp",
         "weatherZone": "Djibouti"
     },
     {
@@ -604,7 +604,7 @@
         "country": "Dominica",
         "timeZone": "America/Dominica",
         "utc": "-04:00",
-        "flag": "dm.png",
+        "flag": "dm.webp",
         "weatherZone": "Roseau"
     },
     {
@@ -612,7 +612,7 @@
         "country": "Dominican Republic",
         "timeZone": "America/Santo_Domingo",
         "utc": "-04:00",
-        "flag": "do.png",
+        "flag": "do.webp",
         "weatherZone": "Santo Domingo"
     },
     {
@@ -620,7 +620,7 @@
         "country": "Ecuador",
         "timeZone": "America/Guayaquil",
         "utc": "-05:00",
-        "flag": "ec.png",
+        "flag": "ec.webp",
         "weatherZone": "Quito"
     },
     {
@@ -628,7 +628,7 @@
         "country": "El Salvador",
         "timeZone": "America/El_Salvador",
         "utc": "-06:00",
-        "flag": "sv.png",
+        "flag": "sv.webp",
         "weatherZone": "San Salvador"
     },
     {
@@ -636,7 +636,7 @@
         "country": "Equatorial Guinea",
         "timeZone": "Africa/Malabo",
         "utc": "+01:00",
-        "flag": "gq.png",
+        "flag": "gq.webp",
         "weatherZone": "Malabo"
     },
     {
@@ -644,7 +644,7 @@
         "country": "Eritrea",
         "timeZone": "Africa/Asmara",
         "utc": "+03:00",
-        "flag": "er.png",
+        "flag": "er.webp",
         "weatherZone": "Asmara"
     },
     {
@@ -652,7 +652,7 @@
         "country": "Estonia",
         "timeZone": "Europe/Tallinn",
         "utc": "+03:00",
-        "flag": "ee.png",
+        "flag": "ee.webp",
         "weatherZone": "Tallinn"
     },
     {
@@ -660,7 +660,7 @@
         "country": "Ethiopia",
         "timeZone": "Africa/Addis_Ababa",
         "utc": "+03:00",
-        "flag": "et.png",
+        "flag": "et.webp",
         "weatherZone": "Addis Ababa"
     },
     {
@@ -668,7 +668,7 @@
         "country": "Gabon",
         "timeZone": "Africa/Libreville",
         "utc": "+01:00",
-        "flag": "ga.png",
+        "flag": "ga.webp",
         "weatherZone": "Libreville"
     },
     {
@@ -676,7 +676,7 @@
         "country": "Gambia",
         "timeZone": "Africa/Banjul",
         "utc": "+00:00",
-        "flag": "gm.png",
+        "flag": "gm.webp",
         "weatherZone": "Banjul"
     },
     {
@@ -684,7 +684,7 @@
         "country": "Georgia",
         "timeZone": "Asia/Tbilisi",
         "utc": "+04:00",
-        "flag": "ge.png",
+        "flag": "ge.webp",
         "weatherZone": "Tbilisi"
     },
     {
@@ -692,7 +692,7 @@
         "country": "Ghana",
         "timeZone": "Africa/Accra",
         "utc": "+00:00",
-        "flag": "gh.png",
+        "flag": "gh.webp",
         "weatherZone": "Accra"
     },
     {
@@ -700,7 +700,7 @@
         "country": "Guatemala",
         "timeZone": "America/Guatemala",
         "utc": "-06:00",
-        "flag": "gt.png",
+        "flag": "gt.webp",
         "weatherZone": "Guatemala City"
     },
     {
@@ -708,7 +708,7 @@
         "country": "Guinea",
         "timeZone": "Africa/Conakry",
         "utc": "+00:00",
-        "flag": "gn.png",
+        "flag": "gn.webp",
         "weatherZone": "Conakry"
     },
     {
@@ -716,7 +716,7 @@
         "country": "Guinea-Bissau",
         "timeZone": "Africa/Bissau",
         "utc": "+00:00",
-        "flag": "gw.png",
+        "flag": "gw.webp",
         "weatherZone": "Bissau"
     },
     {
@@ -724,7 +724,7 @@
         "country": "Guyana",
         "timeZone": "America/Guyana",
         "utc": "-04:00",
-        "flag": "gy.png",
+        "flag": "gy.webp",
         "weatherZone": "Georgetown"
     },
     {
@@ -732,7 +732,7 @@
         "country": "Haiti",
         "timeZone": "America/Port-au-Prince",
         "utc": "-04:00",
-        "flag": "ht.png",
+        "flag": "ht.webp",
         "weatherZone": "Port-au-Prince"
     },
     {
@@ -740,7 +740,7 @@
         "country": "Honduras",
         "timeZone": "America/Tegucigalpa",
         "utc": "-06:00",
-        "flag": "hn.png",
+        "flag": "hn.webp",
         "weatherZone": "Tegucigalpa"
     },
     {
@@ -748,7 +748,7 @@
         "country": "Hungary",
         "timeZone": "Europe/Budapest",
         "utc": "+02:00",
-        "flag": "hu.png",
+        "flag": "hu.webp",
         "weatherZone": "Budapest"
     },
     {
@@ -756,7 +756,7 @@
         "country": "Iceland",
         "timeZone": "Atlantic/Reykjavik",
         "utc": "+00:00",
-        "flag": "is.png",
+        "flag": "is.webp",
         "weatherZone": "Reykjavik"
     },
     {
@@ -764,7 +764,7 @@
         "country": "Iraq",
         "timeZone": "Asia/Baghdad",
         "utc": "+03:00",
-        "flag": "iq.png",
+        "flag": "iq.webp",
         "weatherZone": "Baghdad"
     },
     {
@@ -772,7 +772,7 @@
         "country": "Iran",
         "timeZone": "Asia/Tehran",
         "utc": "+04:30",
-        "flag": "ir.png",
+        "flag": "ir.webp",
         "weatherZone": "Tehran"
     },
     {
@@ -780,7 +780,7 @@
         "country": "Ireland",
         "timeZone": "Europe/Dublin",
         "utc": "+01:00",
-        "flag": "ie.png",
+        "flag": "ie.webp",
         "weatherZone": "Dublin"
     },
     {
@@ -788,7 +788,7 @@
         "country": "Israel",
         "timeZone": "Asia/Jerusalem",
         "utc": "+03:00",
-        "flag": "il.png",
+        "flag": "il.webp",
         "weatherZone": "Jerusalem"
     },
     {
@@ -796,7 +796,7 @@
         "country": "Jamaica",
         "timeZone": "America/Jamaica",
         "utc": "-05:00",
-        "flag": "jm.png",
+        "flag": "jm.webp",
         "weatherZone": "Kingston"
     },
     {
@@ -804,7 +804,7 @@
         "country": "Jordan",
         "timeZone": "Asia/Amman",
         "utc": "+03:00",
-        "flag": "jo.png",
+        "flag": "jo.webp",
         "weatherZone": "Amman"
     },
     {
@@ -812,7 +812,7 @@
         "country": "Kazakhstan",
         "timeZone": "Asia/Almaty",
         "utc": "+06:00",
-        "flag": "kz.png",
+        "flag": "kz.webp",
         "weatherZone": "Astana"
     },
     {
@@ -820,7 +820,7 @@
         "country": "Kenya",
         "timeZone": "Africa/Nairobi",
         "utc": "+03:00",
-        "flag": "ke.png",
+        "flag": "ke.webp",
         "weatherZone": "Nairobi"
     },
     {
@@ -828,7 +828,7 @@
         "country": "Kiribati",
         "timeZone": "Pacific/Tarawa",
         "utc": "+12:00",
-        "flag": "ki.png",
+        "flag": "ki.webp",
         "weatherZone": "Tarawa"
     },
     {
@@ -836,7 +836,7 @@
         "country": "Kosovo",
         "timeZone": "Europe/Belgrade",
         "utc": "+02:00",
-        "flag": "xk.png",
+        "flag": "xk.webp",
         "weatherZone": "Pristina"
     },
     {
@@ -844,7 +844,7 @@
         "country": "Kuwait",
         "timeZone": "Asia/Kuwait",
         "utc": "+03:00",
-        "flag": "kw.png",
+        "flag": "kw.webp",
         "weatherZone": "Kuwait City"
     },
     {
@@ -852,7 +852,7 @@
         "country": "Kyrgyzstan",
         "timeZone": "Asia/Bishkek",
         "utc": "+06:00",
-        "flag": "kg.png",
+        "flag": "kg.webp",
         "weatherZone": "Bishkek"
     },
     {
@@ -860,7 +860,7 @@
         "country": "Laos",
         "timeZone": "Asia/Vientiane",
         "utc": "+07:00",
-        "flag": "la.png",
+        "flag": "la.webp",
         "weatherZone": "Vientiane"
     },
     {
@@ -868,7 +868,7 @@
         "country": "Latvia",
         "timeZone": "Europe/Riga",
         "utc": "+03:00",
-        "flag": "lv.png",
+        "flag": "lv.webp",
         "weatherZone": "Riga"
     },
     {
@@ -876,7 +876,7 @@
         "country": "Lebanon",
         "timeZone": "Asia/Beirut",
         "utc": "+03:00",
-        "flag": "lb.png",
+        "flag": "lb.webp",
         "weatherZone": "Beirut"
     },
     {
@@ -884,7 +884,7 @@
         "country": "Lesotho",
         "timeZone": "Africa/Maseru",
         "utc": "+02:00",
-        "flag": "ls.png",
+        "flag": "ls.webp",
         "weatherZone": "Maseru"
     },
     {
@@ -892,7 +892,7 @@
         "country": "Liberia",
         "timeZone": "Africa/Monrovia",
         "utc": "+00:00",
-        "flag": "lr.png",
+        "flag": "lr.webp",
         "weatherZone": "Monrovia"
     },
     {
@@ -900,7 +900,7 @@
         "country": "Libya",
         "timeZone": "Africa/Tripoli",
         "utc": "+02:00",
-        "flag": "ly.png",
+        "flag": "ly.webp",
         "weatherZone": "Tripoli"
     },
     {
@@ -908,7 +908,7 @@
         "country": "Liechtenstein",
         "timeZone": "Europe/Vaduz",
         "utc": "+02:00",
-        "flag": "li.png",
+        "flag": "li.webp",
         "weatherZone": "Vaduz"
     },
     {
@@ -916,7 +916,7 @@
         "country": "Lithuania",
         "timeZone": "Europe/Vilnius",
         "utc": "+03:00",
-        "flag": "lt.png",
+        "flag": "lt.webp",
         "weatherZone": "Vilnius"
     },
     {
@@ -924,7 +924,7 @@
         "country": "Luxembourg",
         "timeZone": "Europe/Luxembourg",
         "utc": "+02:00",
-        "flag": "lu.png",
+        "flag": "lu.webp",
         "weatherZone": "Luxembourg"
     },
     {
@@ -932,7 +932,7 @@
         "country": "Madagascar",
         "timeZone": "Indian/Antananarivo",
         "utc": "+03:00",
-        "flag": "mg.png",
+        "flag": "mg.webp",
         "weatherZone": "Antananarivo"
     },
     {
@@ -940,7 +940,7 @@
         "country": "Malawi",
         "timeZone": "Africa/Blantyre",
         "utc": "+02:00",
-        "flag": "mw.png",
+        "flag": "mw.webp",
         "weatherZone": "Lilongwe"
     },
     {
@@ -948,7 +948,7 @@
         "country": "Malaysia",
         "timeZone": "Asia/Kuala_Lumpur",
         "utc": "+08:00",
-        "flag": "my.png",
+        "flag": "my.webp",
         "weatherZone": "Kuala Lumpur"
     },
     {
@@ -956,7 +956,7 @@
         "country": "Maldives",
         "timeZone": "Indian/Maldives",
         "utc": "+05:00",
-        "flag": "mv.png",
+        "flag": "mv.webp",
         "weatherZone": "Male"
     },
     {
@@ -964,7 +964,7 @@
         "country": "Mali",
         "timeZone": "Africa/Bamako",
         "utc": "+00:00",
-        "flag": "ml.png",
+        "flag": "ml.webp",
         "weatherZone": "Bamako"
     },
     {
@@ -972,7 +972,7 @@
         "country": "Malta",
         "timeZone": "Europe/Malta",
         "utc": "+02:00",
-        "flag": "mt.png",
+        "flag": "mt.webp",
         "weatherZone": "Valletta"
     },
     {
@@ -980,7 +980,7 @@
         "country": "Marshall Islands",
         "timeZone": "Pacific/Majuro",
         "utc": "+12:00",
-        "flag": "mh.png",
+        "flag": "mh.webp",
         "weatherZone": "Majuro"
     },
     {
@@ -988,7 +988,7 @@
         "country": "Mauritania",
         "timeZone": "Africa/Nouakchott",
         "utc": "+00:00",
-        "flag": "mr.png",
+        "flag": "mr.webp",
         "weatherZone": "Nouakchott"
     },
     {
@@ -996,7 +996,7 @@
         "country": "Mauritius",
         "timeZone": "Indian/Mauritius",
         "utc": "+04:00",
-        "flag": "mu.png",
+        "flag": "mu.webp",
         "weatherZone": "Port Louis"
     },
     {
@@ -1004,7 +1004,7 @@
         "country": "Moldova",
         "timeZone": "Europe/Chisinau",
         "utc": "+03:00",
-        "flag": "md.png",
+        "flag": "md.webp",
         "weatherZone": "Chisinau"
     },
     {
@@ -1012,7 +1012,7 @@
         "country": "Monaco",
         "timeZone": "Europe/Monaco",
         "utc": "+02:00",
-        "flag": "mc.png",
+        "flag": "mc.webp",
         "weatherZone": "Monaco"
     },
     {
@@ -1020,7 +1020,7 @@
         "country": "Mongolia",
         "timeZone": "Asia/Ulaanbaatar",
         "utc": "+08:00",
-        "flag": "mn.png",
+        "flag": "mn.webp",
         "weatherZone": "Ulaanbaatar"
     },
     {
@@ -1028,7 +1028,7 @@
         "country": "Montenegro",
         "timeZone": "Europe/Podgorica",
         "utc": "+02:00",
-        "flag": "me.png",
+        "flag": "me.webp",
         "weatherZone": "Podgorica"
     },
     {
@@ -1036,7 +1036,7 @@
         "country": "Mozambique",
         "timeZone": "Africa/Maputo",
         "utc": "+02:00",
-        "flag": "mz.png",
+        "flag": "mz.webp",
         "weatherZone": "Maputo"
     },
     {
@@ -1044,7 +1044,7 @@
         "country": "Myanmar",
         "timeZone": "Asia/Yangon",
         "utc": "+06:30",
-        "flag": "mm.png",
+        "flag": "mm.webp",
         "weatherZone": "Naypyidaw"
     },
     {
@@ -1052,7 +1052,7 @@
         "country": "Namibia",
         "timeZone": "Africa/Windhoek",
         "utc": "+02:00",
-        "flag": "na.png",
+        "flag": "na.webp",
         "weatherZone": "Windhoek"
     },
     {
@@ -1060,7 +1060,7 @@
         "country": "Nauru",
         "timeZone": "Pacific/Nauru",
         "utc": "+12:00",
-        "flag": "nr.png",
+        "flag": "nr.webp",
         "weatherZone": "Yaren"
     },
     {
@@ -1068,7 +1068,7 @@
         "country": "Nepal",
         "timeZone": "Asia/Kathmandu",
         "utc": "+05:45",
-        "flag": "np.png",
+        "flag": "np.webp",
         "weatherZone": "Kathmandu"
     },
     {
@@ -1076,7 +1076,7 @@
         "country": "Nicaragua",
         "timeZone": "America/Managua",
         "utc": "-06:00",
-        "flag": "ni.png",
+        "flag": "ni.webp",
         "weatherZone": "Managua"
     },
     {
@@ -1084,7 +1084,7 @@
         "country": "Niger",
         "timeZone": "Africa/Niamey",
         "utc": "+01:00",
-        "flag": "ne.png",
+        "flag": "ne.webp",
         "weatherZone": "Niamey"
     },
     {
@@ -1092,7 +1092,7 @@
         "country": "Nigeria",
         "timeZone": "Africa/Lagos",
         "utc": "+01:00",
-        "flag": "ng.png",
+        "flag": "ng.webp",
         "weatherZone": "Abuja"
     },
     {
@@ -1100,7 +1100,7 @@
         "country": "North Korea",
         "timeZone": "Asia/Pyongyang",
         "utc": "+09:00",
-        "flag": "kp.png",
+        "flag": "kp.webp",
         "weatherZone": "Pyongyang"
     },
     {
@@ -1108,7 +1108,7 @@
         "country": "North Macedonia",
         "timeZone": "Europe/Skopje",
         "utc": "+02:00",
-        "flag": "mk.png",
+        "flag": "mk.webp",
         "weatherZone": "Skopje"
     },
     {
@@ -1116,7 +1116,7 @@
         "country": "Oman",
         "timeZone": "Asia/Muscat",
         "utc": "+04:00",
-        "flag": "om.png",
+        "flag": "om.webp",
         "weatherZone": "Muscat"
     },
     {
@@ -1124,7 +1124,7 @@
         "country": "Pakistan",
         "timeZone": "Asia/Karachi",
         "utc": "+05:00",
-        "flag": "pk.png",
+        "flag": "pk.webp",
         "weatherZone": "Islamabad"
     },
     {
@@ -1132,7 +1132,7 @@
         "country": "Palau",
         "timeZone": "Pacific/Palau",
         "utc": "+09:00",
-        "flag": "pw.png",
+        "flag": "pw.webp",
         "weatherZone": "Ngerulmud"
     },
     {
@@ -1140,7 +1140,7 @@
         "country": "Palestine",
         "timeZone": "Asia/Hebron",
         "utc": "+03:00",
-        "flag": "ps.png",
+        "flag": "ps.webp",
         "weatherZone": "Ramallah"
     },
     {
@@ -1148,7 +1148,7 @@
         "country": "Panama",
         "timeZone": "America/Panama",
         "utc": "-05:00",
-        "flag": "pa.png",
+        "flag": "pa.webp",
         "weatherZone": "Panama City"
     },
     {
@@ -1156,7 +1156,7 @@
         "country": "Papua New Guinea",
         "timeZone": "Pacific/Port_Moresby",
         "utc": "+10:00",
-        "flag": "pg.png",
+        "flag": "pg.webp",
         "weatherZone": "Port Moresby"
     },
     {
@@ -1164,7 +1164,7 @@
         "country": "Paraguay",
         "timeZone": "America/Asuncion",
         "utc": "-04:00",
-        "flag": "py.png",
+        "flag": "py.webp",
         "weatherZone": "Asunción"
     },
     {
@@ -1172,7 +1172,7 @@
         "country": "Qatar",
         "timeZone": "Asia/Qatar",
         "utc": "+03:00",
-        "flag": "qa.png",
+        "flag": "qa.webp",
         "weatherZone": "Doha"
     },
     {
@@ -1180,7 +1180,7 @@
         "country": "Romania",
         "timeZone": "Europe/Bucharest",
         "utc": "+03:00",
-        "flag": "ro.png",
+        "flag": "ro.webp",
         "weatherZone": "Bucharest"
     },
     {
@@ -1188,7 +1188,7 @@
         "country": "Russia",
         "timeZone": "Europe/Moscow",
         "utc": "+03:00",
-        "flag": "ru.png",
+        "flag": "ru.webp",
         "weatherZone": "Moscow"
     },
     {
@@ -1196,7 +1196,7 @@
         "country": "Rwanda",
         "timeZone": "Africa/Kigali",
         "utc": "+02:00",
-        "flag": "rw.png",
+        "flag": "rw.webp",
         "weatherZone": "Kigali"
     },
     {
@@ -1204,7 +1204,7 @@
         "country": "Saint Kitts and Nevis",
         "timeZone": "America/St_Kitts",
         "utc": "-04:00",
-        "flag": "kn.png",
+        "flag": "kn.webp",
         "weatherZone": "Basseterre"
     },
     {
@@ -1212,7 +1212,7 @@
         "country": "Saint Lucia",
         "timeZone": "America/St_Lucia",
         "utc": "-04:00",
-        "flag": "lc.png",
+        "flag": "lc.webp",
         "weatherZone": "Castries"
     },
     {
@@ -1220,7 +1220,7 @@
         "country": "Saint Vincent and the Grenadines",
         "timeZone": "America/St_Vincent",
         "utc": "-04:00",
-        "flag": "vc.png",
+        "flag": "vc.webp",
         "weatherZone": "Kingstown"
     },
     {
@@ -1228,7 +1228,7 @@
         "country": "Samoa",
         "timeZone": "Pacific/Apia",
         "utc": "+13:00",
-        "flag": "ws.png",
+        "flag": "ws.webp",
         "weatherZone": "Apia"
     },
     {
@@ -1236,7 +1236,7 @@
         "country": "San Marino",
         "timeZone": "Europe/San_Marino",
         "utc": "+02:00",
-        "flag": "sm.png",
+        "flag": "sm.webp",
         "weatherZone": "San Marino"
     },
     {
@@ -1244,7 +1244,7 @@
         "country": "Sao Tome and Principe",
         "timeZone": "Africa/Sao_Tome",
         "utc": "+00:00",
-        "flag": "st.png",
+        "flag": "st.webp",
         "weatherZone": "São Tomé"
     },
     {
@@ -1252,7 +1252,7 @@
         "country": "Saudi Arabia",
         "timeZone": "Asia/Riyadh",
         "utc": "+03:00",
-        "flag": "sa.png",
+        "flag": "sa.webp",
         "weatherZone": "Riyadh"
     },
     {
@@ -1260,7 +1260,7 @@
         "country": "Senegal",
         "timeZone": "Africa/Dakar",
         "utc": "+00:00",
-        "flag": "sn.png",
+        "flag": "sn.webp",
         "weatherZone": "Dakar"
     },
     {
@@ -1268,7 +1268,7 @@
         "country": "Seychelles",
         "timeZone": "Indian/Mahe",
         "utc": "+04:00",
-        "flag": "sc.png",
+        "flag": "sc.webp",
         "weatherZone": "Victoria"
     },
     {
@@ -1276,7 +1276,7 @@
         "country": "Sierra Leone",
         "timeZone": "Africa/Freetown",
         "utc": "+00:00",
-        "flag": "sl.png",
+        "flag": "sl.webp",
         "weatherZone": "Freetown"
     },
     {
@@ -1284,7 +1284,7 @@
         "country": "Singapore",
         "timeZone": "Asia/Singapore",
         "utc": "+08:00",
-        "flag": "sg.png",
+        "flag": "sg.webp",
         "weatherZone": "Singapore"
     },
     {
@@ -1292,7 +1292,7 @@
         "country": "Solomon Islands",
         "timeZone": "Pacific/Guadalcanal",
         "utc": "+11:00",
-        "flag": "sb.png",
+        "flag": "sb.webp",
         "weatherZone": "Honiara"
     },
     {
@@ -1300,7 +1300,7 @@
         "country": "Somalia",
         "timeZone": "Africa/Mogadishu",
         "utc": "+03:00",
-        "flag": "so.png",
+        "flag": "so.webp",
         "weatherZone": "Mogadishu"
     },
     {
@@ -1308,7 +1308,7 @@
         "country": "South Africa",
         "timeZone": "Africa/Johannesburg",
         "utc": "+02:00",
-        "flag": "za.png",
+        "flag": "za.webp",
         "weatherZone": "Pretoria"
     },
     {
@@ -1316,7 +1316,7 @@
         "country": "South Sudan",
         "timeZone": "Africa/Juba",
         "utc": "+02:00",
-        "flag": "ss.png",
+        "flag": "ss.webp",
         "weatherZone": "Juba"
     },
     {
@@ -1324,7 +1324,7 @@
         "country": "Sri Lanka",
         "timeZone": "Asia/Colombo",
         "utc": "+05:30",
-        "flag": "lk.png",
+        "flag": "lk.webp",
         "weatherZone": "Colombo"
     },
     {
@@ -1332,7 +1332,7 @@
         "country": "Sudan",
         "timeZone": "Africa/Khartoum",
         "utc": "+02:00",
-        "flag": "sd.png",
+        "flag": "sd.webp",
         "weatherZone": "Khartoum"
     },
     {
@@ -1340,7 +1340,7 @@
         "country": "Suriname",
         "timeZone": "America/Paramaribo",
         "utc": "-03:00",
-        "flag": "sr.png",
+        "flag": "sr.webp",
         "weatherZone": "Paramaribo"
     },
     {
@@ -1348,7 +1348,7 @@
         "country": "Eswatini",
         "timeZone": "Africa/Mbabane",
         "utc": "+02:00",
-        "flag": "sz.png",
+        "flag": "sz.webp",
         "weatherZone": "Mbabane"
     },
     {
@@ -1356,7 +1356,7 @@
         "country": "Syria",
         "timeZone": "Asia/Damascus",
         "utc": "+03:00",
-        "flag": "sy.png",
+        "flag": "sy.webp",
         "weatherZone": "Damascus"
     },
     {
@@ -1364,7 +1364,7 @@
         "country": "Taiwan",
         "timeZone": "Asia/Taipei",
         "utc": "+08:00",
-        "flag": "tw.png",
+        "flag": "tw.webp",
         "weatherZone": "Taipei"
     },
     {
@@ -1372,7 +1372,7 @@
         "country": "Tajikistan",
         "timeZone": "Asia/Dushanbe",
         "utc": "+05:00",
-        "flag": "tj.png",
+        "flag": "tj.webp",
         "weatherZone": "Dushanbe"
     },
     {
@@ -1380,7 +1380,7 @@
         "country": "Tanzania",
         "timeZone": "Africa/Dar_es_Salaam",
         "utc": "+03:00",
-        "flag": "tz.png",
+        "flag": "tz.webp",
         "weatherZone": "Dodoma"
     },
     {
@@ -1388,7 +1388,7 @@
         "country": "Thailand",
         "timeZone": "Asia/Bangkok",
         "utc": "+07:00",
-        "flag": "th.png",
+        "flag": "th.webp",
         "weatherZone": "Bangkok"
     },
     {
@@ -1396,7 +1396,7 @@
         "country": "Timor-Leste",
         "timeZone": "Asia/Dili",
         "utc": "+09:00",
-        "flag": "tl.png",
+        "flag": "tl.webp",
         "weatherZone": "Dili"
     },
     {
@@ -1404,7 +1404,7 @@
         "country": "Togo",
         "timeZone": "Africa/Lome",
         "utc": "+00:00",
-        "flag": "tg.png",
+        "flag": "tg.webp",
         "weatherZone": "Lome"
     },
     {
@@ -1412,7 +1412,7 @@
         "country": "Tonga",
         "timeZone": "Pacific/Tongatapu",
         "utc": "+13:00",
-        "flag": "to.png",
+        "flag": "to.webp",
         "weatherZone": "Nukuʻalofa"
     },
     {
@@ -1420,7 +1420,7 @@
         "country": "Trinidad and Tobago",
         "timeZone": "America/Port_of_Spain",
         "utc": "-04:00",
-        "flag": "tt.png",
+        "flag": "tt.webp",
         "weatherZone": "Port of Spain"
     },
     {
@@ -1428,7 +1428,7 @@
         "country": "Tunisia",
         "timeZone": "Africa/Tunis",
         "utc": "+01:00",
-        "flag": "tn.png",
+        "flag": "tn.webp",
         "weatherZone": "Tunis"
     },
     {
@@ -1436,7 +1436,7 @@
         "country": "Turkmenistan",
         "timeZone": "Asia/Ashgabat",
         "utc": "+05:00",
-        "flag": "tm.png",
+        "flag": "tm.webp",
         "weatherZone": "Ashgabat"
     },
     {
@@ -1444,7 +1444,7 @@
         "country": "Tuvalu",
         "timeZone": "Pacific/Funafuti",
         "utc": "+12:00",
-        "flag": "tv.png",
+        "flag": "tv.webp",
         "weatherZone": "Funafuti"
     },
     {
@@ -1452,7 +1452,7 @@
         "country": "Uganda",
         "timeZone": "Africa/Kampala",
         "utc": "+03:00",
-        "flag": "ug.png",
+        "flag": "ug.webp",
         "weatherZone": "Kampala"
     },
     {
@@ -1460,7 +1460,7 @@
         "country": "United Arab Emirates",
         "timeZone": "Asia/Dubai",
         "utc": "+04:00",
-        "flag": "ae.png",
+        "flag": "ae.webp",
         "weatherZone": "Abu Dhabi"
     },
     {
@@ -1468,7 +1468,7 @@
         "country": "Uruguay",
         "timeZone": "America/Montevideo",
         "utc": "-03:00",
-        "flag": "uy.png",
+        "flag": "uy.webp",
         "weatherZone": "Montevideo"
     },
     {
@@ -1476,7 +1476,7 @@
         "country": "Uzbekistan",
         "timeZone": "Asia/Tashkent",
         "utc": "+05:00",
-        "flag": "uz.png",
+        "flag": "uz.webp",
         "weatherZone": "Tashkent"
     },
     {
@@ -1484,7 +1484,7 @@
         "country": "United States",
         "timeZone": "Pacific/Honolulu",
         "utc": "-10:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "Honolulu"
     },
     {
@@ -1492,7 +1492,7 @@
         "country": "United States",
         "timeZone": "America/Chicago",
         "utc": "-06:00",
-        "flag": "us.png",
+        "flag": "us.webp",
         "weatherZone": "Chicago"
     },
     {
@@ -1500,7 +1500,7 @@
         "country": "Poland",
         "timeZone": "Europe/Warsaw",
         "utc": "+02:00",
-        "flag": "pl.png",
+        "flag": "pl.webp",
         "weatherZone": "Warsaw"
     },
     {
@@ -1508,7 +1508,7 @@
         "country": "Germany",
         "timeZone": "Europe/Berlin",
         "utc": "+02:00",
-        "flag": "de.png",
+        "flag": "de.webp",
         "weatherZone": "Furtwangen"
     }
 ]

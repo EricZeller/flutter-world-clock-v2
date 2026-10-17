@@ -105,6 +105,14 @@ android {
         }
     }
 
+    androidResources {
+        // Only package Android resource translations for the languages the
+        // app itself supports (see res/xml/locale_config.xml and lib/l10n).
+        // AndroidX libraries ship strings for ~90 locales that would otherwise
+        // never be shown next to an English fallback UI.
+        localeFilters += ['en', 'de', 'es', 'fr', 'pt']
+    }
+
     android {
         dependenciesInfo {
             // Disables dependency metadata when building APKs.
@@ -112,6 +120,29 @@ android {
             // Disables dependency metadata when building Android App Bundles.
             includeInBundle = false
         }
+    }
+}
+
+// The release buildType's abiFilters above are merged with the ones the Flutter
+// Gradle plugin puts into defaultConfig (armeabi-v7a, arm64-v8a, x86_64), so
+// prebuilt native libraries of plugins (e.g. libdartjni.so) still ended up in
+// the arm64-only release APK for ABIs without Flutter libraries. Package only
+// the ABIs Flutter builds for (`--target-platform`, all three by default), so
+// the App Bundle keeps all three and `flutter run --release` on an x86_64
+// emulator still works. Debug builds are left untouched.
+def flutterPlatformAbis = [
+    'android-arm'  : 'armeabi-v7a',
+    'android-arm64': 'arm64-v8a',
+    'android-x64'  : 'x86_64',
+]
+androidComponents {
+    onVariants(selector().withBuildType("release")) { variant ->
+        def targetPlatforms = project.hasProperty('target-platform')
+            ? project.property('target-platform').toString().split(',').toList()
+            : flutterPlatformAbis.keySet()
+        def flutterAbis = targetPlatforms.collect { flutterPlatformAbis[it] }
+        def otherAbis = ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'] - flutterAbis
+        variant.packaging.jniLibs.excludes.addAll(otherAbis.collect { "lib/$it/**".toString() })
     }
 }
 

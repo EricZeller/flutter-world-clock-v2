@@ -13,7 +13,7 @@ const tokyo = City(
   name: 'Tokyo',
   country: 'Japan',
   timeZone: 'Asia/Tokyo',
-  flag: 'jp.png',
+  flag: 'jp.webp',
   utc: '+09:00',
   weatherZone: 'Tokyo',
 );

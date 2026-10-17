@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +33,46 @@ void main() {
     expect(cities.length, greaterThan(100));
     expect(cities, contains(City.berlin));
     expect(cities.where((city) => city.isCustom), isEmpty);
+  });
+
+  test('every bundled city has a bundled flag image', () async {
+    final cities = await repository.loadAllCities();
+    final missing = <String>[];
+    for (final city in [City.berlin, ...cities]) {
+      // assets/flags/ is bundled as a whole directory (see pubspec.yaml).
+      if (city.flag.isEmpty) continue;
+      if (!File('assets/flags/${city.flag}').existsSync()) {
+        missing.add('${city.name} (${city.flag})');
+      }
+    }
+    expect(missing, isEmpty);
+  });
+
+  test('maps PNG flags stored by older versions to the bundled WebP', () async {
+    // Cities saved before the flags were converted to WebP reference the
+    // former PNG files.
+    final legacyBerlin = {...City.berlin.toJson(), 'flag': 'de.png'};
+    final legacyCustom = {...custom.toJson(), 'flag': 'jp.png'};
+    SharedPreferences.setMockInitialValues({
+      CityRepository.favoritesKey: jsonEncode([legacyBerlin, legacyCustom]),
+      CityRepository.selectedCityKey: jsonEncode(legacyBerlin),
+      CityRepository.customCitiesKey: jsonEncode([legacyCustom]),
+      CityRepository.widgetCitiesKey: jsonEncode({'3': legacyCustom}),
+    });
+
+    final favorites = await repository.loadFavorites();
+    expect(favorites.map((city) => city.flag), ['de.webp', 'jp.webp']);
+    expect((await repository.loadSelectedCity())!.flag, 'de.webp');
+    expect((await repository.loadCustomCities()).single.flag, 'jp.webp');
+    expect((await repository.loadWidgetCities())[3]!.flag, 'jp.webp');
+    for (final flag in ['de.webp', 'jp.webp']) {
+      expect(File('assets/flags/$flag').existsSync(), isTrue);
+    }
+
+    // Saving them again stores the new file names.
+    await repository.saveFavorites(favorites);
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getString(CityRepository.favoritesKey), isNot(contains('.png')));
   });
 
   test('appends saved custom cities to the bundled ones', () async {

@@ -26,7 +26,7 @@ class City {
     name: 'Berlin',
     country: 'Germany',
     timeZone: 'Europe/Berlin',
-    flag: 'de.png',
+    flag: 'de.webp',
     utc: '+02:00',
     weatherZone: 'Berlin',
   );
@@ -50,7 +50,7 @@ class City {
       name: json['name'],
       country: json['country'],
       timeZone: json['timeZone'],
-      flag: json['flag'],
+      flag: migrateFlag(json['flag']),
       utc: json['utc'],
       weatherZone: json['weatherZone'],
       latitude: (json['latitude'] as num?)?.toDouble(),
@@ -58,6 +58,16 @@ class City {
       isCustom: json['isCustom'] == true,
     );
   }
+
+  /// Maps a stored flag file name to the bundled flag asset.
+  ///
+  /// Flags used to be bundled as `assets/flags/<code>.png` and are now
+  /// lossless WebP files. Cities saved by older versions (favorites, custom
+  /// and widget cities) still reference the `.png` name, so it is rewritten
+  /// to the `.webp` file when they are loaded.
+  static String migrateFlag(String flag) => flag.endsWith('.png')
+      ? '${flag.substring(0, flag.length - 4)}.webp'
+      : flag;
 
   // A city restored from preferences is a new instance, so cities are compared
   // by what identifies them rather than by reference.

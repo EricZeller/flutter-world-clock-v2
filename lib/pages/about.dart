@@ -2,13 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
-import 'package:yaml/yaml.dart';
+
+final _versionLine = RegExp(
+  r'''^version:[ \t]*["']?([^\s"'#]+)''',
+  multiLine: true,
+);
+
+/// Returns the app version from the top-level `version:` entry of
+/// [pubspec] without the build number (`1.2.3+45` -> `1.2.3`).
+///
+/// Only this one line is needed, so a regular expression replaces a full
+/// YAML parser, which kept the `yaml` package out of the app binary.
+String parseAppVersion(String pubspec) {
+  final match = _versionLine.firstMatch(pubspec);
+  if (match == null) {
+    throw const FormatException('No version entry in pubspec.yaml');
+  }
+  return match.group(1)!.split('+').first;
+}
 
 Future<String> getAppVersion() async {
   final pubspec = await rootBundle.loadString('pubspec.yaml');
-  final yamlMap = loadYaml(pubspec);
-  final version = yamlMap['version'] as String;
-  return version.split('+').first; // Entfernt die Build-Nummer
+  return parseAppVersion(pubspec);
 }
 
 class AboutPage extends StatelessWidget {
