@@ -18,6 +18,10 @@ void main() {
       expect(parseAppVersion("version: '1.2.3'\n"), '1.2.3');
     });
 
+    test('accepts Windows line endings and extra spaces', () {
+      expect(parseAppVersion('name: app\r\nversion:   1.10.0+31  \r\n'), '1.10.0');
+    });
+
     test('ignores nested version keys', () {
       const pubspec = 'dependencies:\n  foo:\n    version: 9.9.9\nversion: 1.0.0+1\n';
       expect(parseAppVersion(pubspec), '1.0.0');
