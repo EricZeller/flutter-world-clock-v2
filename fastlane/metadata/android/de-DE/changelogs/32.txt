@@ -1,0 +1,6 @@
+• Mehrere Städte: zwischen ihnen wischen und sie sortieren
+• Eigene Stadt für jedes Widget
+• Nachts Mond statt Sonne beim Wetter
+• Hinweis vor der Zeitumstellung
+• Tippen auf die Karte zeigt die Ortszeit
+• Kleinere App, Fehlerbehebungen
