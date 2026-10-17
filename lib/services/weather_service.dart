@@ -184,7 +184,10 @@ class WeatherService {
   }
 
   Future<void> _store(String key, WeatherReport report) async {
-    final cache = await _loadCache();
+    final prefs = await SharedPreferences.getInstance();
+    // Read and write without an await in between, so reports that finish
+    // downloading at the same time do not drop each other from the cache.
+    final cache = _readCache(prefs);
     cache[key] = report.toJson();
     // Keep only the most recently fetched locations.
     final zones = cache.keys.toList()
@@ -192,12 +195,13 @@ class WeatherService {
     for (final stale in zones.skip(maxCachedLocations)) {
       cache.remove(stale);
     }
-    final prefs = await SharedPreferences.getInstance();
     await prefs.setString(cacheKey, jsonEncode(cache));
   }
 
-  Future<Map<String, dynamic>> _loadCache() async {
-    final prefs = await SharedPreferences.getInstance();
+  Future<Map<String, dynamic>> _loadCache() async =>
+      _readCache(await SharedPreferences.getInstance());
+
+  static Map<String, dynamic> _readCache(SharedPreferences prefs) {
     final stored = prefs.getString(cacheKey);
     if (stored == null) return {};
     try {
