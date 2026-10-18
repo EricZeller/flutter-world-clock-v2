@@ -155,20 +155,23 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
      * widgets new IDs. Their own cities are stored by widget ID, so they are
      * moved from [oldWidgetIds] to the [newWidgetIds] at the same position.
      * The two may overlap, so all values are read before any is written.
+     * AppWidgetProvider calls onUpdate for the new IDs right afterwards.
      */
     override fun onRestored(context: Context, oldWidgetIds: IntArray, newWidgetIds: IntArray) {
         super.onRestored(context, oldWidgetIds, newWidgetIds)
         val count = minOf(oldWidgetIds.size, newWidgetIds.size)
         val oldIds = oldWidgetIds.take(count)
         val newIds = newWidgetIds.take(count)
-        val data = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
-        rekeyWidgetData(data, oldIds, newIds)
+        rekeyWidgetData(
+            context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE),
+            oldIds,
+            newIds
+        )
         rekeyFlutterWidgetCities(
             context.getSharedPreferences(FLUTTER_PREFERENCES, Context.MODE_PRIVATE),
             oldIds,
             newIds
         )
-        onUpdate(context, AppWidgetManager.getInstance(context), newWidgetIds, data)
     }
 
     /** Moves the `<key>_<id>` values of [CITY_KEYS] to the new IDs. */
