@@ -14,7 +14,7 @@ struct CityOptionsProvider: DynamicOptionsProvider {
             ItemSection<String>(
                 "\(letter)",
                 items: (groups[letter] ?? []).map { city in
-                    IntentItem(city.label, title: "\(city.name)", subtitle: "\(city.country)")
+                    IntentItem(city.label, title: "\(city.name)", subtitle: "\(city.localizedCountry)")
                 }
             )
         }

@@ -82,7 +82,7 @@ struct MediumClockView: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 1) {
                 CityName(name: entry.city.name, size: 20)
-                Text(entry.city.country)
+                Text(entry.city.localizedCountry)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.white.opacity(0.75))
                     .lineLimit(1)

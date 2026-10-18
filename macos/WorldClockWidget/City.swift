@@ -7,14 +7,29 @@ struct City: Decodable, Hashable, Sendable {
     let country: String
     let timeZone: String
     let weatherZone: String
+    /// The flag file, named by the ISO code of the country: `de.webp`.
+    let flag: String?
 
     /// Shown until a city is chosen, like in the app.
     static let berlin = City(
         name: "Berlin",
         country: "Germany",
         timeZone: "Europe/Berlin",
-        weatherZone: "Berlin"
+        weatherZone: "Berlin",
+        flag: "de.webp"
     )
+
+    /// The country in the widget's language, like the app shows it:
+    /// "Deutschland" in German. English keeps the names of cities.json.
+    var localizedCountry: String {
+        guard let code = flag?.split(separator: ".").first?.uppercased(),
+              let language = Locale.current.language.languageCode?.identifier,
+              language != "en"
+        else { return country }
+        // Hong Kong is listed as China, like in the app.
+        let region = code == "HK" ? "CN" : code
+        return Locale.current.localizedString(forRegionCode: region) ?? country
+    }
 
     /// All cities, sorted by name.
     static let all: [City] = {
