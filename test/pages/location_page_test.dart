@@ -241,6 +241,74 @@ void main() {
     expect(find.text('Tokyo'), findsOneWidget);
   });
 
+  group('in German', () {
+    // Munich is found by its German name, the legacy custom city shows its
+    // country as it was entered.
+    const munich = City(
+      name: 'Munich',
+      country: 'Germany',
+      timeZone: 'Europe/Berlin',
+      flag: 'de.webp',
+      utc: '+02:00',
+      weatherZone: 'Munich',
+    );
+    const legacy = City(
+      name: 'Zuhause',
+      country: 'Atlantis',
+      timeZone: 'Asia/Tokyo',
+      flag: '',
+      utc: '+09:00',
+      weatherZone: 'Zuhause',
+      isCustom: true,
+    );
+
+    Future<void> pumpGerman(WidgetTester tester) async {
+      SharedPreferences.setMockInitialValues({
+        CityRepository.customCitiesKey: jsonEncode([legacy.toJson()]),
+      });
+      await pumpPage(tester, const LocationPage(),
+          settings: await loadSettings(),
+          cities: FakeCityRepository([City.berlin, tokyo, munich]),
+          locale: const Locale('de'));
+    }
+
+    testWidgets('the countries are shown in German', (tester) async {
+      await pumpGerman(tester);
+
+      expect(find.text('Deutschland, UTC+02:00'), findsOneWidget,
+          reason: 'the favorite Berlin');
+      expect(find.text('Deutschland, UTC+02:00 \nEurope/Berlin'),
+          findsNWidgets(2));
+      expect(find.text('Japan, UTC+09:00 \nAsia/Tokyo'), findsOneWidget);
+      expect(find.text('Atlantis, UTC+09:00 \nAsia/Tokyo'), findsOneWidget);
+      expect(find.textContaining('Germany'), findsNothing);
+    });
+
+    testWidgets('search finds German names', (tester) async {
+      await pumpGerman(tester);
+
+      await tester.enterText(find.byType(TextField), 'deutschland');
+      await tester.pump();
+      expect(find.text('Stadt oder Land suchen (2 gefunden)'), findsOneWidget);
+      expect(find.text('Berlin'), findsOneWidget);
+      expect(find.text('Munich'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'Muenchen');
+      await tester.pump();
+      expect(find.text('Stadt oder Land suchen (1 gefunden)'), findsOneWidget);
+      expect(find.text('Munich'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'germany');
+      await tester.pump();
+      expect(find.text('Stadt oder Land suchen (2 gefunden)'), findsOneWidget,
+          reason: 'the English names are found as well');
+
+      await tester.enterText(find.byType(TextField), 'atlantis');
+      await tester.pump();
+      expect(find.text('Zuhause'), findsOneWidget);
+    });
+  });
+
   testWidgets('adds a custom city to the favorites', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final repository = FakeCityRepository();
