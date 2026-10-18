@@ -135,6 +135,31 @@ void main() {
         ),
         isNotNull,
       );
+      final prefs = await SharedPreferences.getInstance();
+      final cache = jsonDecode(prefs.getString(WeatherService.cacheKey)!);
+      expect(cache, hasLength(WeatherService.maxCachedLocations));
+    });
+
+    test('has room for many favorites and widget cities', () async {
+      expect(WeatherService.maxCachedLocations, greaterThanOrEqualTo(50));
+      final service = WeatherService(
+        client: MockClient(
+          (_) async => http.Response.bytes(utf8.encode(wttrBerlinFixture), 200),
+        ),
+      );
+
+      for (var i = 0; i < WeatherService.maxCachedLocations; i++) {
+        await service.refresh(server: server, zone: 'City $i', lang: 'de');
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(WeatherService.cacheKey)!;
+      expect(jsonDecode(stored), hasLength(WeatherService.maxCachedLocations));
+      expect(await service.loadCached(server: server, zone: 'City 0', lang: 'de'),
+          isNotNull);
+      // The full cache stays small enough to keep in the preferences.
+      expect(utf8.encode(stored).length, lessThan(256 * 1024));
+      printOnFailure('cache size: ${utf8.encode(stored).length} bytes');
     });
 
     test('keeps reports that finish downloading together', () async {
@@ -246,6 +271,26 @@ void main() {
 
       expect(result.failure, WeatherFailure.network);
       expect(result.report!.current.description, 'Wolkig');
+    });
+
+    test('offline, a report cached by version 1.10 is used', () async {
+      // Version 1.10 cached the reports by zone alone.
+      final wttr = FakeWttr(clock: () => DateTime(2026, 10, 3, 12));
+      await wttr.service.refresh(server: server, zone: 'Berlin', lang: 'de');
+      final prefs = await SharedPreferences.getInstance();
+      final cache = jsonDecode(prefs.getString(WeatherService.cacheKey)!)
+          as Map<String, dynamic>;
+      await prefs.setString(WeatherService.cacheKey,
+          jsonEncode({'Berlin': cache.values.single}));
+      wttr.offline = true;
+
+      final result = await wttr.service.refresh(server: server, zone: 'Berlin');
+      expect(result.failure, WeatherFailure.network);
+      expect(result.report!.current.description, 'Wolkig');
+      expect(result.report!.fetchedAt, DateTime(2026, 10, 3, 12));
+
+      final other = await wttr.service.refresh(server: server, zone: 'Paris');
+      expect(other.report, isNull);
     });
   });
 }

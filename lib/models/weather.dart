@@ -53,29 +53,30 @@ class WeatherReport {
     final area = (json['nearest_area'] as List?)?.firstOrNull;
     final latitude = double.tryParse('${area?['latitude'] ?? ''}');
     final longitude = double.tryParse('${area?['longitude'] ?? ''}');
+    final location = latitude == null || longitude == null
+        ? null
+        : (latitude: latitude, longitude: longitude);
     return WeatherReport(
-      current: CurrentWeather.fromWttr(
-        current,
-        lang,
-        location: latitude == null || longitude == null
-            ? null
-            : (latitude: latitude, longitude: longitude),
-      ),
+      current: CurrentWeather.fromWttr(current, lang, location: location),
       days: [
         for (final day in json['weather'] as List? ?? const [])
-          DailyForecast.fromWttr(day, lang),
+          DailyForecast.fromWttr(day, lang, location: location),
       ],
       fetchedAt: fetchedAt,
     );
   }
 
-  factory WeatherReport.fromJson(Map<String, dynamic> json) => WeatherReport(
-        current: CurrentWeather.fromJson(json['current']),
-        days: [
-          for (final day in json['days'] as List) DailyForecast.fromJson(day),
-        ],
-        fetchedAt: DateTime.parse(json['fetchedAt']),
-      );
+  factory WeatherReport.fromJson(Map<String, dynamic> json) {
+    final current = CurrentWeather.fromJson(json['current']);
+    return WeatherReport(
+      current: current,
+      days: [
+        for (final day in json['days'] as List)
+          DailyForecast.fromJson(day, location: current.location),
+      ],
+      fetchedAt: DateTime.parse(json['fetchedAt']),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'current': current.toJson(),
@@ -207,7 +208,8 @@ class DailyForecast {
   int get chanceOfRain => hours.fold(
       0, (highest, hour) => hour.chanceOfRain > highest ? hour.chanceOfRain : highest);
 
-  factory DailyForecast.fromWttr(Map<String, dynamic> json, String? lang) {
+  factory DailyForecast.fromWttr(Map<String, dynamic> json, String? lang,
+      {LatLng? location}) {
     final astronomy = (json['astronomy'] as List?)?.firstOrNull ?? const {};
     return DailyForecast(
       date: DateTime.parse(json['date']),
@@ -221,10 +223,12 @@ class DailyForecast {
         for (final hour in json['hourly'] as List? ?? const [])
           HourlyForecast.fromWttr(hour, lang),
       ],
-    ).._markNight();
+    ).._markNight(location);
   }
 
-  factory DailyForecast.fromJson(Map<String, dynamic> json) => DailyForecast(
+  factory DailyForecast.fromJson(Map<String, dynamic> json,
+          {LatLng? location}) =>
+      DailyForecast(
         date: DateTime.parse(json['date']),
         minC: json['minC'],
         maxC: json['maxC'],
@@ -235,16 +239,40 @@ class DailyForecast {
         hours: [
           for (final hour in json['hours'] as List) HourlyForecast.fromJson(hour),
         ],
-      ).._markNight();
+      ).._markNight(location);
 
   /// Marks the hours before sunrise and after sunset of this day.
-  void _markNight() {
+  ///
+  /// The hours, sunrise and sunset are all wall-clock times of the city, so
+  /// they are compared as they are; wttr.in does not tell the UTC offset.
+  void _markNight(LatLng? location) {
     final sunrise = _minutesOfDay(this.sunrise);
     final sunset = _minutesOfDay(this.sunset);
-    if (sunrise == null || sunset == null) return; // Polar day or night.
+    final bool Function(int minutes) isNight;
+    if (sunrise != null && sunset != null) {
+      isNight = sunset < sunrise
+          // Near the midnight sun the sun sets shortly after midnight and
+          // rises again soon after.
+          ? (minutes) => minutes >= sunset && minutes < sunrise
+          : (minutes) => minutes < sunrise || minutes >= sunset;
+    } else if (sunrise != null) {
+      // The sun rises and stays up past midnight, e.g. when the midnight
+      // sun begins.
+      isNight = (minutes) => minutes < sunrise;
+    } else if (sunset != null) {
+      // The sun, up since the day before, sets and rises after midnight.
+      isNight = (minutes) => minutes >= sunset;
+    } else {
+      // Polar day or night: the sun stays above or below the horizon all
+      // day. It is polar day when the sun is over the same half of the
+      // world as [location]. Without a location every hour stays day.
+      if (location == null) return;
+      final sun = subsolarPoint(DateTime.utc(date.year, date.month, date.day));
+      final polarNight = sun.latitude * location.latitude < 0;
+      isNight = (_) => polarNight;
+    }
     for (final hour in hours) {
-      final minutes = hour.hour * 60;
-      hour.isNight = minutes < sunrise || minutes >= sunset;
+      hour.isNight = isNight(hour.hour * 60);
     }
   }
 

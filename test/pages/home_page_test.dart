@@ -412,6 +412,31 @@ void main() {
 
       expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
     });
+
+    testWidgets('an older answer does not overwrite a recent cached report',
+        (tester) async {
+      final wttr = FakeWttr();
+      await wttr.service
+          .refresh(server: 'https://wttr.in', zone: 'Berlin', lang: 'de');
+      wttr.hold = Completer();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+      expect(wttr.requests, hasLength(2));
+
+      // The German report is recent, so nothing is downloaded for it.
+      await pumpPage(tester, const HomePage(),
+          settings: settings,
+          weather: wttr.service,
+          locale: const Locale('de'));
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+      wttr.hold!.complete();
+      await tester.pumpAndSettle();
+
+      expect(wttr.requests, hasLength(2));
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+      expect(find.text('☁️ Cloudy +20°C'), findsNothing);
+    });
   });
 
   group('multiple cities', () {
@@ -498,6 +523,67 @@ void main() {
 
       expect(find.text('Tokyo'), findsOneWidget);
       expect(find.bySemanticsLabel('City 2 of 3'), findsOneWidget);
+    });
+
+    testWidgets('shows the position as text when the dots do not fit',
+        (tester) async {
+      City custom(int i) => City(
+            name: 'Place $i',
+            country: '',
+            timeZone: 'Europe/Berlin',
+            flag: '',
+            utc: '+02:00',
+            weatherZone: 'Place $i',
+            isCustom: true,
+          );
+      // The test screen is 540 dp wide, room for 33 dots.
+      Future<void> show(int count) async {
+        await storeFavorites([for (var i = 0; i < count; i++) custom(i)],
+            index: 2);
+        await pumpPage(tester, const SizedBox(), settings: await loadSettings());
+        await pumpPage(tester, const HomePage(),
+            settings: await loadSettings());
+      }
+
+      await show(40);
+      expect(tester.takeException(), isNull);
+      expect(find.text('3 / 40'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 3 of 40'), findsOneWidget);
+
+      // Dots as long as they fit.
+      await show(30);
+      expect(tester.takeException(), isNull);
+      expect(find.text('3 / 30'), findsNothing);
+      expect(find.bySemanticsLabel('City 3 of 30'), findsOneWidget);
+    });
+
+    testWidgets('remembers the shown city after it moved further back',
+        (tester) async {
+      City custom(String name) => City(
+            name: name,
+            country: '',
+            timeZone: 'Europe/Berlin',
+            flag: '',
+            utc: '+02:00',
+            weatherZone: name,
+            isCustom: true,
+          );
+      await storeFavorites([City.berlin, tokyo], index: 1);
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+      expect(find.text('Tokyo'), findsOneWidget);
+
+      await tester.tap(find.text('Manage cities'));
+      await tester.pumpAndSettle();
+      await CityRepository().saveFavorites(
+          [newYork, custom('A'), custom('B'), City.berlin, tokyo]);
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tokyo'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 5 of 5'), findsOneWidget);
+      // The next start opens the same city.
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt(CityRepository.currentIndexKey), 4);
     });
   });
 

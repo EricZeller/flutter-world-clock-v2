@@ -91,6 +91,48 @@ void main() {
     expect(prefs.getString(CityRepository.favoritesKey), isNot(contains('.png')));
   });
 
+  test('loads stored bundled cities with the current bundled data', () async {
+    // Versions before the fix of the offsets stored Chicago at UTC-06:00.
+    final chicago = (await repository.loadBundledCities())
+        .singleWhere((city) => city.name == 'Chicago');
+    expect(chicago.utc, '-05:00');
+    final stale = {...chicago.toJson(), 'utc': '-06:00', 'flag': 'us.png'};
+    final staleCustom = {...custom.toJson(), 'utc': '+05:00'};
+    SharedPreferences.setMockInitialValues({
+      CityRepository.favoritesKey: jsonEncode([stale, staleCustom]),
+      CityRepository.selectedCityKey: jsonEncode(stale),
+      CityRepository.widgetCitiesKey:
+          jsonEncode({'3': stale, '4': staleCustom}),
+    });
+
+    final favorites = await repository.loadFavorites();
+    expect(favorites.map((city) => city.utc), ['-05:00', '+05:00']);
+    expect(identical(favorites.first, chicago), isTrue);
+    expect(favorites.first.flag, 'us.webp');
+    expect((await repository.loadSelectedCity())!.utc, '-05:00');
+    final widgetCities = await repository.loadWidgetCities();
+    expect(widgetCities[3]!.utc, '-05:00');
+    // Custom cities are the user's own data and stay as stored.
+    expect(widgetCities[4]!.utc, '+05:00');
+    expect(favorites.last.isCustom, isTrue);
+  });
+
+  test('keeps stored cities that are no longer bundled', () async {
+    const gone = City(
+      name: 'Atlantis',
+      country: 'Nowhere',
+      timeZone: 'Etc/UTC',
+      flag: '',
+      utc: '+00:00',
+      weatherZone: 'Atlantis',
+    );
+    await repository.saveFavorites([gone]);
+
+    final favorites = await repository.loadFavorites();
+    expect(favorites.single, gone);
+    expect(favorites.single.utc, '+00:00');
+  });
+
   test('appends saved custom cities to the bundled ones', () async {
     await repository.saveCustomCities([custom]);
 
@@ -191,6 +233,20 @@ void main() {
 
       await repository.replaceWidgetCity(renamed, null);
       expect(await repository.loadWidgetCities(), {9: City.berlin});
+    });
+
+    test('do not lose concurrent changes', () async {
+      await repository.saveWidgetCity(1, custom);
+
+      await Future.wait([
+        repository.saveWidgetCity(7, custom),
+        repository.saveWidgetCity(8, City.berlin),
+        repository.removeWidgetCities([1]),
+        repository.replaceWidgetCity(custom, City.berlin),
+      ]);
+
+      expect(await repository.loadWidgetCities(),
+          {7: City.berlin, 8: City.berlin});
     });
 
     test('ignore broken data', () async {

@@ -20,10 +20,13 @@ struct Provider: AppIntentTimelineProvider {
     func snapshot(for configuration: SelectCityIntent, in context: Context) async -> ClockEntry {
         let city = configuration.selectedCity
         if context.isPreview {
-            // The widget gallery should not wait for the network.
+            // The widget gallery should not wait for the network, nor show
+            // an outdated report as current.
+            let now = Date()
             return ClockEntry(
-                date: Date(), city: city,
-                weather: WeatherLoader.cached(zone: city.weatherZone) ?? .sample
+                date: now, city: city,
+                weather: WeatherLoader.cached(zone: city.weatherZone)
+                    .flatMap { $0.isStale(at: now) ? nil : $0 } ?? .sample
             )
         }
         return ClockEntry(

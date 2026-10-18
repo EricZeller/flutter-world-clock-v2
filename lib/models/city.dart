@@ -62,9 +62,11 @@ class City {
   /// Maps a stored flag file name to the bundled flag asset.
   ///
   /// Flags used to be bundled as `assets/flags/<code>.png` and are now
-  /// lossless WebP files. Cities saved by older versions (favorites, custom
-  /// and widget cities) still reference the `.png` name, so it is rewritten
-  /// to the `.webp` file when they are loaded.
+  /// lossless WebP files. Cities saved by older versions still reference the
+  /// `.png` name, so it is rewritten to the `.webp` file when they are
+  /// loaded. Stored bundled cities are replaced by their current bundled
+  /// version anyway (see `CityRepository`), so this matters for custom
+  /// cities and for cities that are no longer bundled.
   static String migrateFlag(String flag) => flag.endsWith('.png')
       ? '${flag.substring(0, flag.length - 4)}.webp'
       : flag;

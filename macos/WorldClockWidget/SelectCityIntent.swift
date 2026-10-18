@@ -28,8 +28,8 @@ struct CityOptionsProvider: DynamicOptionsProvider {
 
 /// Lets each placed widget show its own city.
 struct SelectCityIntent: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "Select City"
-    static var description = IntentDescription("Choose the city this widget shows.")
+    static let title: LocalizedStringResource = "Select City"
+    static let description = IntentDescription("Choose the city this widget shows.")
 
     @Parameter(title: "City", optionsProvider: CityOptionsProvider())
     var city: String?
