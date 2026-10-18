@@ -172,12 +172,14 @@ class WeatherService {
     }
   }
 
-  /// The newest cached report of [zone] from any server or language.
+  /// The newest cached report of [zone] from any server or language,
+  /// including those of version 1.10, which cached them by zone alone.
   Future<WeatherReport?> _loadAnyCached(String zone) async {
     try {
       final cache = await _loadCache();
       final keys = cache.keys
-          .where((key) => key.split('|').elementAtOrNull(1) == zone)
+          .where((key) =>
+              key == zone || key.split('|').elementAtOrNull(1) == zone)
           .toList()
         ..sort((a, b) => _fetchedAt(cache[b]).compareTo(_fetchedAt(cache[a])));
       return keys.isEmpty ? null : WeatherReport.fromJson(cache[keys.first]);

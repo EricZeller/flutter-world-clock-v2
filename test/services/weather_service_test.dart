@@ -272,5 +272,25 @@ void main() {
       expect(result.failure, WeatherFailure.network);
       expect(result.report!.current.description, 'Wolkig');
     });
+
+    test('offline, a report cached by version 1.10 is used', () async {
+      // Version 1.10 cached the reports by zone alone.
+      final wttr = FakeWttr(clock: () => DateTime(2026, 10, 3, 12));
+      await wttr.service.refresh(server: server, zone: 'Berlin', lang: 'de');
+      final prefs = await SharedPreferences.getInstance();
+      final cache = jsonDecode(prefs.getString(WeatherService.cacheKey)!)
+          as Map<String, dynamic>;
+      await prefs.setString(WeatherService.cacheKey,
+          jsonEncode({'Berlin': cache.values.single}));
+      wttr.offline = true;
+
+      final result = await wttr.service.refresh(server: server, zone: 'Berlin');
+      expect(result.failure, WeatherFailure.network);
+      expect(result.report!.current.description, 'Wolkig');
+      expect(result.report!.fetchedAt, DateTime(2026, 10, 3, 12));
+
+      final other = await wttr.service.refresh(server: server, zone: 'Paris');
+      expect(other.report, isNull);
+    });
   });
 }
