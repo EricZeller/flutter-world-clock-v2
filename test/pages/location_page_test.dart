@@ -5,12 +5,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/pages/location/city_tile.dart';
 import 'package:world_clock_v2/pages/location/location_page.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 
 import '../helpers/custom_city_dialog.dart';
 import '../helpers/test_app.dart';
+import '../helpers/time_zones.dart';
 
 const newYork = City(
   name: 'New York',
@@ -265,6 +267,44 @@ void main() {
     expect(custom.single.flag, 'jp.webp');
     expect(custom.single.isCustom, isTrue);
     expect(await repository.loadFavorites(), [City.berlin, custom.single]);
+  });
+
+  testWidgets('a custom city can get a zone of its country without a city',
+      (tester) async {
+    initializeAppTimeZones();
+    SharedPreferences.setMockInitialValues({});
+    final repository = FakeCityRepository([City.berlin, tokyo], {
+      'de': const [
+        CountryZone(
+          timeZone: 'Europe/Berlin',
+          latitude: 52.5,
+          longitude: 13.3667,
+          comment: 'most of Germany',
+        ),
+        CountryZone(
+          timeZone: 'Europe/Busingen',
+          latitude: 47.7,
+          longitude: 8.6833,
+          comment: 'Busingen',
+        ),
+      ],
+    });
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+
+    await tester.tap(find.byTooltip('Add custom city'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+        find.widgetWithText(TextField, 'City name'), 'Zuhause');
+    await pickCountry(tester, 'germ', 'Germany');
+    await pickTimeZone(tester, 'busingen', 'Europe/Busingen');
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    final custom = (await repository.loadCustomCities()).single;
+    expect(custom.timeZone, 'Europe/Busingen');
+    expect(custom.utc, '+02:00');
+    expect((custom.latitude, custom.longitude), (47.7, 8.6833));
   });
 
   testWidgets('editing a favorite custom city keeps its place',

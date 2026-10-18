@@ -74,6 +74,17 @@ void main() {
     });
   });
 
+  group('listedUtcOffset', () {
+    test('is the offset of 1 July, like the bundled cities list it', () {
+      expect(listedUtcOffset('America/Vancouver', now: winter), '-07:00');
+      expect(listedUtcOffset('Europe/Berlin', now: winter), '+02:00');
+      expect(listedUtcOffset('Australia/Sydney', now: summer), '+10:00');
+      expect(listedUtcOffset('Australia/Perth', now: summer), '+08:00');
+      expect(listedUtcOffset('Asia/Kathmandu', now: summer), '+05:45');
+      expect(listedUtcOffset('America/St_Johns', now: summer), '-02:30');
+    });
+  });
+
   group('parseUtcOffset', () {
     test('parses offsets into minutes', () {
       expect(parseUtcOffset('+02:00'), 120);

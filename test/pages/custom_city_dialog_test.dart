@@ -1,13 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/pages/location/custom_city_dialog.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 
 import '../helpers/custom_city_dialog.dart';
 import '../helpers/test_app.dart';
+import '../helpers/time_zones.dart';
 
 City bundled(
   String name,
@@ -100,8 +104,12 @@ class DialogResult {
   City? city;
 }
 
-Future<DialogResult> openDialog(WidgetTester tester,
-    {City? editing, List<City>? from}) async {
+Future<DialogResult> openDialog(
+  WidgetTester tester, {
+  City? editing,
+  List<City>? from,
+  Map<String, List<CountryZone>> countryZones = const {},
+}) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2.0;
   addTearDown(tester.view.reset);
@@ -118,6 +126,7 @@ Future<DialogResult> openDialog(WidgetTester tester,
               result.city = await showCustomCityDialog(
                 context,
                 cities: from ?? cities,
+                countryZones: countryZones,
                 editing: editing,
               );
               result.closed = true;
@@ -469,6 +478,210 @@ void main() {
 
       expect(result.city!.country, 'Japan');
       expect(result.city!.flag, 'jp.webp');
+    });
+  });
+
+  group('with the time zones of the tz database', () {
+    setUpAll(initializeAppTimeZones);
+
+    final countryZones = CountryZone.parseAll(
+        File(CityRepository.countryZonesAsset).readAsStringSync());
+
+    Future<DialogResult> openBundled(WidgetTester tester,
+        {City? editing}) async {
+      SharedPreferences.setMockInitialValues({});
+      final bundledCities =
+          await tester.runAsync(() => CityRepository().loadAllCities());
+      return openDialog(
+        tester,
+        editing: editing,
+        from: bundledCities,
+        countryZones: countryZones,
+      );
+    }
+
+    Future<List<String>> searchTimeZones(
+        WidgetTester tester, String query) async {
+      await tester.enterText(timeZoneField, query);
+      await tester.pumpAndSettle();
+      return menuEntries();
+    }
+
+    testWidgets('a country offers all its zones, not only its cities\'',
+        (tester) async {
+      await openBundled(tester);
+      await pickCountry(tester, 'canada', 'Canada');
+
+      expect(fieldText(tester, timeZoneField), isEmpty);
+      expect(await searchTimeZones(tester, 'vancouver'), ['America/Vancouver']);
+      expect(find.text('Pacific - BC (most areas)'), findsOneWidget,
+          reason: 'the zone tells where it applies');
+      expect(await searchTimeZones(tester, 'toronto'), ['America/Toronto']);
+      expect(await searchTimeZones(tester, 'america/st_j'),
+          ['America/St Johns']);
+      expect(await searchTimeZones(tester, 'los angeles'), isEmpty);
+
+      await pickCountry(tester, 'australia', 'Australia');
+      expect(await searchTimeZones(tester, 'perth'), ['Australia/Perth']);
+      expect(await searchTimeZones(tester, 'sydney'), ['Australia/Sydney']);
+
+      await pickCountry(tester, 'russia', 'Russia');
+      expect(await searchTimeZones(tester, 'novosibirsk'),
+          ['Asia/Novosibirsk']);
+    });
+
+    testWidgets('zones are sorted and can be found by where they apply',
+        (tester) async {
+      await openBundled(tester);
+      await pickCountry(tester, 'canada', 'Canada');
+
+      expect(await searchTimeZones(tester, 'bc'), [
+        'America/Creston',
+        'America/Dawson Creek',
+        'America/Edmonton',
+        'America/Fort Nelson',
+        'America/Vancouver',
+      ]);
+      expect(await searchTimeZones(tester, 'pacific bc'),
+          ['America/Vancouver']);
+
+      await pickCountry(tester, 'united states', 'United States');
+      expect(
+          await searchTimeZones(tester, 'seattle'), ['America/Los Angeles'],
+          reason: 'zones can still be found by their cities');
+      expect(
+        await searchTimeZones(tester, 'alaska'),
+        contains('America/Anchorage'),
+      );
+    });
+
+    testWidgets('a country with a single zone still picks it', (tester) async {
+      await openBundled(tester);
+      await pickCountry(tester, 'japan', 'Japan');
+      expect(fieldText(tester, timeZoneField), 'Asia/Tokyo');
+
+      await pickCountry(tester, 'hong', 'China (Hong Kong)');
+      expect(fieldText(tester, timeZoneField), 'Asia/Hong Kong');
+
+      await pickCountry(tester, 'kosovo', 'Kosovo');
+      expect(fieldText(tester, timeZoneField), 'Europe/Belgrade',
+          reason: 'without zones in the tz database, those of its city');
+    });
+
+    testWidgets('an alias zone of a city is offered once', (tester) async {
+      await openBundled(tester);
+      await pickCountry(tester, 'ukraine', 'Ukraine');
+
+      await tester.tap(timeZoneField);
+      await tester.pumpAndSettle();
+      expect(menuEntries(), ['Europe/Kiev', 'Europe/Simferopol']);
+      expect(await searchTimeZones(tester, 'kyiv'), ['Europe/Kiev']);
+    });
+
+    testWidgets('a zone without a bundled city saves its own location', (
+      tester,
+    ) async {
+      final result = await openBundled(tester);
+      await enterName(tester);
+      await pickCountry(tester, 'canada', 'Canada');
+      await pickTimeZone(tester, 'vancouver', 'America/Vancouver');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      final city = result.city!;
+      expect(city.country, 'Canada');
+      expect(city.flag, 'ca.webp');
+      expect(city.timeZone, 'America/Vancouver');
+      expect(city.utc, '-07:00', reason: 'as listed in summer, like Seattle');
+      expect(city.latitude, closeTo(49.2667, 0.0001));
+      expect(city.longitude, closeTo(-123.1167, 0.0001));
+      expect(city.weatherZone, 'Zuhause');
+      expect(city.isCustom, isTrue);
+    });
+
+    testWidgets('a zone without a bundled city saves its offset', (
+      tester,
+    ) async {
+      final result = await openBundled(tester);
+      await enterName(tester);
+      await pickCountry(tester, 'australia', 'Australia');
+      await pickTimeZone(tester, 'perth', 'Australia/Perth');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(result.city!.utc, '+08:00');
+      expect(result.city!.latitude, closeTo(-31.95, 0.01));
+    });
+
+    testWidgets('a zone with a bundled city keeps saving its data', (
+      tester,
+    ) async {
+      final result = await openBundled(tester);
+      await enterName(tester);
+      await pickCountry(tester, 'canada', 'Canada');
+      await pickTimeZone(tester, 'toronto', 'America/Toronto');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(result.city!.timeZone, 'America/Toronto');
+      expect(result.city!.utc, '-04:00');
+      expect(result.city!.latitude, isNull, reason: 'as Toronto has none');
+    });
+
+    testWidgets('a city of an older version gets the zone of its country', (
+      tester,
+    ) async {
+      final result = await openBundled(
+        tester,
+        editing: const City(
+          name: 'Vancouver',
+          country: 'Canada',
+          timeZone: 'America/Los_Angeles',
+          flag: 'ca.webp',
+          utc: '-07:00',
+          weatherZone: 'Vancouver',
+          isCustom: true,
+        ),
+      );
+
+      expect(fieldText(tester, countryField), 'Canada');
+      expect(fieldText(tester, timeZoneField), 'America/Los Angeles');
+      expect(find.text('Not a time zone of this country'), findsOneWidget);
+      expect(canSave(tester), isFalse);
+
+      await pickTimeZone(tester, 'vancouver', 'America/Vancouver');
+      expect(find.text('Not a time zone of this country'), findsNothing);
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      final city = result.city!;
+      expect(city.name, 'Vancouver');
+      expect(city.country, 'Canada');
+      expect(city.timeZone, 'America/Vancouver');
+      expect(city.utc, '-07:00');
+      expect(city.latitude, closeTo(49.27, 0.01));
+    });
+
+    testWidgets('a city of an older version keeps a zone that now fits', (
+      tester,
+    ) async {
+      await openBundled(
+        tester,
+        editing: const City(
+          name: 'Perth',
+          country: 'Australia',
+          timeZone: 'Australia/Perth',
+          flag: 'au.webp',
+          utc: '+08:00',
+          weatherZone: 'Perth',
+          isCustom: true,
+        ),
+      );
+
+      expect(fieldText(tester, countryField), 'Australia');
+      expect(fieldText(tester, timeZoneField), 'Australia/Perth');
+      expect(find.text('Not a time zone of this country'), findsNothing);
+      expect(canSave(tester), isTrue);
     });
   });
 }

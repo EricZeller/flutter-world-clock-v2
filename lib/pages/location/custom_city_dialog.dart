@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/models/country_zone.dart';
+import 'package:world_clock_v2/utils/time_utils.dart';
 
 /// Shows a dialog to create a custom city, or edit [editing] if given.
-/// The available countries, flags, time zones and coordinates are taken from
-/// the bundled cities among [cities].
+/// The available countries and flags are taken from the bundled cities among
+/// [cities]. A country offers the time zones of its cities and those of
+/// [countryZones] for its flag, see `CityRepository.loadCountryZones`.
 Future<City?> showCustomCityDialog(
   BuildContext context, {
   required List<City> cities,
+  Map<String, List<CountryZone>> countryZones = const {},
   City? editing,
 }) {
   return showDialog<City>(
     context: context,
-    builder: (context) => CustomCityDialog(cities: cities, editing: editing),
+    builder: (context) => CustomCityDialog(
+      cities: cities,
+      countryZones: countryZones,
+      editing: editing,
+    ),
   );
 }
 
@@ -29,21 +37,53 @@ class _Country {
   /// The name, followed by the cities if another flag has the same name.
   late final String label;
 
-  /// The time zones of [cities], sorted.
-  late final List<String> timeZones;
+  /// The time zones of [cities] and of the tz database for this country,
+  /// by IANA id and sorted by label.
+  late final Map<String, _Zone> zones;
 
   /// Everything the country can be found by: its label and its cities.
   late final String searchText;
+}
 
-  /// Everything each of [timeZones] can be found by: its label and the
-  /// cities of this country in it.
-  late final Map<String, String> timeZoneSearchText;
+/// A time zone of a country: one of the tz database's zones of the country,
+/// one of its bundled cities, or usually both.
+class _Zone {
+  _Zone(this.timeZone);
+
+  final String timeZone;
+
+  /// The zone in the tz database's list of the country's zones.
+  CountryZone? countryZone;
+
+  /// The bundled cities of the country in this zone.
+  final cities = <City>[];
+
+  /// Where in the country the zone applies, such as
+  /// `Pacific - BC (most areas)`.
+  String get comment => countryZone?.comment ?? '';
+
+  /// Everything the zone can be found by: its label, its cities and where
+  /// it applies.
+  late final String searchText = [
+    _CustomCityDialogState.timeZoneLabel(timeZone),
+    for (final city in cities) city.name,
+    comment,
+  ].join(' ').toLowerCase();
 }
 
 class CustomCityDialog extends StatefulWidget {
-  const CustomCityDialog({super.key, required this.cities, this.editing});
+  const CustomCityDialog({
+    super.key,
+    required this.cities,
+    this.countryZones = const {},
+    this.editing,
+  });
 
   final List<City> cities;
+
+  /// The time zones of each country by ISO code, see [CountryZone].
+  final Map<String, List<CountryZone>> countryZones;
+
   final City? editing;
 
   @override
@@ -66,7 +106,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   @override
   void initState() {
     super.initState();
-    _countries = _countriesOf(widget.cities);
+    _countries = _countriesOf(widget.cities, widget.countryZones);
     _countriesByFlag = {
       for (final country in _countries) country.flag: country,
     };
@@ -105,9 +145,13 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     });
   }
 
-  /// The countries of the bundled [cities], sorted by label. Custom cities
-  /// are left out: they may spell their country differently.
-  static List<_Country> _countriesOf(List<City> cities) {
+  /// The countries of the bundled [cities], sorted by label, with the zones
+  /// of their cities and of [countryZones]. Custom cities are left out: they
+  /// may spell their country differently.
+  static List<_Country> _countriesOf(
+    List<City> cities,
+    Map<String, List<CountryZone>> countryZones,
+  ) {
     final byFlag = <String, _Country>{};
     for (final city in cities) {
       if (city.isCustom || city.flag.isEmpty) continue;
@@ -124,22 +168,29 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     }
     for (final country in byFlag.values) {
       final cityNames = country.cities.map((city) => city.name);
+      final zones = <String, _Zone>{};
+      // A country without zones in the tz database's list (Kosovo) still
+      // has those of its cities.
+      _Zone zoneOf(String timeZone) =>
+          zones.putIfAbsent(timeZone, () => _Zone(timeZone));
+      final code = CountryZone.countryCode(country.flag);
+      for (final zone in countryZones[code] ?? const <CountryZone>[]) {
+        zoneOf(zone.timeZone).countryZone ??= zone;
+      }
+      for (final city in country.cities) {
+        zoneOf(city.timeZone).cities.add(city);
+      }
+      String sortKey(_Zone zone) => timeZoneLabel(zone.timeZone).toLowerCase();
       country
         ..label = flagsPerName[country.name]! > 1
             ? '${country.name} (${cityNames.join(', ')})'
             : country.name
-        ..timeZones =
-            (country.cities.map((city) => city.timeZone).toSet().toList()
-              ..sort())
-        ..searchText = [country.label, ...cityNames].join(' ').toLowerCase()
-        ..timeZoneSearchText = {
-          for (final zone in country.timeZones)
-            zone: [
-              timeZoneLabel(zone),
-              for (final city in country.cities)
-                if (city.timeZone == zone) city.name,
-            ].join(' ').toLowerCase(),
-        };
+        ..zones = {
+          for (final zone in zones.values.toList()
+            ..sort((a, b) => sortKey(a).compareTo(sortKey(b))))
+            zone.timeZone: zone,
+        }
+        ..searchText = [country.label, ...cityNames].join(' ').toLowerCase();
     }
     return byFlag.values.toList()
       ..sort((a, b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()));
@@ -151,7 +202,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   /// then the flag. A city without country and without a known flag gets the
   /// only country of its zone.
   _Country? _matchCountry(City city) {
-    bool hasZone(_Country country) => country.timeZones.contains(city.timeZone);
+    bool hasZone(_Country country) => country.zones.containsKey(city.timeZone);
     final name = city.country.trim().toLowerCase();
     if (name.isEmpty && !_countriesByFlag.containsKey(city.flag)) {
       final withZone = _countries.where(hasZone);
@@ -203,7 +254,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   void _selectCountry(String? flag) {
     final country = _countriesByFlag[flag];
     if (country == null) return;
-    final zones = country.timeZones;
+    final zones = country.zones.keys;
     final zone = zones.length == 1
         ? zones.single
         : zones.contains(_timeZone)
@@ -218,7 +269,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   }
 
   bool get _timeZoneFitsCountry =>
-      _country != null && _country!.timeZones.contains(_timeZone);
+      _country != null && _country!.zones.containsKey(_timeZone);
 
   bool get _canSave =>
       _nameController.text.trim().isNotEmpty && _timeZoneFitsCountry;
@@ -226,20 +277,24 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   void _save() {
     final name = _nameController.text.trim();
     final country = _country!;
-    final template = country.cities.firstWhere(
-      (city) => city.timeZone == _timeZone,
-    );
+    final zone = country.zones[_timeZone]!;
+    // The data of a bundled city in the zone, else the zone's own location.
+    final template = zone.cities.firstOrNull;
     Navigator.pop(
       context,
       City(
         name: name,
         country: country.name,
-        timeZone: _timeZone!,
+        timeZone: zone.timeZone,
         flag: country.flag,
-        utc: template.utc,
+        utc: template?.utc ?? listedUtcOffset(zone.timeZone),
         weatherZone: name,
-        latitude: template.latitude,
-        longitude: template.longitude,
+        latitude: template == null
+            ? zone.countryZone?.latitude
+            : template.latitude,
+        longitude: template == null
+            ? zone.countryZone?.longitude
+            : template.longitude,
         isCustom: true,
       ),
     );
@@ -248,6 +303,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     final country = _country;
     return AlertDialog(
       title: Row(
@@ -333,11 +389,29 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
               filterCallback: (entries, query) => _filter(
                 entries,
                 query,
-                (entry) => country!.timeZoneSearchText[entry.value]!,
+                (entry) => country!.zones[entry.value]!.searchText,
               ),
               dropdownMenuEntries: [
-                for (final zone in country?.timeZones ?? const <String>[])
-                  DropdownMenuEntry(value: zone, label: timeZoneLabel(zone)),
+                for (final zone in country?.zones.values ?? const <_Zone>[])
+                  DropdownMenuEntry(
+                    value: zone.timeZone,
+                    label: timeZoneLabel(zone.timeZone),
+                    labelWidget: zone.comment.isEmpty
+                        ? null
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(timeZoneLabel(zone.timeZone)),
+                              Text(
+                                zone.comment,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
               ],
               onSelected: (value) => setState(() => _timeZone = value),
             ),

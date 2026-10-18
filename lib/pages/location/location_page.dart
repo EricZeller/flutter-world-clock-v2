@@ -111,9 +111,12 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   Future<void> _editCustomCity({City? editing}) async {
+    final countryZones = await _repository.loadCountryZones();
+    if (!mounted) return;
     final city = await showCustomCityDialog(
       context,
       cities: _cities,
+      countryZones: countryZones,
       editing: editing,
     );
     if (city == null || !mounted) return;

@@ -15,15 +15,20 @@ Finder get timeZoneField => find.descendant(
       matching: find.byType(TextField),
     );
 
-/// Labels of the entries the open dropdown menu currently offers.
-List<String> menuEntries() => find
-    .descendant(
-      of: find.byType(MenuItemButton).hitTestable(),
-      matching: find.byType(Text),
-    )
-    .evaluate()
-    .map((element) => (element.widget as Text).data!)
-    .toList();
+/// Labels of the entries the open dropdown menu currently offers, without
+/// the line below a time zone that tells where it applies.
+List<String> menuEntries() => [
+      for (final entry in find.byType(MenuItemButton).hitTestable().evaluate())
+        (find
+                .descendant(
+                  of: find.byWidget(entry.widget),
+                  matching: find.byType(Text),
+                )
+                .evaluate()
+                .first
+                .widget as Text)
+            .data!,
+    ];
 
 /// Searches the countries for [query] and picks the entry [label].
 Future<void> pickCountry(
