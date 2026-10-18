@@ -410,23 +410,35 @@ abstract class AppLocalizations {
   /// **'City name'**
   String get cityName;
 
-  /// No description provided for @countryOptional.
+  /// No description provided for @country.
   ///
   /// In en, this message translates to:
-  /// **'Country (optional)'**
-  String get countryOptional;
+  /// **'Country'**
+  String get country;
 
-  /// No description provided for @flagOptional.
+  /// No description provided for @pickCountryFromList.
   ///
   /// In en, this message translates to:
-  /// **'Flag (optional)'**
-  String get flagOptional;
+  /// **'Pick a country from the list'**
+  String get pickCountryFromList;
 
   /// No description provided for @ianaTimeZone.
   ///
   /// In en, this message translates to:
   /// **'IANA time zone'**
   String get ianaTimeZone;
+
+  /// No description provided for @pickCountryFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a country first'**
+  String get pickCountryFirst;
+
+  /// No description provided for @timeZoneNotInCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Not a time zone of {country}'**
+  String timeZoneNotInCountry(String country);
 
   /// No description provided for @customCityOfflineHint.
   ///

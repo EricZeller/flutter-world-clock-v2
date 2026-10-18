@@ -173,13 +173,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get cityName => 'Stadtname';
 
   @override
-  String get countryOptional => 'Land (optional)';
+  String get country => 'Land';
 
   @override
-  String get flagOptional => 'Flagge (optional)';
+  String get pickCountryFromList => 'Wähle ein Land aus der Liste';
 
   @override
   String get ianaTimeZone => 'IANA-Zeitzone';
+
+  @override
+  String get pickCountryFirst => 'Wähle zuerst ein Land';
+
+  @override
+  String timeZoneNotInCountry(String country) {
+    return 'Keine Zeitzone von $country';
+  }
 
   @override
   String get customCityOfflineHint =>

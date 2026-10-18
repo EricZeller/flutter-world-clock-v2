@@ -65,9 +65,18 @@
   "searchHint": "Search city or country ({count} found)",
   "addCustomCity": "Add custom city",
   "cityName": "City name",
-  "countryOptional": "Country (optional)",
-  "flagOptional": "Flag (optional)",
+  "country": "Country",
+  "pickCountryFromList": "Pick a country from the list",
   "ianaTimeZone": "IANA time zone",
+  "pickCountryFirst": "Pick a country first",
+  "timeZoneNotInCountry": "Not a time zone of {country}",
+  "@timeZoneNotInCountry": {
+    "placeholders": {
+      "country": {
+        "type": "String"
+      }
+    }
+  },
   "customCityOfflineHint": "Time works offline. Weather may be unavailable if wttr.in does not know this city.",
   "add": "Add",
   "cancel": "Cancel",
