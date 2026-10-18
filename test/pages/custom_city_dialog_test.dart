@@ -110,6 +110,7 @@ Future<DialogResult> openDialog(
   List<City>? from,
   Map<String, List<CountryZone>> countryZones = const {},
   Size physicalSize = const Size(1080, 2400),
+  Locale locale = const Locale('en'),
 }) async {
   tester.view.physicalSize = physicalSize;
   tester.view.devicePixelRatio = 2.0;
@@ -119,7 +120,7 @@ Future<DialogResult> openDialog(
     MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('en'),
+      locale: locale,
       home: Builder(
         builder: (context) => Scaffold(
           body: TextButton(
@@ -210,6 +211,139 @@ void main() {
       'America/New York',
       'Pacific/Honolulu',
     ]);
+  });
+
+  group('in German', () {
+    final germanCountryField = find.descendant(
+      of: dropdownMenu('Land'),
+      matching: find.byType(TextField),
+    );
+
+    Future<void> search(WidgetTester tester, String query) async {
+      await tester.enterText(germanCountryField, query);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the countries are labeled and found in German', (
+      tester,
+    ) async {
+      await openDialog(tester, locale: const Locale('de'));
+
+      await search(tester, 'vereinigte');
+      expect(menuEntries(), ['Vereinigte Staaten']);
+      await search(tester, 'states');
+      expect(menuEntries(), ['Vereinigte Staaten'],
+          reason: 'the English name is found as well');
+      await search(tester, 'frankreich');
+      expect(menuEntries(), ['Frankreich']);
+      await search(tester, 'china');
+      expect(menuEntries(), ['China (Beijing)', 'China (Hong Kong)']);
+      await search(tester, 'peking');
+      expect(menuEntries(), ['China (Beijing)'],
+          reason: 'cities are found by their German names');
+      await search(tester, 'Hongkong');
+      expect(menuEntries(), ['China (Hong Kong)']);
+    });
+
+    testWidgets('the cities keep the English country', (tester) async {
+      final result = await openDialog(tester, locale: const Locale('de'));
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Stadtname'),
+        'Zuhause',
+      );
+      await search(tester, 'deutsch');
+      await tester.tap(find.text('Deutschland').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Hinzufügen'));
+      await tester.pumpAndSettle();
+
+      expect(result.city!.country, 'Germany');
+      expect(result.city!.flag, 'de.webp');
+    });
+
+    testWidgets('a city entered in German finds its country', (
+      tester,
+    ) async {
+      await openDialog(
+        tester,
+        locale: const Locale('de'),
+        editing: custom(country: 'Frankreich', timeZone: 'Europe/Paris'),
+      );
+
+      expect(fieldText(tester, germanCountryField), 'Frankreich');
+      expect(find.text('Wähle ein Land aus der Liste'), findsNothing);
+    });
+
+    testWidgets('a new app language relabels the picked country', (
+      tester,
+    ) async {
+      final locale = ValueNotifier(const Locale('en'));
+      addTearDown(locale.dispose);
+      await tester.pumpWidget(
+        ValueListenableBuilder(
+          valueListenable: locale,
+          builder: (context, value, _) => MaterialApp(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: value,
+            home: Builder(
+              builder: (context) => Scaffold(
+                body: TextButton(
+                  onPressed: () =>
+                      showCustomCityDialog(context, cities: cities),
+                  child: const Text('open'),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+      await pickCountry(tester, 'germ', 'Germany');
+
+      locale.value = const Locale('de');
+      await tester.pumpAndSettle();
+
+      expect(fieldText(tester, germanCountryField), 'Deutschland');
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Hinzufügen'),
+            )
+            .onPressed,
+        isNull,
+        reason: 'no name yet, but the country stays picked',
+      );
+      await tester.enterText(
+        find.widgetWithText(TextField, 'Stadtname'),
+        'Zuhause',
+      );
+      await tester.pump();
+      expect(
+        tester
+            .widget<FilledButton>(
+              find.widgetWithText(FilledButton, 'Hinzufügen'),
+            )
+            .onPressed,
+        isNotNull,
+        reason: 'the country and its only zone are still picked',
+      );
+    });
+
+    testWidgets('French labels China and Hong Kong apart', (tester) async {
+      await openDialog(tester, locale: const Locale('fr'));
+
+      await tester.enterText(
+        find.descendant(
+          of: dropdownMenu('Pays'),
+          matching: find.byType(TextField),
+        ),
+        'chine',
+      );
+      await tester.pumpAndSettle();
+      expect(menuEntries(), ['Chine (Beijing)', 'Chine (Hong Kong)']);
+    });
   });
 
   testWidgets('the time zone needs a country first', (tester) async {
@@ -517,7 +651,7 @@ void main() {
       expect(fieldText(tester, timeZoneField), 'America/Toronto',
           reason: 'the zone of its bundled cities');
       expect(await searchTimeZones(tester, 'vancouver'), ['America/Vancouver']);
-      expect(find.text('Pacific - BC (most areas)'), findsOneWidget,
+      expect(find.text('MST - BC (most areas)'), findsOneWidget,
           reason: 'the zone tells where it applies');
       expect(await searchTimeZones(tester, 'toronto'), ['America/Toronto']);
       expect(await searchTimeZones(tester, 'america/st_j'),
@@ -545,7 +679,7 @@ void main() {
         'America/Fort Nelson',
         'America/Vancouver',
       ]);
-      expect(await searchTimeZones(tester, 'pacific bc'),
+      expect(await searchTimeZones(tester, 'mst bc most'),
           ['America/Vancouver']);
 
       await pickCountry(tester, 'united states', 'United States');

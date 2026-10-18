@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/models/country_zone.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
+import 'package:world_clock_v2/utils/search.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
 
 /// Shows a dialog to create a custom city, or edit [editing] if given.
@@ -31,17 +33,24 @@ class _Country {
   _Country(this.flag, this.name);
 
   final String flag;
+
+  /// The English name the country's cities are saved with.
   final String name;
   final cities = <City>[];
 
-  /// The name, followed by the cities if another flag has the same name.
+  /// The name in the app's language, see [PlaceNames.country].
+  late final String localName;
+
+  /// The [localName], followed by the cities if another flag has the same
+  /// name: China (Beijing) and China (Hong Kong).
   late final String label;
 
   /// The time zones of [cities] and of the tz database for this country,
   /// by IANA id and sorted by label.
   late final Map<String, _Zone> zones;
 
-  /// Everything the country can be found by: its label and its cities.
+  /// Everything the country can be found by: its label, its English name
+  /// and its cities, see [PlaceNames.searchText].
   late final String searchText;
 }
 
@@ -59,16 +68,12 @@ class _Zone {
   final cities = <City>[];
 
   /// Where in the country the zone applies, such as
-  /// `Pacific - BC (most areas)`.
+  /// `MST - BC (most areas)`.
   String get comment => countryZone?.comment ?? '';
 
   /// Everything the zone can be found by: its label, its cities and where
   /// it applies.
-  late final String searchText = [
-    _CustomCityDialogState.timeZoneLabel(timeZone),
-    for (final city in cities) city.name,
-    comment,
-  ].join(' ').toLowerCase();
+  late final String searchText;
 }
 
 class CustomCityDialog extends StatefulWidget {
@@ -94,8 +99,11 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   late final TextEditingController _nameController;
   final _countryController = TextEditingController();
   final _timeZoneController = TextEditingController();
-  late final List<_Country> _countries;
-  late final Map<String, _Country> _countriesByFlag;
+
+  /// The names of the app's language, which the countries are labeled in.
+  PlaceNames? _names;
+  List<_Country> _countries = const [];
+  Map<String, _Country> _countriesByFlag = const {};
   _Country? _country;
   String? _timeZone;
 
@@ -106,13 +114,33 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   @override
   void initState() {
     super.initState();
-    _countries = _countriesOf(widget.cities, widget.countryZones);
+    _nameController = TextEditingController(text: widget.editing?.name);
+  }
+
+  /// Labels the countries in the app's language, which is only known here.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final names = PlaceNames.of(context);
+    if (names == _names) return;
+    final isFirst = _names == null;
+    _names = names;
+    _countries = _countriesOf(widget.cities, widget.countryZones, names);
     _countriesByFlag = {
       for (final country in _countries) country.flag: country,
     };
+    if (isFirst) {
+      _showEditing();
+    } else if (_country != null) {
+      // The picked country, labeled in the new language.
+      _country = _countriesByFlag[_country!.flag];
+      _countryController.text = _country!.label;
+    }
+  }
 
+  /// Fills in the city being edited and starts to watch the fields.
+  void _showEditing() {
     final editing = widget.editing;
-    _nameController = TextEditingController(text: editing?.name);
     if (editing != null) {
       _country = _matchCountry(editing);
       final country = editing.country.trim();
@@ -145,27 +173,35 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     });
   }
 
-  /// The countries of the bundled [cities], sorted by label, with the zones
-  /// of their cities and of [countryZones]. Custom cities are left out: they
-  /// may spell their country differently.
+  /// The countries of the bundled [cities], labeled in the language of
+  /// [names] and sorted by label, with the zones of their cities and of
+  /// [countryZones]. Custom cities are left out: they may spell their
+  /// country differently.
   static List<_Country> _countriesOf(
     List<City> cities,
     Map<String, List<CountryZone>> countryZones,
+    PlaceNames names,
   ) {
     final byFlag = <String, _Country>{};
     for (final city in cities) {
       if (city.isCustom || city.flag.isEmpty) continue;
-      final country = byFlag[city.flag] ??= _Country(city.flag, city.country);
+      final country = byFlag.putIfAbsent(
+        city.flag,
+        () => _Country(city.flag, city.country)
+          ..localName = names.country(city),
+      );
       country.cities.add(city);
     }
     final flagsPerName = <String, int>{};
     for (final country in byFlag.values) {
       flagsPerName.update(
-        country.name,
+        country.localName,
         (count) => count + 1,
         ifAbsent: () => 1,
       );
     }
+    // A city's own name and those of its language, such as München.
+    List<String> namesOf(City city) => [city.name, ...names.otherNames(city)];
     for (final country in byFlag.values) {
       final cityNames = country.cities.map((city) => city.name);
       final zones = <String, _Zone>{};
@@ -180,36 +216,50 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
       for (final city in country.cities) {
         zoneOf(city.timeZone).cities.add(city);
       }
-      String sortKey(_Zone zone) => timeZoneLabel(zone.timeZone).toLowerCase();
+      for (final zone in zones.values) {
+        zone.searchText = searchTextOf([
+          timeZoneLabel(zone.timeZone),
+          for (final city in zone.cities) ...namesOf(city),
+          zone.comment,
+        ]);
+      }
       country
-        ..label = flagsPerName[country.name]! > 1
-            ? '${country.name} (${cityNames.join(', ')})'
-            : country.name
+        ..label = flagsPerName[country.localName]! > 1
+            ? '${country.localName} (${cityNames.join(', ')})'
+            : country.localName
         ..zones = {
           for (final zone in zones.values.toList()
-            ..sort((a, b) => sortKey(a).compareTo(sortKey(b))))
+            ..sort((a, b) => compareNames(
+                timeZoneLabel(a.timeZone), timeZoneLabel(b.timeZone))))
             zone.timeZone: zone,
         }
-        ..searchText = [country.label, ...cityNames].join(' ').toLowerCase();
+        ..searchText = searchTextOf([
+          country.label,
+          country.name,
+          for (final city in country.cities) ...namesOf(city),
+        ]);
     }
     return byFlag.values.toList()
-      ..sort((a, b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()));
+      ..sort((a, b) => compareNames(a.label, b.label));
   }
 
   /// The country [city] was saved with. Cities of older versions could
   /// combine any flag, country name and time zone, so the flag and the name
   /// are both tried, preferring a country that has the city's time zone and
-  /// then the flag. A city without country and without a known flag gets the
-  /// only country of its zone.
+  /// then the flag. The name may be in English or in the app's language. A
+  /// city without country and without a known flag gets the only country of
+  /// its zone.
   _Country? _matchCountry(City city) {
     bool hasZone(_Country country) => country.zones.containsKey(city.timeZone);
-    final name = city.country.trim().toLowerCase();
+    final name = foldForSearch(city.country.trim());
     if (name.isEmpty && !_countriesByFlag.containsKey(city.flag)) {
       final withZone = _countries.where(hasZone);
       return withZone.length == 1 ? withZone.single : null;
     }
     final candidates = _countries.where((country) =>
-        country.flag == city.flag || country.name.toLowerCase() == name);
+        country.flag == city.flag ||
+        foldForSearch(country.name) == name ||
+        foldForSearch(country.localName) == name);
     return candidates.where(hasZone).firstOrNull ??
         _countriesByFlag[city.flag] ??
         candidates.firstOrNull;
@@ -230,17 +280,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     List<DropdownMenuEntry<String>> entries,
     String query,
     String Function(DropdownMenuEntry<String> entry) searchText,
-  ) {
-    // Underscores as in the IANA id `America/New_York` match the label.
-    final words = query
-        .toLowerCase()
-        .replaceAll('_', ' ')
-        .split(' ')
-        .where((word) => word.isNotEmpty);
-    return entries
-        .where((entry) => words.every(searchText(entry).contains))
-        .toList();
-  }
+  ) =>
+      // Underscores as in the IANA id `America/New_York` match the label,
+      // see foldForSearch.
+      entries
+          .where((entry) => matchesSearch(searchText(entry), query))
+          .toList();
 
   @override
   void dispose() {

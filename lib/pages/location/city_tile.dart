@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
-
-String _cityDetails(City city) =>
-    "${city.country.isEmpty ? '' : '${city.country}, '}UTC${city.utc}";
+import 'package:world_clock_v2/utils/place_names.dart';
 
 Widget _flag(City city) => SizedBox(
       width: 40,
@@ -41,7 +39,9 @@ class CityTile extends StatelessWidget {
         city.name,
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
-      subtitle: Text('${_cityDetails(city)} \n${city.timeZone}'),
+      subtitle: Text(
+        '${PlaceNames.of(context).details(city)} \n${city.timeZone}',
+      ),
       secondary: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -87,7 +87,7 @@ class FavoriteTile extends StatelessWidget {
           city.name,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(_cityDetails(city)),
+        subtitle: Text(PlaceNames.of(context).details(city)),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

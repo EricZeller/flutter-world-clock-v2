@@ -10,6 +10,7 @@ import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
 import 'package:world_clock_v2/utils/city_sorting.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 
 /// Shown when a home screen widget is added or reconfigured on Android:
 /// picks the city this one widget shows.
@@ -103,8 +104,7 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
         city.name,
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
-      subtitle: Text(
-          "${city.country.isEmpty ? '' : '${city.country}, '}UTC${city.utc}"),
+      subtitle: Text(PlaceNames.of(context).details(city)),
       trailing: isCurrent
           ? Icon(Icons.check_circle,
               color: Theme.of(context).colorScheme.primary)
@@ -118,7 +118,7 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final results = filterCities(_cities, _query);
+    final results = filterCities(_cities, _query, PlaceNames.of(context));
     final showFavorites = _query.trim().isEmpty;
 
     return Scaffold(

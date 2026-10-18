@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:timezone/timezone.dart' as tz;
 import 'package:world_clock_v2/utils/time_utils.dart';
 
 import '../helpers/time_zones.dart';
@@ -82,6 +83,19 @@ void main() {
       expect(listedUtcOffset('Australia/Perth', now: summer), '+08:00');
       expect(listedUtcOffset('Asia/Kathmandu', now: summer), '+05:45');
       expect(listedUtcOffset('America/St_Johns', now: summer), '-02:30');
+    });
+
+    test('keeps western Canada on fixed offsets after July 2026', () {
+      String offsetIn(String zone, DateTime utc) => formatOffset(
+          tz.TZDateTime.from(utc, findLocation(zone)).timeZoneOffset);
+      final december = DateTime.utc(2026, 12);
+
+      expect(offsetIn('America/Vancouver', december), '-07:00');
+      expect(offsetIn('America/Edmonton', december), '-06:00');
+      expect(offsetIn('America/Winnipeg', december), '-05:00');
+      expect(offsetIn('America/Inuvik', december), '-06:00');
+      expect(offsetIn('America/Los_Angeles', december), '-08:00');
+      expect(listedUtcOffset('America/Vancouver', now: december), '-07:00');
     });
   });
 
@@ -203,6 +217,28 @@ void main() {
     test('returns null for zones without daylight saving time', () {
       expect(nextOffsetChange('Asia/Tokyo', now: DateTime.utc(2026, 10, 16)),
           isNull);
+    });
+
+    // British Columbia (tzdata 2026b), Alberta (2026c), the Northwest
+    // Territories (2026d) and Manitoba (2026e) stay on their summer offsets
+    // instead of falling back on 2026-11-01.
+    test('announces no fall back in western Canada after July 2026', () {
+      for (final zone in [
+        'America/Vancouver',
+        'America/Edmonton',
+        'America/Winnipeg',
+        'America/Inuvik',
+      ]) {
+        expect(nextOffsetChange(zone, now: DateTime.utc(2026, 10, 18)),
+            isNull,
+            reason: zone);
+        expect(
+            nextOffsetChange(zone,
+                now: DateTime.utc(2026, 7, 2),
+                within: const Duration(days: 365)),
+            isNull,
+            reason: zone);
+      }
     });
   });
 }

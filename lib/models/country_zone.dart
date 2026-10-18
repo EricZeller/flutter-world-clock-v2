@@ -18,7 +18,7 @@ class CountryZone {
   final double longitude;
 
   /// Where in the country the zone applies, such as
-  /// `Pacific - BC (most areas)`; empty for a country with a single zone.
+  /// `MST - BC (most areas)`; empty for a country with a single zone.
   final String comment;
 
   /// The ISO code that keys a country's zones: `de` for the flag `de.webp`.

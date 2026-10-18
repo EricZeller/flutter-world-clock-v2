@@ -1,14 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/utils/city_sorting.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 
 City _city(String name, String country, String timeZone, String utc,
-        {bool custom = false}) =>
+        {bool custom = false, String flag = ''}) =>
     City(
       name: name,
       country: country,
       timeZone: timeZone,
-      flag: '',
+      flag: flag,
       utc: utc,
       weatherZone: name,
       isCustom: custom,
@@ -70,6 +71,65 @@ void main() {
 
     test('returns everything for an empty query', () {
       expect(filterCities(cities, '  '), cities);
+    });
+  });
+
+  group('in German', () {
+    const german = PlaceNames('de');
+    final vienna = _city('Vienna', 'Austria', 'Europe/Vienna', '+02:00',
+        flag: 'at.webp');
+    final warsaw = _city('Warsaw', 'Poland', 'Europe/Warsaw', '+02:00',
+        flag: 'pl.webp');
+    final munich = _city('Munich', 'Germany', 'Europe/Berlin', '+02:00',
+        flag: 'de.webp');
+    final berlin = _city('Berlin', 'Germany', 'Europe/Berlin', '+02:00',
+        flag: 'de.webp');
+    final beijing = _city('Beijing', 'China', 'Asia/Shanghai', '+08:00',
+        flag: 'cn.webp');
+    final saoTome = _city('São Tomé', 'Sao Tome and Principe',
+        'Africa/Sao_Tome', '+00:00',
+        flag: 'st.webp');
+    final cities = [vienna, warsaw, munich, berlin, beijing, saoTome];
+
+    test('cities are found by their German and English names', () {
+      expect(filterCities(cities, 'deutschland', german), [munich, berlin]);
+      expect(filterCities(cities, 'germany', german), [munich, berlin]);
+      expect(filterCities(cities, 'München', german), [munich]);
+      expect(filterCities(cities, 'muenchen', german), [munich]);
+      expect(filterCities(cities, 'Peking', german), [beijing]);
+      expect(filterCities(cities, 'warschau', german), [warsaw]);
+      expect(filterCities(cities, 'österreich', german), [vienna]);
+      expect(filterCities(cities, 'oesterreich', german), [vienna]);
+    });
+
+    test('diacritics do not matter', () {
+      expect(filterCities(cities, 'sao tome', german), [saoTome]);
+      expect(filterCities(cities, 'SÃO TOMÉ', german), [saoTome]);
+      expect(filterCities(cities, 'sao tome', PlaceNames.english), [saoTome]);
+    });
+
+    test('English finds no German names', () {
+      expect(filterCities(cities, 'deutschland'), isEmpty);
+      expect(filterCities(cities, 'peking'), isEmpty);
+    });
+
+    test('sorting by country uses the German names', () {
+      expect(sortCities(cities, CitySort.country, german).map((c) => c.name), [
+        'Beijing', // China
+        'Berlin', // Deutschland, by city within the country
+        'Munich',
+        'Vienna', // Österreich, sorted as O
+        'Warsaw', // Polen
+        'São Tomé', // São Tomé und Príncipe
+      ]);
+      expect(sortCities(cities, CitySort.country).map((c) => c.name), [
+        'Vienna', // Austria
+        'Beijing', // China
+        'Berlin', // Germany
+        'Munich',
+        'Warsaw', // Poland
+        'São Tomé', // Sao Tome and Principe
+      ]);
     });
   });
 }
