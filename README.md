@@ -59,6 +59,8 @@ All icons and fonts from [fonts.google.com](https://fonts.google.com)
 
 Flag icons from [flagpedia.net](https://flagpedia.net/download)
 
+Time zones of the countries and their locations from the [IANA tz database](https://www.iana.org/time-zones) (`zone.tab`, public domain)
+
 Libraries/packages from pub.dev
 
 Used (keyless) weather API: [wttr.in](https://github.com/chubin/wttr.in) by [@chubin](https://github.com/chubin)
