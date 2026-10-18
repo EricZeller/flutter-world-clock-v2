@@ -109,8 +109,9 @@ Future<DialogResult> openDialog(
   City? editing,
   List<City>? from,
   Map<String, List<CountryZone>> countryZones = const {},
+  Size physicalSize = const Size(1080, 2400),
 }) async {
-  tester.view.physicalSize = const Size(1080, 2400);
+  tester.view.physicalSize = physicalSize;
   tester.view.devicePixelRatio = 2.0;
   addTearDown(tester.view.reset);
   final result = DialogResult();
@@ -488,7 +489,7 @@ void main() {
         File(CityRepository.countryZonesAsset).readAsStringSync());
 
     Future<DialogResult> openBundled(WidgetTester tester,
-        {City? editing}) async {
+        {City? editing, Size physicalSize = const Size(1080, 2400)}) async {
       SharedPreferences.setMockInitialValues({});
       final bundledCities =
           await tester.runAsync(() => CityRepository().loadAllCities());
@@ -497,6 +498,7 @@ void main() {
         editing: editing,
         from: bundledCities,
         countryZones: countryZones,
+        physicalSize: physicalSize,
       );
     }
 
@@ -512,7 +514,8 @@ void main() {
       await openBundled(tester);
       await pickCountry(tester, 'canada', 'Canada');
 
-      expect(fieldText(tester, timeZoneField), isEmpty);
+      expect(fieldText(tester, timeZoneField), 'America/Toronto',
+          reason: 'the zone of its bundled cities');
       expect(await searchTimeZones(tester, 'vancouver'), ['America/Vancouver']);
       expect(find.text('Pacific - BC (most areas)'), findsOneWidget,
           reason: 'the zone tells where it applies');
@@ -566,6 +569,56 @@ void main() {
       await pickCountry(tester, 'kosovo', 'Kosovo');
       expect(fieldText(tester, timeZoneField), 'Europe/Belgrade',
           reason: 'without zones in the tz database, those of its city');
+    });
+
+    testWidgets('the zone of the bundled cities is preselected', (
+      tester,
+    ) async {
+      await openBundled(tester);
+      await enterName(tester);
+      await pickCountry(tester, 'germany', 'Germany');
+
+      expect(fieldText(tester, timeZoneField), 'Europe/Berlin');
+      expect(find.text('most of Germany'), findsOneWidget,
+          reason: 'the picked zone tells where it applies');
+      expect(canSave(tester), isTrue);
+      await tester.tap(timeZoneField);
+      await tester.pumpAndSettle();
+      expect(menuEntries(), ['Europe/Berlin', 'Europe/Busingen'],
+          reason: 'the other zones are still offered');
+      await tester.tap(find.text('Europe/Busingen').last);
+      await tester.pumpAndSettle();
+      expect(fieldText(tester, timeZoneField), 'Europe/Busingen');
+      expect(find.text('most of Germany'), findsNothing);
+
+      await pickCountry(tester, 'spain', 'Spain');
+      expect(fieldText(tester, timeZoneField), 'Europe/Madrid');
+      expect(find.text('Spain (mainland)'), findsOneWidget);
+
+      await pickCountry(tester, 'united states', 'United States');
+      expect(fieldText(tester, timeZoneField), isEmpty,
+          reason: 'its bundled cities have several zones');
+      expect(canSave(tester), isFalse);
+    });
+
+    testWidgets('long lists of zones fit on a small phone', (tester) async {
+      // 320 x 568 like an iPhone SE (1st generation).
+      await openBundled(tester, physicalSize: const Size(640, 1136));
+      await enterName(tester);
+
+      await pickCountry(tester, 'indonesia', 'Indonesia');
+      await pickTimeZone(tester, 'bali', 'Asia/Makassar');
+      expect(
+        find.text('Borneo (east, south), Sulawesi/Celebes, Bali, '
+            'Nusa Tengarra, Timor (west)'),
+        findsOneWidget,
+      );
+
+      await pickCountry(tester, 'russia', 'Russia');
+      await tester.tap(timeZoneField);
+      await tester.pumpAndSettle();
+      expect(menuEntries(), isNotEmpty);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('an alias zone of a city is offered once', (tester) async {

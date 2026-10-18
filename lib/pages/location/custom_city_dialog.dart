@@ -219,6 +219,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   static const _fieldStyle = InputDecorationThemeData(
     border: UnderlineInputBorder(),
     contentPadding: EdgeInsets.symmetric(vertical: 12),
+    helperMaxLines: 2,
   );
 
   /// `America/New_York` reads better and is easier to find as
@@ -250,15 +251,20 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   }
 
   /// Picks the country of [flag] and keeps the time zone only if it is one
-  /// of the country's; the only zone of a country is picked with it.
+  /// of the country's. Otherwise the zone of the country's bundled cities is
+  /// preselected if they all have the same one, such as Europe/Berlin for
+  /// Germany. That also picks the only zone of a country.
   void _selectCountry(String? flag) {
     final country = _countriesByFlag[flag];
     if (country == null) return;
-    final zones = country.zones.keys;
-    final zone = zones.length == 1
-        ? zones.single
-        : zones.contains(_timeZone)
-            ? _timeZone
+    final cityZones = [
+      for (final zone in country.zones.values)
+        if (zone.cities.isNotEmpty) zone.timeZone,
+    ];
+    final zone = country.zones.containsKey(_timeZone)
+        ? _timeZone
+        : cityZones.length == 1
+            ? cityZones.single
             : null;
     setState(() {
       _country = country;
@@ -305,6 +311,8 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final country = _country;
+    final appliesIn =
+        _timeZoneFitsCountry ? country!.zones[_timeZone]!.comment : '';
     return AlertDialog(
       title: Row(
         children: [
@@ -380,7 +388,13 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
               requestFocusOnTap: true,
               inputDecorationTheme: _fieldStyle,
               label: Text(l10n.ianaTimeZone),
-              helperText: country == null ? l10n.pickCountryFirst : null,
+              // Where a picked zone applies, so a preselected one is easy to
+              // check.
+              helperText: country == null
+                  ? l10n.pickCountryFirst
+                  : appliesIn.isEmpty
+                      ? null
+                      : appliesIn,
               errorText:
                   country != null && _timeZone != null && !_timeZoneFitsCountry
                       ? l10n.timeZoneNotInCountry
