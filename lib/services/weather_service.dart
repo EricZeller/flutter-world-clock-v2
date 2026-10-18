@@ -44,7 +44,10 @@ class WeatherService {
       _clock = clock ?? DateTime.now;
 
   static const cacheKey = 'weatherCache';
-  static const maxCachedLocations = 10;
+  /// Reports kept in the cache, one per server, place and language. Enough
+  /// for many favorites and widget cities, so swiping through them does not
+  /// evict reports needed offline; a report takes about 3 KB.
+  static const maxCachedLocations = 50;
 
   /// How long a report counts as current.
   static const refreshInterval = Duration(minutes: 15);

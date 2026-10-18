@@ -135,6 +135,31 @@ void main() {
         ),
         isNotNull,
       );
+      final prefs = await SharedPreferences.getInstance();
+      final cache = jsonDecode(prefs.getString(WeatherService.cacheKey)!);
+      expect(cache, hasLength(WeatherService.maxCachedLocations));
+    });
+
+    test('has room for many favorites and widget cities', () async {
+      expect(WeatherService.maxCachedLocations, greaterThanOrEqualTo(50));
+      final service = WeatherService(
+        client: MockClient(
+          (_) async => http.Response.bytes(utf8.encode(wttrBerlinFixture), 200),
+        ),
+      );
+
+      for (var i = 0; i < WeatherService.maxCachedLocations; i++) {
+        await service.refresh(server: server, zone: 'City $i', lang: 'de');
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      final stored = prefs.getString(WeatherService.cacheKey)!;
+      expect(jsonDecode(stored), hasLength(WeatherService.maxCachedLocations));
+      expect(await service.loadCached(server: server, zone: 'City 0', lang: 'de'),
+          isNotNull);
+      // The full cache stays small enough to keep in the preferences.
+      expect(utf8.encode(stored).length, lessThan(256 * 1024));
+      printOnFailure('cache size: ${utf8.encode(stored).length} bytes');
     });
 
     test('keeps reports that finish downloading together', () async {
