@@ -1,0 +1,5 @@
+• Countries in your language, search in your language and without accents
+• Custom cities: the time zone now matches the country, with all its time zones
+• Up-to-date time zone data (Canada)
+• More reliable widgets, weather and city list
+• Bug fixes
