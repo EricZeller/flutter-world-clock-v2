@@ -56,8 +56,10 @@ void main() {
   });
 
   test('are the same in the macOS widget', () {
+    // A Windows checkout may use CRLF line endings.
     final swift = File('macos/WorldClockWidget/CountryNames.swift')
-        .readAsStringSync();
+        .readAsStringSync()
+        .replaceAll('\r\n', '\n');
     for (final language in languages.difference({'en'})) {
       final block = [
         '        "$language": [',
