@@ -85,11 +85,28 @@ jobs:
       - name: Run tests
         run: flutter test
 
+      # Maven Central sometimes answers Gradle with 429 Too Many Requests.
       - name: Build signed release APK
-        run: flutter build apk --release --target-platform android-arm64
+        run: |
+          for attempt in 1 2 3; do
+            flutter build apk --release --target-platform android-arm64 && exit 0
+            if [ "$attempt" -lt 3 ]; then
+              echo "::warning::Build attempt $attempt failed, retrying in 60 seconds."
+              sleep 60
+            fi
+          done
+          exit 1
 
       - name: Build signed release App Bundle
-        run: flutter build appbundle --release
+        run: |
+          for attempt in 1 2 3; do
+            flutter build appbundle --release && exit 0
+            if [ "$attempt" -lt 3 ]; then
+              echo "::warning::Build attempt $attempt failed, retrying in 60 seconds."
+              sleep 60
+            fi
+          done
+          exit 1
 
       - name: Rename APK with version and source
         id: rename_apk
