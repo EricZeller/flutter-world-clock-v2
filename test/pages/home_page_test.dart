@@ -524,6 +524,35 @@ void main() {
       expect(find.text('Tokyo'), findsOneWidget);
       expect(find.bySemanticsLabel('City 2 of 3'), findsOneWidget);
     });
+
+    testWidgets('remembers the shown city after it moved further back',
+        (tester) async {
+      City custom(String name) => City(
+            name: name,
+            country: '',
+            timeZone: 'Europe/Berlin',
+            flag: '',
+            utc: '+02:00',
+            weatherZone: name,
+            isCustom: true,
+          );
+      await storeFavorites([City.berlin, tokyo], index: 1);
+      await pumpPage(tester, const HomePage(), settings: await loadSettings());
+      expect(find.text('Tokyo'), findsOneWidget);
+
+      await tester.tap(find.text('Manage cities'));
+      await tester.pumpAndSettle();
+      await CityRepository().saveFavorites(
+          [newYork, custom('A'), custom('B'), City.berlin, tokyo]);
+      tester.state<NavigatorState>(find.byType(Navigator)).pop();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Tokyo'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 5 of 5'), findsOneWidget);
+      // The next start opens the same city.
+      final prefs = await SharedPreferences.getInstance();
+      expect(prefs.getInt(CityRepository.currentIndexKey), 4);
+    });
   });
 
   group('cached weather', () {

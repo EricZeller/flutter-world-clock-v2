@@ -69,6 +69,9 @@ class _HomePageState extends State<HomePage> {
     if (controller != null && controller.hasClients) {
       controller.jumpToPage(index);
     }
+    // The jump happens before the pages are rebuilt and does not always
+    // report a page change, e.g. to a page the old list did not have.
+    if (index != savedIndex) repository.saveCurrentIndex(index);
     _syncHomeWidget();
   }
 
