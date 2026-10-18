@@ -59,7 +59,7 @@ class _Zone {
   final cities = <City>[];
 
   /// Where in the country the zone applies, such as
-  /// `Pacific - BC (most areas)`.
+  /// `MST - BC (most areas)`.
   String get comment => countryZone?.comment ?? '';
 
   /// Everything the zone can be found by: its label, its cities and where
