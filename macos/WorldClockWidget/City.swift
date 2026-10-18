@@ -20,15 +20,14 @@ struct City: Decodable, Hashable, Sendable {
     )
 
     /// The country in the widget's language, like the app shows it:
-    /// "Deutschland" in German. English keeps the names of cities.json.
+    /// "Deutschland" in German. English keeps the names of cities.json, and
+    /// Hong Kong is listed as China. The language is the one the widget's
+    /// texts are shown in, like that of the weather.
     var localizedCountry: String {
-        guard let code = flag?.split(separator: ".").first?.uppercased(),
-              let language = Locale.current.language.languageCode?.identifier,
-              language != "en"
+        guard let code = flag?.split(separator: ".").first?.lowercased(),
+              let language = Bundle.main.preferredLocalizations.first
         else { return country }
-        // Hong Kong is listed as China, like in the app.
-        let region = code == "HK" ? "CN" : code
-        return Locale.current.localizedString(forRegionCode: region) ?? country
+        return CountryNames.byLanguage[language]?[code] ?? country
     }
 
     /// All cities, sorted by name.

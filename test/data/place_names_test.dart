@@ -55,6 +55,21 @@ void main() {
         reason: 'the usual name, which German users search for');
   });
 
+  test('are the same in the macOS widget', () {
+    final swift = File('macos/WorldClockWidget/CountryNames.swift')
+        .readAsStringSync();
+    for (final language in languages.difference({'en'})) {
+      final block = [
+        '        "$language": [',
+        for (final MapEntry(key: code, value: name)
+            in countryNames[language]!.entries)
+          '            "$code": "$name",',
+        '        ],',
+      ].join('\n');
+      expect(swift, contains(block), reason: language);
+    }
+  });
+
   test('give other names only for bundled cities', () {
     final names = {for (final city in cities) city['name'] as String};
     for (final MapEntry(key: language, value: exonyms)
