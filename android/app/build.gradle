@@ -88,20 +88,6 @@ android {
             } else {
                 signingConfig = signingConfigs.debug
             }
-            ndk {
-                // Alle automatisch gesetzten Filters löschen
-                abiFilters.clear()
-                // Nur die gewünschten ABIs setzen
-                boolean isBuildingBundle = gradle.startParameter.taskNames.any { it.contains("bundle") || it.contains("Bundle") }
-                
-                if (isBuildingBundle) {
-                    // Für das App Bundle (AAB) erlauben wir alle gängigen Architekturen
-                    abiFilters.addAll(['armeabi-v7a', 'arm64-v8a', 'x86_64'])
-                } else {
-                    // Für die APK bleibt es exakt so wie von dir gewünscht (nur 64-Bit)
-                    abiFilters.addAll(['arm64-v8a'])
-                }
-            }
         }
     }
 
@@ -123,13 +109,15 @@ android {
     }
 }
 
-// The release buildType's abiFilters above are merged with the ones the Flutter
-// Gradle plugin puts into defaultConfig (armeabi-v7a, arm64-v8a, x86_64), so
-// prebuilt native libraries of plugins (e.g. libdartjni.so) still ended up in
-// the arm64-only release APK for ABIs without Flutter libraries. Package only
-// the ABIs Flutter builds for (`--target-platform`, all three by default), so
-// the App Bundle keeps all three and `flutter run --release` on an x86_64
-// emulator still works. Debug builds are left untouched.
+// AGP packages the native libraries of every ABI in Flutter's defaultConfig
+// abiFilters (armeabi-v7a, arm64-v8a, x86_64), so prebuilt libraries of
+// plugins (e.g. libdartjni.so) would end up in an arm64-only release APK for
+// ABIs without Flutter libraries. Package only the ABIs Flutter builds for
+// (`--target-platform`, all three by default), so the App Bundle keeps all
+// three and `flutter run --release` on an x86_64 emulator still works.
+// abiFilters can't do this: they are merged with Flutter's, and set on the
+// release buildType they break `flutter build apk --split-per-abi`. Debug
+// builds are left untouched.
 def flutterPlatformAbis = [
     'android-arm'  : 'armeabi-v7a',
     'android-arm64': 'arm64-v8a',
