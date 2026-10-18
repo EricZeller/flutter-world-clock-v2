@@ -10,6 +10,8 @@ void main() {
       expect(foldForSearch('Kraków Łódź'), 'krakow lodz');
       expect(foldForSearch('Chișinău'), 'chisinau');
       expect(foldForSearch('İstanbul'), 'istanbul');
+      expect(foldForSearch('Đà Nẵng Huế'), 'da nang hue');
+      expect(foldForSearch('Ơ Ư Lǚ'), 'o u lu');
     });
 
     test('spells out ligatures and ß', () {

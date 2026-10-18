@@ -2,26 +2,28 @@
 // fields of the app. Pure Dart, so tool/generate_place_names.dart can use it
 // too.
 
-/// Latin letters with diacritics and the letters they are found by.
+/// Latin letters with diacritics and the letters they are found by: those
+/// of Latin-1 and Latin Extended-A, then those of Vietnamese and pinyin
+/// (Đà Nẵng).
 const _foldings = {
-  'a': 'àáâãäåāăą',
+  'a': 'àáâãäåāăą' 'ǎạảấầẩẫậắằẳẵặ',
   'c': 'çćĉċč',
   'd': 'ďđð',
-  'e': 'èéêëēĕėęě',
+  'e': 'èéêëēĕėęě' 'ẹẻẽếềểễệ',
   'g': 'ĝğġģ',
   'h': 'ĥħ',
-  'i': 'ìíîïĩīĭįı',
+  'i': 'ìíîïĩīĭįı' 'ǐỉị',
   'j': 'ĵ',
   'k': 'ķ',
   'l': 'ĺļľŀł',
   'n': 'ñńņňŉ',
-  'o': 'òóôõöøōŏő',
+  'o': 'òóôõöøōŏő' 'ơǒọỏốồổỗộớờởỡợ',
   'r': 'ŕŗř',
   's': 'śŝşšș',
   't': 'ţťŧț',
-  'u': 'ùúûüũūŭůűų',
+  'u': 'ùúûüũūŭůűų' 'ưǔǖǘǚǜụủứừửữự',
   'w': 'ŵ',
-  'y': 'ýÿŷ',
+  'y': 'ýÿŷ' 'ỳỵỷỹ',
   'z': 'źżž',
   'ae': 'æ',
   'oe': 'œ',
