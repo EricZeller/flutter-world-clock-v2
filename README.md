@@ -61,6 +61,8 @@ Flag icons from [flagpedia.net](https://flagpedia.net/download)
 
 Time zones of the countries and their locations from the [IANA tz database](https://www.iana.org/time-zones) (`zone.tab`, public domain)
 
+Country and city names in German, Spanish, French and Portuguese from the [Unicode CLDR](https://cldr.unicode.org) 48.2.3 (Copyright © 2015-2024 Unicode, Inc., [Unicode License v3](https://www.unicode.org/license.txt); the full notice is in `lib/data/place_names.g.dart`)
+
 Libraries/packages from pub.dev
 
 Used (keyless) weather API: [wttr.in](https://github.com/chubin/wttr.in) by [@chubin](https://github.com/chubin)

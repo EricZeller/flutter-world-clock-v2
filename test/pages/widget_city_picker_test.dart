@@ -34,6 +34,20 @@ void main() {
     expect(isMarked(tester, 'Berlin'), isFalse);
   });
 
+  testWidgets('shows and finds the countries in the app language',
+      (tester) async {
+    await pumpPage(tester, const WidgetCityPickerPage(widgetId: 5),
+        settings: await loadSettings(), locale: const Locale('de'));
+
+    expect(find.text('Deutschland, UTC+02:00'), findsNWidgets(2),
+        reason: 'Berlin is a favorite and one of all cities');
+
+    await tester.enterText(find.byType(TextField), 'deutschland');
+    await tester.pump();
+    expect(find.text('Berlin'), findsOneWidget);
+    expect(find.text('Tokyo'), findsNothing);
+  });
+
   testWidgets('choosing a city saves it and ends the configuration',
       (tester) async {
     final widget = HomeWidgetRecorder.install()..installedWidgetIds = [5];

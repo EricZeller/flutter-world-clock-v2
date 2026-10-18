@@ -11,6 +11,7 @@ import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
 import 'package:world_clock_v2/utils/city_sorting.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
 import 'package:world_clock_v2/widgets/world_map/world_map.dart';
 
@@ -192,7 +193,9 @@ class _LocationPageState extends State<LocationPage> {
   Widget _buildScaffold(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final visibleCities = sortCities(filterCities(_cities, _query), _sort);
+    final names = PlaceNames.of(context);
+    final visibleCities =
+        sortCities(filterCities(_cities, _query, names), _sort, names);
     final showFavorites = _query.trim().isEmpty;
 
     return Scaffold(

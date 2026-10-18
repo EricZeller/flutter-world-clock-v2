@@ -46,6 +46,15 @@ void main() {
     expect(wttr.requests.single.path, '/Tokyo');
   });
 
+  testWidgets('shows the country in the app language', (tester) async {
+    await pumpPage(tester, const HomePage(),
+        settings: await loadSettings(), locale: const Locale('de'));
+
+    expect(find.text('Berlin'), findsOneWidget);
+    expect(find.text('Deutschland, UTC+02:00'), findsOneWidget);
+    expect(find.text('Germany, UTC+02:00'), findsNothing);
+  });
+
   testWidgets('shows sunrise and sunset with the extra info',
       (tester) async {
     await pumpPage(tester, const HomePage(), settings: await loadSettings());

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
 import 'package:world_clock_v2/widgets/second_ticker.dart';
 
@@ -38,7 +39,7 @@ class CityClock extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              "${city.country.isEmpty ? '' : '${city.country}, '}UTC${city.utc}",
+              PlaceNames.of(context).details(city),
               style: TextStyle(letterSpacing: 2, fontSize: 18, color: color),
             ),
           ),
