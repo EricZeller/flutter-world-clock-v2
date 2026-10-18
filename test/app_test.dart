@@ -40,6 +40,12 @@ void main() {
       expect(find.text('Manage cities'), findsOneWidget);
     });
 
+    testWidgets('is English for a device language of another script',
+        (tester) async {
+      expect(await appLocaleFor(tester, const Locale('zh', 'CN')),
+          const Locale('en'));
+    });
+
     testWidgets('follows a supported device language', (tester) async {
       expect(await appLocaleFor(tester, const Locale('de', 'AT')),
           const Locale('de'));
@@ -47,6 +53,11 @@ void main() {
 
     testWidgets('uses Portuguese for any Portuguese region', (tester) async {
       expect(await appLocaleFor(tester, const Locale('pt', 'PT')),
+          const Locale('pt'));
+    });
+
+    testWidgets('uses Portuguese for Brazil', (tester) async {
+      expect(await appLocaleFor(tester, const Locale('pt', 'BR')),
           const Locale('pt'));
     });
   });

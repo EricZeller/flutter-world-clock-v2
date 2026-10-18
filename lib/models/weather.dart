@@ -242,26 +242,37 @@ class DailyForecast {
       ).._markNight(location);
 
   /// Marks the hours before sunrise and after sunset of this day.
+  ///
+  /// The hours, sunrise and sunset are all wall-clock times of the city, so
+  /// they are compared as they are; wttr.in does not tell the UTC offset.
   void _markNight(LatLng? location) {
     final sunrise = _minutesOfDay(this.sunrise);
     final sunset = _minutesOfDay(this.sunset);
-    if (sunrise == null || sunset == null) {
-      // Polar day or night: wttr.in sends `No sunrise` or `No sunset`, so
-      // the sun's elevation at [location] decides, as for the current
-      // weather. Without a location every hour stays day.
+    final bool Function(int minutes) isNight;
+    if (sunrise != null && sunset != null) {
+      isNight = sunset < sunrise
+          // Near the midnight sun the sun sets shortly after midnight and
+          // rises again soon after.
+          ? (minutes) => minutes >= sunset && minutes < sunrise
+          : (minutes) => minutes < sunrise || minutes >= sunset;
+    } else if (sunrise != null) {
+      // The sun rises and stays up past midnight, e.g. when the midnight
+      // sun begins.
+      isNight = (minutes) => minutes < sunrise;
+    } else if (sunset != null) {
+      // The sun, up since the day before, sets and rises after midnight.
+      isNight = (minutes) => minutes >= sunset;
+    } else {
+      // Polar day or night: the sun stays above or below the horizon all
+      // day. It is polar day when the sun is over the same half of the
+      // world as [location]. Without a location every hour stays day.
       if (location == null) return;
-      for (final hour in hours) {
-        // The hours are wall-clock times of the city; its mean solar time
-        // is close enough to tell whether the sun is up at all.
-        final time = DateTime.utc(date.year, date.month, date.day, hour.hour)
-            .subtract(Duration(minutes: (location.longitude * 4).round()));
-        hour.isNight = isNightAt(location, time);
-      }
-      return;
+      final sun = subsolarPoint(DateTime.utc(date.year, date.month, date.day));
+      final polarNight = sun.latitude * location.latitude < 0;
+      isNight = (_) => polarNight;
     }
     for (final hour in hours) {
-      final minutes = hour.hour * 60;
-      hour.isNight = minutes < sunrise || minutes >= sunset;
+      hour.isNight = isNight(hour.hour * 60);
     }
   }
 

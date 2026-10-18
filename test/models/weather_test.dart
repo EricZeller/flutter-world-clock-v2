@@ -175,20 +175,27 @@ void main() {
     group('without sunrise or sunset', () {
       // Tromsø, where the sun does not rise in December and does not set
       // in June.
-      WeatherReport polar(String date, {bool withLocation = true}) =>
+      WeatherReport polar(
+        String date, {
+        bool withLocation = true,
+        String latitude = '69.649',
+        String longitude = '18.957',
+        String sunrise = 'No sunrise',
+        String sunset = 'No sunset',
+      }) =>
           WeatherReport.fromWttr({
             'current_condition': [
               {'weatherCode': '113'}
             ],
             if (withLocation)
               'nearest_area': [
-                {'latitude': '69.649', 'longitude': '18.957'}
+                {'latitude': latitude, 'longitude': longitude}
               ],
             'weather': [
               {
                 'date': date,
                 'astronomy': [
-                  {'sunrise': 'No sunrise', 'sunset': 'No sunset'}
+                  {'sunrise': sunrise, 'sunset': sunset}
                 ],
                 'hourly': [
                   for (var hour = 0; hour < 24; hour += 3)
@@ -218,6 +225,41 @@ void main() {
       test('without a location the sun is assumed', () {
         expect(nights(polar('2026-12-15', withLocation: false)),
             everyElement(isFalse));
+      });
+
+      test('do not depend on how far the clocks are from the sun', () {
+        // Longyearbyen keeps Central European (summer) time, about an hour
+        // ahead of the sun; McMurdo keeps New Zealand time on the south.
+        WeatherReport longyearbyen(String date) =>
+            polar(date, latitude: '78.000', longitude: '16.000');
+        WeatherReport mcMurdo(String date) =>
+            polar(date, latitude: '-77.846', longitude: '166.676');
+
+        expect(nights(longyearbyen('2026-04-23')), everyElement(isFalse));
+        expect(nights(longyearbyen('2026-06-21')), everyElement(isFalse));
+        expect(nights(longyearbyen('2026-08-22')), everyElement(isFalse));
+        expect(nights(longyearbyen('2026-12-15')), everyElement(isTrue));
+        expect(nights(mcMurdo('2026-06-21')), everyElement(isTrue));
+        expect(nights(mcMurdo('2026-12-21')), everyElement(isFalse));
+      });
+
+      test('a sunrise without a sunset is night only before it', () {
+        // Tromsø on the day the midnight sun begins.
+        expect(nights(polar('2026-05-18', sunrise: '01:24 AM')),
+            [true, false, false, false, false, false, false, false]);
+      });
+
+      test('a sunset without a sunrise is night only after it', () {
+        expect(nights(polar('2026-07-28', sunset: '08:30 PM')),
+            [false, false, false, false, false, false, false, true]);
+      });
+
+      test('a short night after midnight is only night until sunrise', () {
+        // The sun sets at 00:40 and rises again at 03:30.
+        final report =
+            polar('2026-07-27', sunrise: '03:30 AM', sunset: '12:40 AM');
+        expect(nights(report),
+            [false, true, false, false, false, false, false, false]);
       });
     });
 
