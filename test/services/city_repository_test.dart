@@ -235,6 +235,20 @@ void main() {
       expect(await repository.loadWidgetCities(), {9: City.berlin});
     });
 
+    test('do not lose concurrent changes', () async {
+      await repository.saveWidgetCity(1, custom);
+
+      await Future.wait([
+        repository.saveWidgetCity(7, custom),
+        repository.saveWidgetCity(8, City.berlin),
+        repository.removeWidgetCities([1]),
+        repository.replaceWidgetCity(custom, City.berlin),
+      ]);
+
+      expect(await repository.loadWidgetCities(),
+          {7: City.berlin, 8: City.berlin});
+    });
+
     test('ignore broken data', () async {
       SharedPreferences.setMockInitialValues(
           {CityRepository.widgetCitiesKey: '{"x": 1}'});

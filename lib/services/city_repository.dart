@@ -162,33 +162,46 @@ class CityRepository {
     }
   }
 
-  Future<void> saveWidgetCity(int widgetId, City city) async {
-    await _saveWidgetCities({...await loadWidgetCities(), widgetId: city});
-  }
+  Future<void> saveWidgetCity(int widgetId, City city) =>
+      _updateWidgetCities((cities) => {...cities, widgetId: city});
 
-  Future<void> removeWidgetCities(Iterable<int> widgetIds) async {
-    final cities = await loadWidgetCities()
-      ..removeWhere((id, _) => widgetIds.contains(id));
-    await _saveWidgetCities(cities);
-  }
+  Future<void> removeWidgetCities(Iterable<int> widgetIds) =>
+      _updateWidgetCities(
+          (cities) => cities..removeWhere((id, _) => widgetIds.contains(id)));
 
   /// Gives widgets that show [city] its edited version [replacement], or
   /// without one returns them to the first favorite.
-  Future<void> replaceWidgetCity(City city, City? replacement) async {
-    final cities = await loadWidgetCities();
-    final ids = [
-      for (final MapEntry(:key, :value) in cities.entries)
-        if (value == city) key,
-    ];
-    if (ids.isEmpty) return;
-    for (final id in ids) {
-      if (replacement == null) {
-        cities.remove(id);
-      } else {
-        cities[id] = replacement;
-      }
-    }
-    await _saveWidgetCities(cities);
+  Future<void> replaceWidgetCity(City city, City? replacement) =>
+      _updateWidgetCities((cities) {
+        final ids = [
+          for (final MapEntry(:key, :value) in cities.entries)
+            if (value == city) key,
+        ];
+        if (ids.isEmpty) return null;
+        for (final id in ids) {
+          if (replacement == null) {
+            cities.remove(id);
+          } else {
+            cities[id] = replacement;
+          }
+        }
+        return cities;
+      });
+
+  // Changes run one after another, so concurrent changes do not read the
+  // same old map and overwrite each other.
+  Future<void> _widgetCitiesChange = Future.value();
+
+  /// Stores what [update] makes of the stored widget cities; `null` keeps
+  /// them unchanged.
+  Future<void> _updateWidgetCities(
+      Map<int, City>? Function(Map<int, City> cities) update) {
+    final change = _widgetCitiesChange.then((_) async {
+      final updated = update(await loadWidgetCities());
+      if (updated != null) await _saveWidgetCities(updated);
+    });
+    _widgetCitiesChange = change.catchError((_) {});
+    return change;
   }
 
   Future<void> _saveWidgetCities(Map<int, City> cities) async {
