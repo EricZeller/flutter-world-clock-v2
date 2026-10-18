@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:world_clock_v2/models/country_zone.dart';
+import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
 
 import '../helpers/time_zones.dart';
@@ -21,6 +23,114 @@ void main() {
           '${city['name']} (${city['timeZone']})',
     ];
     expect(missing, isEmpty);
+  });
+
+  test('every bundled city lists the offset of 1 July as its utc', () {
+    // Custom cities without a bundled city in their zone get the same, see
+    // listedUtcOffset.
+    final wrong = [
+      for (final city in cities)
+        if (city['utc'] != listedUtcOffset(city['timeZone'] as String))
+          '${city['name']} (${city['timeZone']}): ${city['utc']}, expected '
+              '${listedUtcOffset(city['timeZone'] as String)}',
+    ];
+    expect(wrong, isEmpty);
+  });
+
+  // If one of these fails, run: dart run tool/generate_time_zones.dart
+  group('the time zones of the countries', () {
+    final countryZones = CountryZone.parseAll(
+      File(CityRepository.countryZonesAsset).readAsStringSync(),
+    );
+    final flags = {for (final city in cities) city['flag'] as String};
+
+    test('are all in the shipped database', () {
+      final missing = [
+        for (final MapEntry(:key, :value) in countryZones.entries)
+          for (final zone in value)
+            if (!tz.timeZoneDatabase.locations.containsKey(zone.timeZone))
+              '$key: ${zone.timeZone}',
+      ];
+      expect(missing, isEmpty);
+    });
+
+    test('exist for every country of the bundled cities', () {
+      final codes = flags.map(CountryZone.countryCode).toSet();
+      expect(
+        codes.difference(countryZones.keys.toSet()),
+        {'xk'},
+        reason:
+            'Kosovo has no zone of its own in the tz database and '
+            'offers the zone of its city',
+      );
+      expect(
+        countryZones.keys.toSet().difference(codes),
+        isEmpty,
+        reason: 'only countries of the app are bundled',
+      );
+    });
+
+    test('include the zones of the bundled cities of the country', () {
+      final missing = [
+        for (final city in cities)
+          if (countryZones[CountryZone.countryCode(city['flag'] as String)]
+              case final zones?)
+            if (!zones.any((zone) => zone.timeZone == city['timeZone']))
+              '${city['name']} (${city['timeZone']})',
+      ];
+      expect(
+        missing,
+        isEmpty,
+        reason:
+            'an alias such as Europe/Kyiv is listed under the name '
+            'its cities use, Europe/Kiev',
+      );
+    });
+
+    test('offer all zones of large countries', () {
+      List<String> zonesOf(String code) => [
+        for (final zone in countryZones[code]!) zone.timeZone,
+      ];
+
+      expect(
+        zonesOf('ca'),
+        containsAll([
+          'America/Vancouver',
+          'America/Toronto',
+          'America/Halifax',
+          'America/St_Johns',
+        ]),
+      );
+      expect(
+        zonesOf('au'),
+        containsAll(['Australia/Perth', 'Australia/Sydney']),
+      );
+      expect(
+        zonesOf('ru'),
+        containsAll(['Europe/Moscow', 'Asia/Novosibirsk', 'Asia/Vladivostok']),
+      );
+      expect(zonesOf('us'), hasLength(greaterThan(20)));
+      expect(zonesOf('hk'), ['Asia/Hong_Kong']);
+      expect(
+        zonesOf('ua'),
+        unorderedEquals(['Europe/Kiev', 'Europe/Simferopol']),
+      );
+    });
+
+    test('have the coordinates of their principal location', () {
+      for (final zones in countryZones.values) {
+        for (final zone in zones) {
+          expect(zone.latitude, inInclusiveRange(-90, 90));
+          expect(zone.longitude, inInclusiveRange(-180, 180));
+        }
+      }
+      final perth = countryZones['au']!.singleWhere(
+        (zone) => zone.timeZone == 'Australia/Perth',
+      );
+      expect(perth.latitude, closeTo(-31.95, 0.01));
+      expect(perth.longitude, closeTo(115.85, 0.01));
+      expect(perth.comment, 'Western Australia (most areas)');
+    });
   });
 
   test('alias zones keep their daylight saving rules', () {

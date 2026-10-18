@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
@@ -20,13 +21,24 @@ const tokyo = City(
 
 /// City repository with a small in-memory city list instead of the asset.
 class FakeCityRepository extends CityRepository {
-  FakeCityRepository([this.cities = const [City.berlin, tokyo]]);
+  FakeCityRepository([
+    this.cities = const [City.berlin, tokyo],
+    this.countryZones = const {},
+  ]);
 
   final List<City> cities;
+
+  /// The tz database's zones of each country; none by default, so the
+  /// countries offer the zones of [cities].
+  final Map<String, List<CountryZone>> countryZones;
 
   @override
   Future<List<City>> loadAllCities() async =>
       [...cities, ...await loadCustomCities()];
+
+  @override
+  Future<Map<String, List<CountryZone>>> loadCountryZones() async =>
+      countryZones;
 }
 
 /// Pumps [page] inside a localized MaterialApp with all app providers.

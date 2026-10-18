@@ -99,7 +99,7 @@
         "name": "Cairo",
         "country": "Egypt",
         "timeZone": "Africa/Cairo",
-        "utc": "+02:00",
+        "utc": "+03:00",
         "flag": "eg.webp",
         "weatherZone": "Cairo"
     },
@@ -171,7 +171,7 @@
         "name": "Mexico City",
         "country": "Mexico",
         "timeZone": "America/Mexico_City",
-        "utc": "-05:00",
+        "utc": "-06:00",
         "flag": "mx.webp",
         "weatherZone": "Mexico City"
     },
@@ -195,7 +195,7 @@
         "name": "Helsinki",
         "country": "Finland",
         "timeZone": "Europe/Helsinki",
-        "utc": "+02:00",
+        "utc": "+03:00",
         "flag": "fi.webp",
         "weatherZone": "Helsinki"
     },
@@ -771,7 +771,7 @@
         "name": "Tehran",
         "country": "Iran",
         "timeZone": "Asia/Tehran",
-        "utc": "+04:30",
+        "utc": "+03:30",
         "flag": "ir.webp",
         "weatherZone": "Tehran"
     },
@@ -811,7 +811,7 @@
         "name": "Astana",
         "country": "Kazakhstan",
         "timeZone": "Asia/Almaty",
-        "utc": "+06:00",
+        "utc": "+05:00",
         "flag": "kz.webp",
         "weatherZone": "Astana"
     },
@@ -1163,7 +1163,7 @@
         "name": "Asunción",
         "country": "Paraguay",
         "timeZone": "America/Asuncion",
-        "utc": "-04:00",
+        "utc": "-03:00",
         "flag": "py.webp",
         "weatherZone": "Asunción"
     },
@@ -1491,7 +1491,7 @@
         "name": "Chicago",
         "country": "United States",
         "timeZone": "America/Chicago",
-        "utc": "-06:00",
+        "utc": "-05:00",
         "flag": "us.webp",
         "weatherZone": "Chicago"
     },

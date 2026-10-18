@@ -35,6 +35,22 @@ void main() {
     expect(cities.where((city) => city.isCustom), isEmpty);
   });
 
+  test('loads the time zones of the countries once', () async {
+    final zones = await repository.loadCountryZones();
+
+    final canada = zones['ca']!;
+    final vancouver = canada.singleWhere(
+      (zone) => zone.timeZone == 'America/Vancouver',
+    );
+    expect(vancouver.comment, 'Pacific - BC (most areas)');
+    expect(vancouver.latitude, closeTo(49.27, 0.01));
+    expect(vancouver.longitude, closeTo(-123.12, 0.01));
+    expect(canada.map((zone) => zone.timeZone), contains('America/Toronto'));
+    expect(zones['jp']!.single.timeZone, 'Asia/Tokyo');
+    expect(zones['jp']!.single.comment, isEmpty);
+    expect(identical(await repository.loadCountryZones(), zones), isTrue);
+  });
+
   test('every bundled city has a bundled flag image', () async {
     final cities = await repository.loadAllCities();
     final missing = <String>[];
