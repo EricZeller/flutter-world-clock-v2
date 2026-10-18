@@ -106,6 +106,7 @@ flutter:
     - pubspec.yaml
     - assets/flags/
     - assets/data/cities.json
+    - assets/data/country_zones.json
     - assets/data/timezones.tzf
 
   #   - images/a_dot_ham.jpeg

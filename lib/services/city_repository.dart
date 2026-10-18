@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/models/country_zone.dart';
 
 /// Loads the bundled city list and persists custom cities and the favorites.
 class CityRepository {
@@ -26,6 +28,21 @@ class CityRepository {
       ...await loadCustomCities(),
     ];
   }
+
+  /// The time zones of each country by ISO code, from the tz database.
+  /// Loaded once, when the first custom city dialog opens.
+  Future<Map<String, List<CountryZone>>> loadCountryZones() =>
+      _countryZones ??= _bundle
+          .loadString(countryZonesAsset)
+          .then(CountryZone.parseAll)
+          .catchError((Object error) {
+            // The dialog still offers the zones of the bundled cities.
+            debugPrint('Could not load $countryZonesAsset: $error');
+            return <String, List<CountryZone>>{};
+          });
+
+  static const countryZonesAsset = 'assets/data/country_zones.json';
+  Future<Map<String, List<CountryZone>>>? _countryZones;
 
   Future<List<City>> loadCustomCities() async {
     final prefs = await SharedPreferences.getInstance();
