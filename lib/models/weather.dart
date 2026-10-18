@@ -53,29 +53,30 @@ class WeatherReport {
     final area = (json['nearest_area'] as List?)?.firstOrNull;
     final latitude = double.tryParse('${area?['latitude'] ?? ''}');
     final longitude = double.tryParse('${area?['longitude'] ?? ''}');
+    final location = latitude == null || longitude == null
+        ? null
+        : (latitude: latitude, longitude: longitude);
     return WeatherReport(
-      current: CurrentWeather.fromWttr(
-        current,
-        lang,
-        location: latitude == null || longitude == null
-            ? null
-            : (latitude: latitude, longitude: longitude),
-      ),
+      current: CurrentWeather.fromWttr(current, lang, location: location),
       days: [
         for (final day in json['weather'] as List? ?? const [])
-          DailyForecast.fromWttr(day, lang),
+          DailyForecast.fromWttr(day, lang, location: location),
       ],
       fetchedAt: fetchedAt,
     );
   }
 
-  factory WeatherReport.fromJson(Map<String, dynamic> json) => WeatherReport(
-        current: CurrentWeather.fromJson(json['current']),
-        days: [
-          for (final day in json['days'] as List) DailyForecast.fromJson(day),
-        ],
-        fetchedAt: DateTime.parse(json['fetchedAt']),
-      );
+  factory WeatherReport.fromJson(Map<String, dynamic> json) {
+    final current = CurrentWeather.fromJson(json['current']);
+    return WeatherReport(
+      current: current,
+      days: [
+        for (final day in json['days'] as List)
+          DailyForecast.fromJson(day, location: current.location),
+      ],
+      fetchedAt: DateTime.parse(json['fetchedAt']),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
         'current': current.toJson(),
@@ -207,7 +208,8 @@ class DailyForecast {
   int get chanceOfRain => hours.fold(
       0, (highest, hour) => hour.chanceOfRain > highest ? hour.chanceOfRain : highest);
 
-  factory DailyForecast.fromWttr(Map<String, dynamic> json, String? lang) {
+  factory DailyForecast.fromWttr(Map<String, dynamic> json, String? lang,
+      {LatLng? location}) {
     final astronomy = (json['astronomy'] as List?)?.firstOrNull ?? const {};
     return DailyForecast(
       date: DateTime.parse(json['date']),
@@ -221,10 +223,12 @@ class DailyForecast {
         for (final hour in json['hourly'] as List? ?? const [])
           HourlyForecast.fromWttr(hour, lang),
       ],
-    ).._markNight();
+    ).._markNight(location);
   }
 
-  factory DailyForecast.fromJson(Map<String, dynamic> json) => DailyForecast(
+  factory DailyForecast.fromJson(Map<String, dynamic> json,
+          {LatLng? location}) =>
+      DailyForecast(
         date: DateTime.parse(json['date']),
         minC: json['minC'],
         maxC: json['maxC'],
@@ -235,13 +239,26 @@ class DailyForecast {
         hours: [
           for (final hour in json['hours'] as List) HourlyForecast.fromJson(hour),
         ],
-      ).._markNight();
+      ).._markNight(location);
 
   /// Marks the hours before sunrise and after sunset of this day.
-  void _markNight() {
+  void _markNight(LatLng? location) {
     final sunrise = _minutesOfDay(this.sunrise);
     final sunset = _minutesOfDay(this.sunset);
-    if (sunrise == null || sunset == null) return; // Polar day or night.
+    if (sunrise == null || sunset == null) {
+      // Polar day or night: wttr.in sends `No sunrise` or `No sunset`, so
+      // the sun's elevation at [location] decides, as for the current
+      // weather. Without a location every hour stays day.
+      if (location == null) return;
+      for (final hour in hours) {
+        // The hours are wall-clock times of the city; its mean solar time
+        // is close enough to tell whether the sun is up at all.
+        final time = DateTime.utc(date.year, date.month, date.day, hour.hour)
+            .subtract(Duration(minutes: (location.longitude * 4).round()));
+        hour.isNight = isNightAt(location, time);
+      }
+      return;
+    }
     for (final hour in hours) {
       final minutes = hour.hour * 60;
       hour.isNight = minutes < sunrise || minutes >= sunset;

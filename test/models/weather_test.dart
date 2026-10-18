@@ -172,6 +172,55 @@ void main() {
           [true, true, true, false, false, false, false, true]);
     });
 
+    group('without sunrise or sunset', () {
+      // Tromsø, where the sun does not rise in December and does not set
+      // in June.
+      WeatherReport polar(String date, {bool withLocation = true}) =>
+          WeatherReport.fromWttr({
+            'current_condition': [
+              {'weatherCode': '113'}
+            ],
+            if (withLocation)
+              'nearest_area': [
+                {'latitude': '69.649', 'longitude': '18.957'}
+              ],
+            'weather': [
+              {
+                'date': date,
+                'astronomy': [
+                  {'sunrise': 'No sunrise', 'sunset': 'No sunset'}
+                ],
+                'hourly': [
+                  for (var hour = 0; hour < 24; hour += 3)
+                    {'time': '${hour * 100}', 'weatherCode': '113'}
+                ],
+              }
+            ],
+          }, fetchedAt: fetchedAt);
+
+      List<bool> nights(WeatherReport report) =>
+          [for (final hour in report.today!.hours) hour.isNight];
+
+      test('polar night has night all day', () {
+        final report = polar('2026-12-15');
+
+        expect(nights(report), everyElement(isTrue));
+        expect(report.today!.hours[4].symbol, '🌙');
+        final restored =
+            WeatherReport.fromJson(jsonDecode(jsonEncode(report.toJson())));
+        expect(nights(restored), everyElement(isTrue));
+      });
+
+      test('polar day has day all day', () {
+        expect(nights(polar('2026-06-21')), everyElement(isFalse));
+      });
+
+      test('without a location the sun is assumed', () {
+        expect(nights(polar('2026-12-15', withLocation: false)),
+            everyElement(isFalse));
+      });
+    });
+
     test('survives the cache', () {
       final report = parse();
       final restored =
