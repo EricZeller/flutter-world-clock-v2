@@ -28,12 +28,11 @@ jobs:
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:${{ hashFiles('**/pubspec.lock') }}"
 
       - name: Setup Java
-        uses: actions/setup-java@v5 # Geändert auf v5
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Direkter Cache für Gradle (ersetzt gradle/actions/setup-gradle)
       - name: Cache Gradle packages
         uses: actions/cache@v6
         with:
@@ -53,20 +52,30 @@ jobs:
         run: |
           echo "$KEYSTORE_BASE64" | base64 --decode > android/app/key.jks
 
+      # printf writes the secrets as they are; the shell never expands them.
       - name: Create key.properties
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
-          cat <<EOF > android/key.properties
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyPassword=${{ secrets.KEY_PASSWORD }}
-          keyAlias=${{ secrets.KEY_ALIAS }}
-          storeFile=key.jks
-          EOF
+          printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=%s\nstoreFile=key.jks\n' \
+            "$KEYSTORE_PASSWORD" "$KEY_PASSWORD" "$KEY_ALIAS" > android/key.properties
 
       - name: Run tests
         run: flutter test
 
+      # Maven Central sometimes answers Gradle with 429 Too Many Requests.
       - name: Build signed release APK
-        run: flutter build apk --release --target-platform android-arm64
+        run: |
+          for attempt in 1 2 3; do
+            flutter build apk --release --target-platform android-arm64 && exit 0
+            if [ "$attempt" -lt 3 ]; then
+              echo "::warning::Build attempt $attempt failed, retrying in 60 seconds."
+              sleep 60
+            fi
+          done
+          exit 1
 
       - name: Upload APK artifacts
         uses: actions/upload-artifact@v7
