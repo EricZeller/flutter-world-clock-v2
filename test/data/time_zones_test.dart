@@ -25,6 +25,18 @@ void main() {
     expect(missing, isEmpty);
   });
 
+  test('every bundled city lists the offset of 1 July as its utc', () {
+    // Custom cities without a bundled city in their zone get the same, see
+    // listedUtcOffset.
+    final wrong = [
+      for (final city in cities)
+        if (city['utc'] != listedUtcOffset(city['timeZone'] as String))
+          '${city['name']} (${city['timeZone']}): ${city['utc']}, expected '
+              '${listedUtcOffset(city['timeZone'] as String)}',
+    ];
+    expect(wrong, isEmpty);
+  });
+
   // If one of these fails, run: dart run tool/generate_time_zones.dart
   group('the time zones of the countries', () {
     final countryZones = CountryZone.parseAll(
