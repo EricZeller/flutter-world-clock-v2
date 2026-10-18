@@ -51,6 +51,8 @@ void main() {
     expect(countryNames['de']!['hk'], 'China',
         reason: 'Hong Kong is listed as China, like in English');
     expect(countryNames['pt']!['br'], 'Brasil');
+    expect(countryNames['de']!['cz'], 'Tschechien',
+        reason: 'the usual name, which German users search for');
   });
 
   test('give other names only for bundled cities', () {

@@ -45,11 +45,12 @@ const languages = ['de', 'es', 'fr', 'pt'];
 
 /// CLDR territory keys for countries whose name in cities.json is not
 /// CLDR's default English name of their code. Turkey keeps the default
-/// Türkiye (TR): its variant is Türkiye in French.
+/// Türkiye (TR): its variant is Türkiye in French. The Czech Republic keeps
+/// the default Czechia (CZ), the usual name in the other languages
+/// (Tschechien), which German users search for.
 const cldrKeys = {
   'cd': 'CD-alt-variant', // Congo (DRC)
   'cg': 'CG-alt-variant', // Congo (Republic)
-  'cz': 'CZ-alt-variant', // Czech Republic
   'hk': 'CN', // China, like the rest of China
   'mm': 'MM-alt-short', // Myanmar
   'ps': 'PS-alt-short', // Palestine
