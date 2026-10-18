@@ -55,7 +55,7 @@
   "pickCountryFromList": "Wähle ein Land aus der Liste",
   "ianaTimeZone": "IANA-Zeitzone",
   "pickCountryFirst": "Wähle zuerst ein Land",
-  "timeZoneNotInCountry": "Keine Zeitzone von {country}",
+  "timeZoneNotInCountry": "Keine Zeitzone dieses Landes",
   "customCityOfflineHint": "Die Uhrzeit funktioniert offline. Das Wetter ist möglicherweise nicht verfügbar, wenn wttr.in diese Stadt nicht kennt.",
   "add": "Hinzufügen",
   "cancel": "Abbrechen",

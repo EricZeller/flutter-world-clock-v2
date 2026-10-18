@@ -437,8 +437,8 @@ abstract class AppLocalizations {
   /// No description provided for @timeZoneNotInCountry.
   ///
   /// In en, this message translates to:
-  /// **'Not a time zone of {country}'**
-  String timeZoneNotInCountry(String country);
+  /// **'Not a time zone of this country'**
+  String get timeZoneNotInCountry;
 
   /// No description provided for @customCityOfflineHint.
   ///

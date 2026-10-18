@@ -303,6 +303,43 @@ void main() {
         reason: 'the widget shows the edited city');
   });
 
+  testWidgets('a favorite custom city whose country is renamed stays in place',
+      (tester) async {
+    const custom = City(
+      name: 'Zuhause',
+      country: 'Deutschland',
+      timeZone: 'Europe/Berlin',
+      flag: 'de.webp',
+      utc: '+02:00',
+      weatherZone: 'Zuhause',
+      isCustom: true,
+    );
+    SharedPreferences.setMockInitialValues({
+      CityRepository.customCitiesKey: jsonEncode([custom.toJson()]),
+    });
+    final repository = FakeCityRepository();
+    await repository.saveFavorites([tokyo, custom, City.berlin]);
+    await repository.saveWidgetCity(7, custom);
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+
+    // The typed country becomes the bundled name, so the edited city is no
+    // longer equal to the old one.
+    await tester.tap(find.byType(PopupMenuButton<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+
+    expect(favoriteNames(tester), ['Tokyo', 'Zuhause', 'Berlin']);
+    final favorites = await repository.loadFavorites();
+    expect(favorites[1].country, 'Germany');
+    expect((await repository.loadCustomCities()).single.country, 'Germany');
+    expect((await repository.loadWidgetCities())[7]!.country, 'Germany',
+        reason: 'the widget shows the edited city');
+  });
+
   testWidgets('editing a custom city does not make it a favorite',
       (tester) async {
     const custom = City(

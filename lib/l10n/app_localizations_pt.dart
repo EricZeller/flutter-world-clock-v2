@@ -186,9 +186,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get pickCountryFirst => 'Escolha primeiro um país';
 
   @override
-  String timeZoneNotInCountry(String country) {
-    return 'Não é um fuso horário de $country';
-  }
+  String get timeZoneNotInCountry => 'Não é um fuso horário deste país';
 
   @override
   String get customCityOfflineHint =>

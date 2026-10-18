@@ -69,7 +69,7 @@
   "pickCountryFromList": "Choisissez un pays dans la liste",
   "ianaTimeZone": "Fuseau horaire IANA",
   "pickCountryFirst": "Choisissez d’abord un pays",
-  "timeZoneNotInCountry": "Pas un fuseau horaire de {country}",
+  "timeZoneNotInCountry": "Pas un fuseau horaire de ce pays",
   "customCityOfflineHint": "L’heure fonctionne hors ligne. La météo peut être indisponible si wttr.in ne connaît pas cette ville.",
   "add": "Ajouter",
   "cancel": "Annuler",

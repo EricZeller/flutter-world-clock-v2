@@ -148,12 +148,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   /// The country [city] was saved with. Cities of older versions could
   /// combine any flag, country name and time zone, so the flag and the name
   /// are both tried, preferring a country that has the city's time zone and
-  /// then the flag. A city without flag and country gets the only country of
-  /// its zone.
+  /// then the flag. A city without country and without a known flag gets the
+  /// only country of its zone.
   _Country? _matchCountry(City city) {
     bool hasZone(_Country country) => country.timeZones.contains(city.timeZone);
     final name = city.country.trim().toLowerCase();
-    if (city.flag.isEmpty && name.isEmpty) {
+    if (name.isEmpty && !_countriesByFlag.containsKey(city.flag)) {
       final withZone = _countries.where(hasZone);
       return withZone.length == 1 ? withZone.single : null;
     }
@@ -327,7 +327,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
               helperText: country == null ? l10n.pickCountryFirst : null,
               errorText:
                   country != null && _timeZone != null && !_timeZoneFitsCountry
-                      ? l10n.timeZoneNotInCountry(country.name)
+                      ? l10n.timeZoneNotInCountry
                       : null,
               leadingIcon: const Icon(Icons.schedule_rounded),
               filterCallback: (entries, query) => _filter(

@@ -55,7 +55,7 @@
   "pickCountryFromList": "Escolha um país da lista",
   "ianaTimeZone": "Fuso horário IANA",
   "pickCountryFirst": "Escolha primeiro um país",
-  "timeZoneNotInCountry": "Não é um fuso horário de {country}",
+  "timeZoneNotInCountry": "Não é um fuso horário deste país",
   "customCityOfflineHint": "O horário funciona offline. O clima pode não estar disponível se o wttr.in não reconhecer esta cidade.",
   "add": "Adicionar",
   "cancel": "Cancelar",

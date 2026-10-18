@@ -356,6 +356,42 @@ void main() {
       expect(result.city!.flag, 'jp.webp');
     });
 
+    testWidgets('with a flag of no country takes the only country of its zone',
+        (tester) async {
+      final result = await openDialog(
+        tester,
+        editing: custom(flag: 'xx.webp'),
+      );
+
+      expect(fieldText(tester, countryField), 'Japan');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(result.city!.country, 'Japan');
+      expect(result.city!.flag, 'jp.webp');
+    });
+
+    testWidgets('saves a typed country name as the one of its flag', (
+      tester,
+    ) async {
+      final result = await openDialog(
+        tester,
+        editing: custom(
+          country: 'Deutschland',
+          flag: 'de.webp',
+          timeZone: 'Europe/Berlin',
+        ),
+      );
+
+      expect(fieldText(tester, countryField), 'Germany');
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(result.city!.country, 'Germany');
+      expect(result.city!.flag, 'de.webp');
+      expect(result.city!.timeZone, 'Europe/Berlin');
+    });
+
     testWidgets('prefers the flag or name whose country has the zone', (
       tester,
     ) async {
@@ -395,7 +431,7 @@ void main() {
         reason: 'neither has the zone, so the flag wins',
       );
       expect(fieldText(tester, timeZoneField), 'America/New York');
-      expect(find.text('Not a time zone of Japan'), findsOneWidget);
+      expect(find.text('Not a time zone of this country'), findsOneWidget);
       expect(canSave(tester), isFalse);
 
       await tester.tap(timeZoneField);
@@ -403,7 +439,7 @@ void main() {
       expect(menuEntries(), ['Asia/Tokyo']);
       await tester.tap(find.text('Asia/Tokyo').last);
       await tester.pumpAndSettle();
-      expect(find.text('Not a time zone of Japan'), findsNothing);
+      expect(find.text('Not a time zone of this country'), findsNothing);
       await tester.tap(find.text('Add'));
       await tester.pumpAndSettle();
 
