@@ -42,7 +42,7 @@ void main() {
     final vancouver = canada.singleWhere(
       (zone) => zone.timeZone == 'America/Vancouver',
     );
-    expect(vancouver.comment, 'Pacific - BC (most areas)');
+    expect(vancouver.comment, 'MST - BC (most areas)');
     expect(vancouver.latitude, closeTo(49.27, 0.01));
     expect(vancouver.longitude, closeTo(-123.12, 0.01));
     expect(canada.map((zone) => zone.timeZone), contains('America/Toronto'));

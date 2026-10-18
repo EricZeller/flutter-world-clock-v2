@@ -21,10 +21,10 @@
 //
 // After upgrading package:timezone, first replace tool/data/zone.tab with
 // the one of the matching release (the version is in the header of
-// package:timezone's lib/data/latest_all.dart), e.g. for 2025c:
+// package:timezone's lib/data/latest_all.dart), e.g. for 2026e:
 //
-//   curl -O https://data.iana.org/time-zones/releases/tzdata2025c.tar.gz
-//   tar -xzf tzdata2025c.tar.gz zone.tab && mv zone.tab tool/data/zone.tab
+//   curl -O https://data.iana.org/time-zones/releases/tzdata2026e.tar.gz
+//   tar -xzf tzdata2026e.tar.gz zone.tab && mv zone.tab tool/data/zone.tab
 //
 // and update [zoneTabVersion].
 //
@@ -40,7 +40,7 @@ import 'package:timezone/src/tzdb.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 /// The tzdata release of tool/data/zone.tab.
-const zoneTabVersion = '2025c';
+const zoneTabVersion = '2026e';
 
 const citiesPath = 'assets/data/cities.json';
 const zoneTabPath = 'tool/data/zone.tab';

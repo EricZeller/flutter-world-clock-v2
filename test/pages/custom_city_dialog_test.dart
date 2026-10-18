@@ -517,7 +517,7 @@ void main() {
       expect(fieldText(tester, timeZoneField), 'America/Toronto',
           reason: 'the zone of its bundled cities');
       expect(await searchTimeZones(tester, 'vancouver'), ['America/Vancouver']);
-      expect(find.text('Pacific - BC (most areas)'), findsOneWidget,
+      expect(find.text('MST - BC (most areas)'), findsOneWidget,
           reason: 'the zone tells where it applies');
       expect(await searchTimeZones(tester, 'toronto'), ['America/Toronto']);
       expect(await searchTimeZones(tester, 'america/st_j'),
@@ -545,7 +545,7 @@ void main() {
         'America/Fort Nelson',
         'America/Vancouver',
       ]);
-      expect(await searchTimeZones(tester, 'pacific bc'),
+      expect(await searchTimeZones(tester, 'mst bc most'),
           ['America/Vancouver']);
 
       await pickCountry(tester, 'united states', 'United States');

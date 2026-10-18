@@ -148,6 +148,20 @@ void main() {
     expect(offset('Australia/Sydney', winter), const Duration(hours: 11));
   });
 
+  test('the shipped database has the 2026 rules of western Canada', () {
+    // If this fails, package:timezone is older than tzdata 2026e or the
+    // asset was not regenerated: dart run tool/generate_time_zones.dart
+    Duration offset(String zone, DateTime utc) =>
+        tz.TZDateTime.from(utc, tz.getLocation(zone)).timeZoneOffset;
+    final december = DateTime.utc(2026, 12);
+
+    expect(offset('America/Vancouver', december), const Duration(hours: -7));
+    expect(offset('America/Edmonton', december), const Duration(hours: -6));
+    expect(offset('America/Winnipeg', december), const Duration(hours: -5));
+    expect(offset('America/Inuvik', december), const Duration(hours: -6));
+    expect(offset('Europe/Berlin', december), const Duration(hours: 1));
+  });
+
   test('unknown zones fall back to UTC instead of throwing', () {
     expect(findLocation('Mars/Olympus_Mons'), tz.UTC);
     expect(
