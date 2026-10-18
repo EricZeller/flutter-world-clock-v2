@@ -412,6 +412,31 @@ void main() {
 
       expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
     });
+
+    testWidgets('an older answer does not overwrite a recent cached report',
+        (tester) async {
+      final wttr = FakeWttr();
+      await wttr.service
+          .refresh(server: 'https://wttr.in', zone: 'Berlin', lang: 'de');
+      wttr.hold = Completer();
+      final settings = await loadSettings();
+      await pumpPage(tester, const HomePage(),
+          settings: settings, weather: wttr.service);
+      expect(wttr.requests, hasLength(2));
+
+      // The German report is recent, so nothing is downloaded for it.
+      await pumpPage(tester, const HomePage(),
+          settings: settings,
+          weather: wttr.service,
+          locale: const Locale('de'));
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+      wttr.hold!.complete();
+      await tester.pumpAndSettle();
+
+      expect(wttr.requests, hasLength(2));
+      expect(find.text('☁️ Wolkig +20°C'), findsOneWidget);
+      expect(find.text('☁️ Cloudy +20°C'), findsNothing);
+    });
   });
 
   group('multiple cities', () {

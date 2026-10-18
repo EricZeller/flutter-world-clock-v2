@@ -162,8 +162,13 @@ class _CityPageState extends State<CityPage> {
           zone: city.weatherZone,
           lang: language,
         );
-    // A newer request (other city, server or language) supersedes this one.
-    if (!mounted || _pendingWeather?.request != request) return;
+    // A newer request (other city, server or language) supersedes this one,
+    // also when its recent cached report made a download unnecessary.
+    if (!mounted ||
+        _shownRequest != request ||
+        _pendingWeather?.request != request) {
+      return;
+    }
     setState(() {
       _weather = result.report ?? _weather;
       _weatherFailure = result.failure;
