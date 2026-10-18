@@ -1,0 +1,5 @@
+• Países no seu idioma, busca no seu idioma e sem acentos
+• Cidades próprias: o fuso horário agora corresponde ao país, com todos os seus fusos
+• Dados de fusos horários atualizados (Canadá)
+• Widgets, clima e lista de cidades mais confiáveis
+• Correções

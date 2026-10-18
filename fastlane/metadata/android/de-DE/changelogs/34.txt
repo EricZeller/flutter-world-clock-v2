@@ -1,0 +1,5 @@
+• Länder in deiner Sprache, Suche auf Deutsch und ohne Akzente
+• Eigene Städte: Die Zeitzone passt jetzt zum Land, mit allen Zeitzonen des Landes
+• Aktuelle Zeitzonendaten (Kanada)
+• Zuverlässigere Widgets, Wetter und Städteliste
+• Fehlerbehebungen
