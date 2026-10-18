@@ -525,6 +525,38 @@ void main() {
       expect(find.bySemanticsLabel('City 2 of 3'), findsOneWidget);
     });
 
+    testWidgets('shows the position as text when the dots do not fit',
+        (tester) async {
+      City custom(int i) => City(
+            name: 'Place $i',
+            country: '',
+            timeZone: 'Europe/Berlin',
+            flag: '',
+            utc: '+02:00',
+            weatherZone: 'Place $i',
+            isCustom: true,
+          );
+      // The test screen is 540 dp wide, room for 33 dots.
+      Future<void> show(int count) async {
+        await storeFavorites([for (var i = 0; i < count; i++) custom(i)],
+            index: 2);
+        await pumpPage(tester, const SizedBox(), settings: await loadSettings());
+        await pumpPage(tester, const HomePage(),
+            settings: await loadSettings());
+      }
+
+      await show(40);
+      expect(tester.takeException(), isNull);
+      expect(find.text('3 / 40'), findsOneWidget);
+      expect(find.bySemanticsLabel('City 3 of 40'), findsOneWidget);
+
+      // Dots as long as they fit.
+      await show(30);
+      expect(tester.takeException(), isNull);
+      expect(find.text('3 / 30'), findsNothing);
+      expect(find.bySemanticsLabel('City 3 of 30'), findsOneWidget);
+    });
+
     testWidgets('remembers the shown city after it moved further back',
         (tester) async {
       City custom(String name) => City(

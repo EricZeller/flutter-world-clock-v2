@@ -163,27 +163,44 @@ class _PageDots extends StatelessWidget {
   final int count;
   final int index;
 
+  // Width of an inactive dot with its margins, and the extra of the active.
+  static const _dotExtent = 16.0;
+  static const _activeExtra = 10.0;
+
   @override
   Widget build(BuildContext context) {
-    final color = Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final color = theme.colorScheme.primary;
     return Semantics(
       label: AppLocalizations.of(context)!.cityPosition(index + 1, count),
       excludeSemantics: true,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          for (var i = 0; i < count; i++)
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: i == index ? 18 : 8,
-              height: 8,
-              decoration: BoxDecoration(
-                color: i == index ? color : color.withValues(alpha: 0.35),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          // Too many cities for dots: the position as text instead.
+          if (count * _dotExtent + _activeExtra > constraints.maxWidth) {
+            return Text(
+              '${index + 1} / $count',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.labelLarge?.copyWith(color: color),
+            );
+          }
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < count; i++)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: i == index ? 18 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: i == index ? color : color.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }
