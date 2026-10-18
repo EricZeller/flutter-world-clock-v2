@@ -15,6 +15,8 @@ import android.view.View
 import android.widget.RemoteViews
 import es.antonborri.home_widget.HomeWidgetProvider
 import kotlin.math.roundToInt
+import org.json.JSONException
+import org.json.JSONObject
 
 class WorldClockWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, widgetData: android.content.SharedPreferences) {
@@ -148,6 +150,77 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
         editor.apply()
     }
 
+    /**
+     * After a backup is restored, e.g. on a new phone, the launcher gives the
+     * widgets new IDs. Their own cities are stored by widget ID, so they are
+     * moved from [oldWidgetIds] to the [newWidgetIds] at the same position.
+     * The two may overlap, so all values are read before any is written.
+     */
+    override fun onRestored(context: Context, oldWidgetIds: IntArray, newWidgetIds: IntArray) {
+        super.onRestored(context, oldWidgetIds, newWidgetIds)
+        val count = minOf(oldWidgetIds.size, newWidgetIds.size)
+        val oldIds = oldWidgetIds.take(count)
+        val newIds = newWidgetIds.take(count)
+        val data = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+        rekeyWidgetData(data, oldIds, newIds)
+        rekeyFlutterWidgetCities(
+            context.getSharedPreferences(FLUTTER_PREFERENCES, Context.MODE_PRIVATE),
+            oldIds,
+            newIds
+        )
+        onUpdate(context, AppWidgetManager.getInstance(context), newWidgetIds, data)
+    }
+
+    /** Moves the `<key>_<id>` values of [CITY_KEYS] to the new IDs. */
+    private fun rekeyWidgetData(
+        data: android.content.SharedPreferences,
+        oldIds: List<Int>,
+        newIds: List<Int>
+    ) {
+        val all = data.all
+        val moved = mutableMapOf<String, String>()
+        oldIds.zip(newIds).forEach { (oldId, newId) ->
+            for (key in CITY_KEYS) {
+                val value = all["${key}_$oldId"] as? String ?: continue
+                moved["${key}_$newId"] = value
+            }
+        }
+        val editor = data.edit()
+        // Within one edit the last change of a key wins, so the moved values
+        // replace the removals of IDs that are both old and new.
+        for (id in oldIds + newIds) {
+            for (key in CITY_KEYS) editor.remove("${key}_$id")
+        }
+        for ((key, value) in moved) editor.putString(key, value)
+        editor.apply()
+    }
+
+    /**
+     * Moves the entries of the app's widget cities, a JSON object by widget
+     * ID that `CityRepository` keeps in the app's shared preferences.
+     */
+    private fun rekeyFlutterWidgetCities(
+        prefs: android.content.SharedPreferences,
+        oldIds: List<Int>,
+        newIds: List<Int>
+    ) {
+        val stored = prefs.getString(FLUTTER_WIDGET_CITIES, null) ?: return
+        val cities = try {
+            JSONObject(stored)
+        } catch (e: JSONException) {
+            return
+        }
+        val changed = (oldIds + newIds).map { it.toString() }.toSet()
+        val result = JSONObject()
+        for (key in cities.keys()) {
+            if (key !in changed) result.put(key, cities.get(key))
+        }
+        oldIds.zip(newIds).forEach { (oldId, newId) ->
+            cities.opt(oldId.toString())?.let { result.put(newId.toString(), it) }
+        }
+        prefs.edit().putString(FLUTTER_WIDGET_CITIES, result.toString()).apply()
+    }
+
     private fun getFloatPreference(
         data: android.content.SharedPreferences,
         key: String,
@@ -216,6 +289,10 @@ class WorldClockWidgetProvider : HomeWidgetProvider() {
     private companion object {
         const val REFERENCE_TEXT = "ÅHlgjy"
         const val PREFERENCES = "HomeWidgetPreferences"
+        // Where the shared_preferences plugin stores the app's values, with
+        // its "flutter." prefix; see CityRepository.widgetCitiesKey.
+        const val FLUTTER_PREFERENCES = "FlutterSharedPreferences"
+        const val FLUTTER_WIDGET_CITIES = "flutter.widgetCities"
         // Keep in sync with HomeWidgetService.cityKeys.
         val CITY_KEYS = listOf("city", "weather", "weather_icon", "weather_temp", "timeZone")
         const val MAX_BITMAP_WIDTH = 1200f
