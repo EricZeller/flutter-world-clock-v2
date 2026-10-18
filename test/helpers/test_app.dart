@@ -33,8 +33,7 @@ class FakeCityRepository extends CityRepository {
   final Map<String, List<CountryZone>> countryZones;
 
   @override
-  Future<List<City>> loadAllCities() async =>
-      [...cities, ...await loadCustomCities()];
+  Future<List<City>> loadBundledCities() async => cities;
 
   @override
   Future<Map<String, List<CountryZone>>> loadCountryZones() async =>

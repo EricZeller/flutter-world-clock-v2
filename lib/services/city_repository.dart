@@ -20,13 +20,47 @@ class CityRepository {
 
   final AssetBundle _bundle;
 
-  Future<List<City>> loadAllCities() async {
-    final response = await _bundle.loadString('assets/data/cities.json');
-    final data = json.decode(response) as List;
-    return [
-      ...data.map((city) => City.fromJson(city as Map<String, dynamic>)),
-      ...await loadCustomCities(),
-    ];
+  Future<List<City>> loadAllCities() async =>
+      [...await loadBundledCities(), ...await loadCustomCities()];
+
+  /// The cities shipped with the app. Loaded once.
+  Future<List<City>> loadBundledCities() =>
+      _bundledCities ??= _loadBundledCities();
+
+  Future<List<City>> _loadBundledCities() async {
+    try {
+      // Cached here rather than in the bundle, which would keep the string.
+      final response = await _bundle.loadString(citiesAsset, cache: false);
+      return [
+        for (final city in json.decode(response) as List)
+          City.fromJson(city as Map<String, dynamic>),
+      ];
+    } catch (_) {
+      // Try again next time.
+      _bundledCities = null;
+      rethrow;
+    }
+  }
+
+  static const citiesAsset = 'assets/data/cities.json';
+  Future<List<City>>? _bundledCities;
+  Future<Map<City, City>>? _bundledByIdentity;
+
+  /// Replaces stored copies of bundled cities by their current bundled
+  /// version, so fixes to the city list (e.g. a corrected UTC offset) reach
+  /// favorites and widget cities saved by older versions. Custom cities and
+  /// cities that are no longer bundled stay as stored.
+  Future<City Function(City)> _resolver() async {
+    final Map<City, City> bundled;
+    try {
+      bundled = await (_bundledByIdentity ??= loadBundledCities()
+          .then((cities) => {for (final city in cities) city: city}));
+    } catch (error) {
+      _bundledByIdentity = null;
+      debugPrint('Could not load $citiesAsset: $error');
+      return (City city) => city;
+    }
+    return (City city) => city.isCustom ? city : bundled[city] ?? city;
   }
 
   /// The time zones of each country by ISO code, from the tz database.
@@ -72,9 +106,10 @@ class CityRepository {
     final stored = prefs.getString(favoritesKey);
     if (stored != null) {
       try {
+        final resolve = await _resolver();
         final favorites = <City>[];
         for (final json in jsonDecode(stored) as List) {
-          final city = City.fromJson(json as Map<String, dynamic>);
+          final city = resolve(City.fromJson(json as Map<String, dynamic>));
           if (!favorites.contains(city)) favorites.add(city);
         }
         if (favorites.isNotEmpty) return favorites;
@@ -116,10 +151,11 @@ class CityRepository {
     final stored = prefs.getString(widgetCitiesKey);
     if (stored == null) return {};
     try {
+      final resolve = await _resolver();
       return {
         for (final MapEntry(:key, :value)
             in (jsonDecode(stored) as Map<String, dynamic>).entries)
-          int.parse(key): City.fromJson(value as Map<String, dynamic>),
+          int.parse(key): resolve(City.fromJson(value as Map<String, dynamic>)),
       };
     } catch (_) {
       return {};
@@ -169,7 +205,8 @@ class CityRepository {
     final stored = prefs.getString(selectedCityKey);
     if (stored == null) return null;
     try {
-      return City.fromJson(jsonDecode(stored) as Map<String, dynamic>);
+      final city = City.fromJson(jsonDecode(stored) as Map<String, dynamic>);
+      return (await _resolver())(city);
     } catch (_) {
       return null;
     }
