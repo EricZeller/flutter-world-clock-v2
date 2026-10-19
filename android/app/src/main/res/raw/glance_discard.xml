@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- home_widget 0.10 keeps the Glance code that lays out Glance widgets, and
+     with it about 900 layouts. The app's widget uses RemoteViews, so these
+     layouts are never inflated. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:discard="@layout/glance_*,@layout/box_*,@layout/row_*,@layout/column_*,@layout/radio_*,@layout/complex_*,@layout/size_*,@layout/root_*" />
