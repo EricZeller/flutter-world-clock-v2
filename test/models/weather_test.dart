@@ -109,9 +109,9 @@ void main() {
           [53, 42, 32]);
     });
 
-    test('accept numbers and padded strings', () {
+    test('accept numbers, padded strings and any case', () {
       final report =
-          parseWith(uvIndex: 7, phase: ' Full Moon ', lit: ' 100 ');
+          parseWith(uvIndex: 7, phase: ' full MOON ', lit: ' 100 ');
 
       expect(report.current.uvIndex, 7);
       expect(report.today!.uvIndex, 7);
@@ -120,7 +120,7 @@ void main() {
     });
 
     test('stay unknown for garbage', () {
-      for (final garbage in ['', 'n/a', '4.5', 'Blue Moon', 'full moon']) {
+      for (final garbage in ['', 'n/a', '4.5', '-1', 'Blue Moon', 'Fullmoon']) {
         final report =
             parseWith(uvIndex: garbage, phase: garbage, lit: garbage);
 

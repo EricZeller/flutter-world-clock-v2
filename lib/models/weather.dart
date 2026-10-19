@@ -140,7 +140,7 @@ class CurrentWeather {
         humidity: _int(json['humidity']),
         windKmph: _int(json['windspeedKmph']),
         windMph: _int(json['windspeedMiles']),
-        uvIndex: _intOrNull(json['uvIndex']),
+        uvIndex: _nonNegative(json['uvIndex']),
       );
 
   factory CurrentWeather.fromJson(Map<String, dynamic> json) => CurrentWeather(
@@ -241,9 +241,9 @@ class DailyForecast {
         for (final hour in json['hourly'] as List? ?? const [])
           HourlyForecast.fromWttr(hour, lang),
       ],
-      uvIndex: _intOrNull(json['uvIndex']),
+      uvIndex: _nonNegative(json['uvIndex']),
       moonPhase: MoonPhase.fromWttr(astronomy['moon_phase']),
-      moonIllumination: _intOrNull(astronomy['moon_illumination']),
+      moonIllumination: _nonNegative(astronomy['moon_illumination']),
     ).._markNight(location);
   }
 
@@ -331,11 +331,11 @@ enum MoonPhase {
   final String wttrName;
   final String symbol;
 
-  /// `null` for a missing or unknown name.
+  /// Ignores the case; `null` for a missing or unknown name.
   static MoonPhase? fromWttr(Object? name) {
-    final trimmed = '${name ?? ''}'.trim();
+    final normalized = '${name ?? ''}'.trim().toLowerCase();
     for (final phase in values) {
-      if (phase.wttrName == trimmed) return phase;
+      if (phase.wttrName.toLowerCase() == normalized) return phase;
     }
     return null;
   }
@@ -415,6 +415,12 @@ class HourlyForecast {
 int _int(Object? value) => _intOrNull(value) ?? 0;
 
 int? _intOrNull(Object? value) => int.tryParse('${value ?? ''}'.trim());
+
+/// `null` for a missing or negative value, e.g. a broken UV index.
+int? _nonNegative(Object? value) {
+  final number = _intOrNull(value);
+  return number == null || number < 0 ? null : number;
+}
 
 /// Prefers the translation (`lang_de`, ...) and falls back to English.
 String _description(Map<String, dynamic> json, String? lang) {
