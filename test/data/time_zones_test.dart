@@ -139,13 +139,14 @@ void main() {
 
     test('keep the folded zones in the shipped database', () {
       // Custom cities may have been saved with them.
-      Duration offset(String zone, DateTime utc) =>
-          tz.TZDateTime.from(utc, tz.getLocation(zone)).timeZoneOffset;
-      final instants = [
-        DateTime.utc(2000, 1, 1),
-        DateTime.utc(2026, 1, 15),
-        DateTime.utc(2026, 7, 1),
-        DateTime.utc(2037, 7, 1),
+      Duration offset(String zone, int at) =>
+          tz.getLocation(zone).timeZone(at).offset;
+      // The offsets only change at transitions, so comparing them at every
+      // transition of both zones in the shipped data covers all instants.
+      List<int> instants(String a, String b) => [
+        DateTime.utc(2000).millisecondsSinceEpoch,
+        ...tz.getLocation(a).transitionAt,
+        ...tz.getLocation(b).transitionAt,
       ];
       final offered = {
         for (final zones in countryZones.values)
@@ -159,7 +160,7 @@ void main() {
               wrong.add('$folded is not shipped');
             } else if (offered.contains(folded)) {
               wrong.add('$folded is offered as well');
-            } else if (instants.any((at) =>
+            } else if (instants(folded, zone.timeZone).any((at) =>
                 offset(folded, at) != offset(zone.timeZone, at))) {
               wrong.add('$folded differs from ${zone.timeZone}');
             }

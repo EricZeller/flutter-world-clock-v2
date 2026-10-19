@@ -312,9 +312,10 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   }
 
   /// Picks the country of [flag] and keeps the time zone only if it is one
-  /// of the country's, or offered as one of them. Otherwise the zone of the country's bundled cities is
-  /// preselected if they all have the same one, such as Europe/Berlin for
-  /// Germany. That also picks the only zone of a country.
+  /// of the country's, or offered as one of them. Otherwise the zone of the
+  /// country's bundled cities is preselected if they all have the same one,
+  /// such as Europe/Berlin for Germany. That also picks the only zone of a
+  /// country.
   void _selectCountry(String? flag) {
     final country = _countriesByFlag[flag];
     if (country == null) return;
