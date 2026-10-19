@@ -7,6 +7,11 @@
 //   zone.tab comment appended if there is one. The coordinates are those of
 //   the zone's principal location. A zone.tab zone that is an alias of a
 //   zone used by the country's cities is listed under the cities' name.
+//   A zone that has shown the same time as another zone of the country
+//   since [sameTimeSince] is folded into that one, see [foldSameTime]: it
+//   is appended as a map of its id to its comment, so it can still be found
+//   by its name and a custom city saved with it can be moved to the zone it
+//   was folded into. The only zone left of a country has no comment.
 //   Countries without a zone.tab entry (Kosovo) are left out; the app falls
 //   back to the zones of their cities.
 // - assets/data/timezones.tzf: the time zone rules of all zones of
@@ -84,7 +89,7 @@ Future<void> main() async {
       );
       continue;
     }
-    countryZones[code] = [
+    countryZones[code] = foldSameTime(database, [
       for (final zone in zones)
         zone.renamed(
           ownZones.firstWhere(
@@ -92,13 +97,24 @@ Future<void> main() async {
             orElse: () => zone.name,
           ),
         ),
+    ], ownZones);
+    final folded = [
+      for (final entry in countryZones[code]!)
+        for (final zone in entry.sameTime.keys) '$zone (${entry.name})',
     ];
+    if (folded.isNotEmpty) {
+      print(
+        '"$code": ${zones.length} -> ${countryZones[code]!.length} zones, '
+        'folded ${folded.join(', ')}',
+      );
+    }
   }
 
+  // The folded zones stay, for the custom cities that were saved with them.
   final zones = {
     ...cityZones,
     for (final entries in countryZones.values)
-      for (final entry in entries) entry.name,
+      for (final entry in entries) ...[entry.name, ...entry.sameTime.keys],
   };
   final filtered = filterTimeZoneData(
     database,
@@ -161,22 +177,86 @@ bool sameRules(tz.LocationDatabase database, String a, String b) {
       sameList(first.zones, second.zones);
 }
 
+/// Zones of a country that have had the same UTC offset as another of its
+/// zones at every instant since then are folded into that one. Their
+/// differences before are history that the app does not show: it only
+/// ships the transitions from 2000 on and shows the current time. 1981 is
+/// the first year in which the EC countries and Switzerland began summer
+/// time on the same day. Since then Europe/Busingen, which follows Swiss
+/// time, has been Europe/Berlin; in 1980 Germany had summer time but
+/// Switzerland did not.
+final sameTimeSince = DateTime.utc(1981);
+
+/// Folds each zone of a country's [entries] into the first zone kept before
+/// it that has shown the same time since [sameTimeSince]. The zones of the
+/// country's bundled cities, [ownZones], are kept first and always, as the
+/// app offers them anyway; then the others in the order of zone.tab. The
+/// kept zones are returned in that order, a single one without comment.
+List<ZoneTabEntry> foldSameTime(
+  tz.LocationDatabase database,
+  List<ZoneTabEntry> entries,
+  Set<String> ownZones,
+) {
+  final kept = <ZoneTabEntry>[];
+  for (final entry in [
+    ...entries.where((entry) => ownZones.contains(entry.name)),
+    ...entries.where((entry) => !ownZones.contains(entry.name)),
+  ]) {
+    final same = ownZones.contains(entry.name)
+        ? null
+        : kept
+              .where((zone) => showSameTime(database, zone.name, entry.name))
+              .firstOrNull;
+    if (same == null) {
+      kept.add(entry);
+    } else {
+      same.sameTime[entry.name] = entry.comment;
+    }
+  }
+  kept.sort((a, b) => entries.indexOf(a).compareTo(entries.indexOf(b)));
+  return kept.length == 1 ? [kept.single.withComment('')] : kept;
+}
+
+/// Whether the zones [a] and [b] have had the same UTC offset at every
+/// instant since [sameTimeSince]. The offsets only change at transitions, so
+/// comparing them there is enough.
+bool showSameTime(tz.LocationDatabase database, String a, String b) {
+  final first = database.locations[a]!;
+  final second = database.locations[b]!;
+  final since = sameTimeSince.millisecondsSinceEpoch;
+  return {
+    since,
+    ...first.transitionAt.where((at) => at > since),
+    ...second.transitionAt.where((at) => at > since),
+  }.every((at) => first.timeZone(at).offset == second.timeZone(at).offset);
+}
+
 class ZoneTabEntry {
-  const ZoneTabEntry(this.name, this.latitude, this.longitude, this.comment);
+  ZoneTabEntry(this.name, this.latitude, this.longitude, this.comment);
 
   final String name;
   final double latitude;
   final double longitude;
   final String comment;
 
+  /// The zones folded into this one, by id, with their comments, see
+  /// [foldSameTime].
+  final sameTime = <String, String>{};
+
   ZoneTabEntry renamed(String name) =>
-      ZoneTabEntry(name, latitude, longitude, comment);
+      ZoneTabEntry(name, latitude, longitude, comment)
+        ..sameTime.addAll(sameTime);
+
+  ZoneTabEntry withComment(String comment) =>
+      ZoneTabEntry(name, latitude, longitude, comment)
+        ..sameTime.addAll(sameTime);
 
   List<Object> toJson() => [
     name,
     latitude,
     longitude,
-    if (comment.isNotEmpty) comment,
+    if (comment.isNotEmpty || sameTime.isNotEmpty) comment,
+    if (sameTime.isNotEmpty) sameTime,
   ];
 }
 

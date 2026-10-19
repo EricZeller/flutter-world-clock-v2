@@ -674,7 +674,6 @@ void main() {
 
       expect(await searchTimeZones(tester, 'bc'), [
         'America/Creston',
-        'America/Dawson Creek',
         'America/Edmonton',
         'America/Fort Nelson',
         'America/Vancouver',
@@ -713,26 +712,100 @@ void main() {
       await pickCountry(tester, 'germany', 'Germany');
 
       expect(fieldText(tester, timeZoneField), 'Europe/Berlin');
-      expect(find.text('most of Germany'), findsOneWidget,
-          reason: 'the picked zone tells where it applies');
       expect(canSave(tester), isTrue);
-      await tester.tap(timeZoneField);
-      await tester.pumpAndSettle();
-      expect(menuEntries(), ['Europe/Berlin', 'Europe/Busingen'],
-          reason: 'the other zones are still offered');
-      await tester.tap(find.text('Europe/Busingen').last);
-      await tester.pumpAndSettle();
-      expect(fieldText(tester, timeZoneField), 'Europe/Busingen');
-      expect(find.text('most of Germany'), findsNothing);
 
       await pickCountry(tester, 'spain', 'Spain');
       expect(fieldText(tester, timeZoneField), 'Europe/Madrid');
-      expect(find.text('Spain (mainland)'), findsOneWidget);
+      expect(find.text('Spain (mainland)'), findsOneWidget,
+          reason: 'the picked zone tells where it applies');
+      await tester.tap(timeZoneField);
+      await tester.pumpAndSettle();
+      expect(
+          menuEntries(), ['Africa/Ceuta', 'Atlantic/Canary', 'Europe/Madrid'],
+          reason: 'the other zones are still offered');
+      await tester.tap(find.text('Africa/Ceuta').last);
+      await tester.pumpAndSettle();
+      expect(fieldText(tester, timeZoneField), 'Africa/Ceuta');
+      expect(find.text('Spain (mainland)'), findsNothing);
 
       await pickCountry(tester, 'united states', 'United States');
       expect(fieldText(tester, timeZoneField), isEmpty,
           reason: 'its bundled cities have several zones');
       expect(canSave(tester), isFalse);
+    });
+
+    testWidgets('Germany offers only Europe/Berlin', (tester) async {
+      await openBundled(tester);
+      await pickCountry(tester, 'germany', 'Germany');
+
+      await tester.tap(timeZoneField);
+      await tester.pumpAndSettle();
+      expect(menuEntries(), ['Europe/Berlin'],
+          reason: 'Busingen has had the time of Berlin since 1981');
+      expect(find.text('most of Germany'), findsNothing,
+          reason: 'the only zone of a country needs no comment');
+      expect(find.text('Busingen'), findsNothing);
+    });
+
+    testWidgets('a zone with the time of another is found as that one', (
+      tester,
+    ) async {
+      await openBundled(tester);
+      await pickCountry(tester, 'germany', 'Germany');
+      expect(await searchTimeZones(tester, 'busingen'), ['Europe/Berlin']);
+
+      await pickCountry(tester, 'united states', 'United States');
+      expect(await searchTimeZones(tester, 'detroit'), ['America/New York']);
+      expect(await searchTimeZones(tester, 'boise'), ['America/Denver']);
+
+      await pickCountry(tester, 'canada', 'Canada');
+      expect(await searchTimeZones(tester, 'dawson cr'), ['America/Creston']);
+    });
+
+    testWidgets('a city saved with Europe/Busingen gets Europe/Berlin', (
+      tester,
+    ) async {
+      final result = await openBundled(
+        tester,
+        editing: const City(
+          name: 'Büsingen',
+          country: 'Germany',
+          timeZone: 'Europe/Busingen',
+          flag: 'de.webp',
+          utc: '+02:00',
+          weatherZone: 'Büsingen',
+          latitude: 47.7,
+          longitude: 8.6833,
+          isCustom: true,
+        ),
+      );
+
+      expect(fieldText(tester, countryField), 'Germany');
+      expect(fieldText(tester, timeZoneField), 'Europe/Berlin');
+      expect(find.text('Not a time zone of this country'), findsNothing);
+      expect(canSave(tester), isTrue);
+      await tester.tap(find.text('Add'));
+      await tester.pumpAndSettle();
+
+      expect(result.city!.name, 'Büsingen');
+      expect(result.city!.country, 'Germany');
+      expect(result.city!.timeZone, 'Europe/Berlin');
+    });
+
+    testWidgets('a zone with the time of another finds its country', (
+      tester,
+    ) async {
+      await openBundled(
+        tester,
+        editing: custom(timeZone: 'America/Detroit'),
+      );
+
+      expect(fieldText(tester, countryField), 'United States');
+      expect(fieldText(tester, timeZoneField), 'America/New York');
+
+      await pickCountry(tester, 'canada', 'Canada');
+      expect(fieldText(tester, timeZoneField), 'America/Toronto',
+          reason: 'Detroit is no zone of Canada');
     });
 
     testWidgets('long lists of zones fit on a small phone', (tester) async {

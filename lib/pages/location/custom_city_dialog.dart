@@ -52,6 +52,16 @@ class _Country {
   /// Everything the country can be found by: its label, its English name
   /// and its cities, see [PlaceNames.searchText].
   late final String searchText;
+
+  /// The zone of [zones] that [timeZone] is or is offered as, such as
+  /// `Europe/Berlin` for `Europe/Busingen`, see [CountryZone.sameTime].
+  String? zoneFor(String? timeZone) => zones.containsKey(timeZone)
+      ? timeZone
+      : zones.values
+          .where((zone) =>
+              zone.countryZone?.sameTime.containsKey(timeZone) ?? false)
+          .firstOrNull
+          ?.timeZone;
 }
 
 /// A time zone of a country: one of the tz database's zones of the country,
@@ -71,8 +81,8 @@ class _Zone {
   /// `MST - BC (most areas)`.
   String get comment => countryZone?.comment ?? '';
 
-  /// Everything the zone can be found by: its label, its cities and where
-  /// it applies.
+  /// Everything the zone can be found by: its label, its cities, where it
+  /// applies and the zones it is offered for.
   late final String searchText;
 }
 
@@ -149,9 +159,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
       } else if (country.isNotEmpty) {
         _countryController.text = _unknownCountry = country;
       }
-      // Shown even if it is no zone of the country, so it can be fixed.
-      _timeZone = editing.timeZone;
-      _timeZoneController.text = timeZoneLabel(editing.timeZone);
+      // Shown even if it is no zone of the country, so it can be fixed. A
+      // zone that is offered as another one, such as Europe/Busingen as
+      // Europe/Berlin, is shown as that one.
+      final zone = _country?.zoneFor(editing.timeZone) ?? editing.timeZone;
+      _timeZone = zone;
+      _timeZoneController.text = timeZoneLabel(zone);
     }
 
     // A typed search that was not confirmed by picking an entry must not
@@ -221,6 +234,9 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
           timeZoneLabel(zone.timeZone),
           for (final city in zone.cities) ...namesOf(city),
           zone.comment,
+          for (final MapEntry(:key, :value)
+              in zone.countryZone?.sameTime.entries ?? const [])
+            ...[timeZoneLabel(key), value],
         ]);
       }
       country
@@ -250,7 +266,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   /// city without country and without a known flag gets the only country of
   /// its zone.
   _Country? _matchCountry(City city) {
-    bool hasZone(_Country country) => country.zones.containsKey(city.timeZone);
+    bool hasZone(_Country country) => country.zoneFor(city.timeZone) != null;
     final name = foldForSearch(city.country.trim());
     if (name.isEmpty && !_countriesByFlag.containsKey(city.flag)) {
       final withZone = _countries.where(hasZone);
@@ -296,7 +312,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   }
 
   /// Picks the country of [flag] and keeps the time zone only if it is one
-  /// of the country's. Otherwise the zone of the country's bundled cities is
+  /// of the country's, or offered as one of them. Otherwise the zone of the country's bundled cities is
   /// preselected if they all have the same one, such as Europe/Berlin for
   /// Germany. That also picks the only zone of a country.
   void _selectCountry(String? flag) {
@@ -306,11 +322,8 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
       for (final zone in country.zones.values)
         if (zone.cities.isNotEmpty) zone.timeZone,
     ];
-    final zone = country.zones.containsKey(_timeZone)
-        ? _timeZone
-        : cityZones.length == 1
-            ? cityZones.single
-            : null;
+    final zone = country.zoneFor(_timeZone) ??
+        (cityZones.length == 1 ? cityZones.single : null);
     setState(() {
       _country = country;
       _timeZone = zone;
