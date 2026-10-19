@@ -1,0 +1,7 @@
+• Ländernamen übersetzt, Suche auch auf Deutsch und ohne Akzente
+• Eigene Städte: Die Zeitzone passt jetzt zum Land, mit allen Zeitzonen des Landes
+• Aktuelle Zeitzonendaten
+• Zuverlässigere Widgets, Wetter und Städteliste
+• Übersichtlichere Zeitzonenauswahl ohne doppelte Zonen
+• Neu: UV-Index und Mondphase im Wetter
+• Fehlerbehebungen

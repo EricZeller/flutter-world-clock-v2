@@ -1,0 +1,7 @@
+• Noms de pays traduits, recherche aussi en français et sans accents
+• Villes personnalisées : le fuseau horaire correspond au pays, avec tous ses fuseaux
+• Données de fuseaux horaires à jour
+• Widgets, météo et liste des villes plus fiables
+• Choix du fuseau horaire plus clair, sans fuseaux en double
+• Nouveau : indice UV et phase de la lune dans la météo
+• Corrections
