@@ -578,6 +578,102 @@ abstract class AppLocalizations {
   /// **'Chance of rain'**
   String get chanceOfRain;
 
+  /// No description provided for @uvIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'UV index'**
+  String get uvIndex;
+
+  /// No description provided for @uvIndexValue.
+  ///
+  /// In en, this message translates to:
+  /// **'UV {index} · {risk}'**
+  String uvIndexValue(String index, String risk);
+
+  /// No description provided for @uvRiskLow.
+  ///
+  /// In en, this message translates to:
+  /// **'low'**
+  String get uvRiskLow;
+
+  /// No description provided for @uvRiskModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'moderate'**
+  String get uvRiskModerate;
+
+  /// No description provided for @uvRiskHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'high'**
+  String get uvRiskHigh;
+
+  /// No description provided for @uvRiskVeryHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'very high'**
+  String get uvRiskVeryHigh;
+
+  /// No description provided for @uvRiskExtreme.
+  ///
+  /// In en, this message translates to:
+  /// **'extreme'**
+  String get uvRiskExtreme;
+
+  /// No description provided for @moonPhase.
+  ///
+  /// In en, this message translates to:
+  /// **'Moon phase'**
+  String get moonPhase;
+
+  /// No description provided for @moonNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New moon'**
+  String get moonNew;
+
+  /// No description provided for @moonWaxingCrescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing crescent'**
+  String get moonWaxingCrescent;
+
+  /// No description provided for @moonFirstQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'First quarter'**
+  String get moonFirstQuarter;
+
+  /// No description provided for @moonWaxingGibbous.
+  ///
+  /// In en, this message translates to:
+  /// **'Waxing gibbous'**
+  String get moonWaxingGibbous;
+
+  /// No description provided for @moonFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Full moon'**
+  String get moonFull;
+
+  /// No description provided for @moonWaningGibbous.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning gibbous'**
+  String get moonWaningGibbous;
+
+  /// No description provided for @moonLastQuarter.
+  ///
+  /// In en, this message translates to:
+  /// **'Last quarter'**
+  String get moonLastQuarter;
+
+  /// No description provided for @moonWaningCrescent.
+  ///
+  /// In en, this message translates to:
+  /// **'Waning crescent'**
+  String get moonWaningCrescent;
+
   /// No description provided for @showForecast.
   ///
   /// In en, this message translates to:

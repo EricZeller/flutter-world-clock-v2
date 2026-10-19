@@ -6,6 +6,7 @@ import 'package:world_clock_v2/models/weather.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
+import 'package:world_clock_v2/utils/weather_labels.dart';
 import 'package:world_clock_v2/utils/weather_status.dart';
 import 'package:world_clock_v2/widgets/info_chip.dart';
 
@@ -41,6 +42,7 @@ class WeatherSection extends StatelessWidget {
     final sunset = report?.today == null
         ? null
         : formatWttrTime(report!.today!.sunset, use24hr: settings.use24hr);
+    final moonPhase = report?.today?.moonPhase;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -100,11 +102,14 @@ class WeatherSection extends StatelessWidget {
               ),
             ],
           ),
-        if (settings.showMoreInfo && (sunrise != null || sunset != null))
+        if (settings.showMoreInfo &&
+            (sunrise != null || sunset != null || moonPhase != null))
           Padding(
-            padding: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
             child: Wrap(
+              alignment: WrapAlignment.center,
               spacing: 8,
+              runSpacing: 8,
               children: [
                 if (sunrise != null)
                   Tooltip(
@@ -119,6 +124,16 @@ class WeatherSection extends StatelessWidget {
                     message: l10n.sunset,
                     child: InfoChip(
                         icon: Icons.nights_stay_rounded, label: sunset),
+                  ),
+                if (moonPhase != null)
+                  Tooltip(
+                    triggerMode: TooltipTriggerMode.tap,
+                    message: l10n.moonPhase,
+                    child: InfoChip(
+                      symbol: moonPhase.symbol,
+                      label: moonPhaseText(l10n, moonPhase,
+                          illumination: report?.today?.moonIllumination),
+                    ),
                   ),
               ],
             ),

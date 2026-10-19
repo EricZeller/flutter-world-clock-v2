@@ -96,6 +96,7 @@ class CurrentWeather {
     required this.humidity,
     required this.windKmph,
     required this.windMph,
+    this.uvIndex,
     this.location,
   });
 
@@ -108,6 +109,9 @@ class CurrentWeather {
   final int humidity;
   final int windKmph;
   final int windMph;
+
+  /// `null` when wttr.in or an older cache did not send it.
+  final int? uvIndex;
 
   /// Where wttr.in found the weather; tells whether it is night there.
   final LatLng? location;
@@ -136,6 +140,7 @@ class CurrentWeather {
         humidity: _int(json['humidity']),
         windKmph: _int(json['windspeedKmph']),
         windMph: _int(json['windspeedMiles']),
+        uvIndex: _intOrNull(json['uvIndex']),
       );
 
   factory CurrentWeather.fromJson(Map<String, dynamic> json) => CurrentWeather(
@@ -148,6 +153,7 @@ class CurrentWeather {
         humidity: json['humidity'],
         windKmph: json['windKmph'],
         windMph: json['windMph'],
+        uvIndex: json['uvIndex'],
         location: json['latitude'] == null || json['longitude'] == null
             ? null
             : (
@@ -166,6 +172,7 @@ class CurrentWeather {
         'humidity': humidity,
         'windKmph': windKmph,
         'windMph': windMph,
+        'uvIndex': uvIndex,
         'latitude': location?.latitude,
         'longitude': location?.longitude,
       };
@@ -181,6 +188,9 @@ class DailyForecast {
     required this.sunrise,
     required this.sunset,
     required this.hours,
+    this.uvIndex,
+    this.moonPhase,
+    this.moonIllumination,
   });
 
   /// Local date of the city.
@@ -194,6 +204,14 @@ class DailyForecast {
   final String sunrise;
   final String sunset;
   final List<HourlyForecast> hours;
+
+  /// The day's highest UV index. Like the moon, `null` when wttr.in or an
+  /// older cache did not send it.
+  final int? uvIndex;
+  final MoonPhase? moonPhase;
+
+  /// Lit part of the moon in percent.
+  final int? moonIllumination;
 
   int min(bool fahrenheit) => fahrenheit ? minF : minC;
   int max(bool fahrenheit) => fahrenheit ? maxF : maxC;
@@ -223,6 +241,9 @@ class DailyForecast {
         for (final hour in json['hourly'] as List? ?? const [])
           HourlyForecast.fromWttr(hour, lang),
       ],
+      uvIndex: _intOrNull(json['uvIndex']),
+      moonPhase: MoonPhase.fromWttr(astronomy['moon_phase']),
+      moonIllumination: _intOrNull(astronomy['moon_illumination']),
     ).._markNight(location);
   }
 
@@ -239,6 +260,9 @@ class DailyForecast {
         hours: [
           for (final hour in json['hours'] as List) HourlyForecast.fromJson(hour),
         ],
+        uvIndex: json['uvIndex'],
+        moonPhase: MoonPhase.values.asNameMap()[json['moonPhase']],
+        moonIllumination: json['moonIllumination'],
       ).._markNight(location);
 
   /// Marks the hours before sunrise and after sunset of this day.
@@ -285,6 +309,52 @@ class DailyForecast {
         'sunrise': sunrise,
         'sunset': sunset,
         'hours': hours.map((hour) => hour.toJson()).toList(),
+        'uvIndex': uvIndex,
+        'moonPhase': moonPhase?.name,
+        'moonIllumination': moonIllumination,
+      };
+}
+
+enum MoonPhase {
+  newMoon('New Moon', '🌑'),
+  waxingCrescent('Waxing Crescent', '🌒'),
+  firstQuarter('First Quarter', '🌓'),
+  waxingGibbous('Waxing Gibbous', '🌔'),
+  fullMoon('Full Moon', '🌕'),
+  waningGibbous('Waning Gibbous', '🌖'),
+  lastQuarter('Last Quarter', '🌗'),
+  waningCrescent('Waning Crescent', '🌘');
+
+  const MoonPhase(this.wttrName, this.symbol);
+
+  /// The English name wttr.in sends as `moon_phase`.
+  final String wttrName;
+  final String symbol;
+
+  /// `null` for a missing or unknown name.
+  static MoonPhase? fromWttr(Object? name) {
+    final trimmed = '${name ?? ''}'.trim();
+    for (final phase in values) {
+      if (phase.wttrName == trimmed) return phase;
+    }
+    return null;
+  }
+}
+
+/// Risk levels of the WHO UV index scale.
+enum UvRisk {
+  low,
+  moderate,
+  high,
+  veryHigh,
+  extreme;
+
+  factory UvRisk.of(int uvIndex) => switch (uvIndex) {
+        <= 2 => low,
+        <= 5 => moderate,
+        <= 7 => high,
+        <= 10 => veryHigh,
+        _ => extreme,
       };
 }
 
@@ -342,7 +412,9 @@ class HourlyForecast {
       };
 }
 
-int _int(Object? value) => int.tryParse('${value ?? ''}'.trim()) ?? 0;
+int _int(Object? value) => _intOrNull(value) ?? 0;
+
+int? _intOrNull(Object? value) => int.tryParse('${value ?? ''}'.trim());
 
 /// Prefers the translation (`lang_de`, ...) and falls back to English.
 String _description(Map<String, dynamic> json, String? lang) {

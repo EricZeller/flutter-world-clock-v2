@@ -114,6 +114,32 @@
   "humidity": "Humidity",
   "wind": "Wind",
   "chanceOfRain": "Chance of rain",
+  "uvIndex": "UV index",
+  "uvIndexValue": "UV {index} · {risk}",
+  "@uvIndexValue": {
+    "placeholders": {
+      "index": {
+        "type": "String"
+      },
+      "risk": {
+        "type": "String"
+      }
+    }
+  },
+  "uvRiskLow": "low",
+  "uvRiskModerate": "moderate",
+  "uvRiskHigh": "high",
+  "uvRiskVeryHigh": "very high",
+  "uvRiskExtreme": "extreme",
+  "moonPhase": "Moon phase",
+  "moonNew": "New moon",
+  "moonWaxingCrescent": "Waxing crescent",
+  "moonFirstQuarter": "First quarter",
+  "moonWaxingGibbous": "Waxing gibbous",
+  "moonFull": "Full moon",
+  "moonWaningGibbous": "Waning gibbous",
+  "moonLastQuarter": "Last quarter",
+  "moonWaningCrescent": "Waning crescent",
   "showForecast": "Show forecast",
   "manageCities": "Manage cities",
   "favorites": "Your cities",

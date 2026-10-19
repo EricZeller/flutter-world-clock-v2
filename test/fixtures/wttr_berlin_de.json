@@ -11,6 +11,7 @@
    ],
    "temp_C": "20",
    "temp_F": "68",
+   "uvIndex": "0",
    "weatherCode": "119",
    "weatherDesc": [
     {
@@ -25,6 +26,8 @@
   {
    "astronomy": [
     {
+     "moon_illumination": "53",
+     "moon_phase": "Last Quarter",
      "sunrise": "07:11 AM",
      "sunset": "06:39 PM"
     }
@@ -34,6 +37,7 @@
    "maxtempF": "69",
    "mintempC": "15",
    "mintempF": "59",
+   "uvIndex": "2",
    "hourly": [
     {
      "chanceofrain": "25",
@@ -176,6 +180,8 @@
   {
    "astronomy": [
     {
+     "moon_illumination": "42",
+     "moon_phase": "Waning Crescent",
      "sunrise": "07:13 AM",
      "sunset": "06:37 PM"
     }
@@ -185,6 +191,7 @@
    "maxtempF": "70",
    "mintempC": "15",
    "mintempF": "59",
+   "uvIndex": "2",
    "hourly": [
     {
      "chanceofrain": "19",
@@ -327,6 +334,8 @@
   {
    "astronomy": [
     {
+     "moon_illumination": "32",
+     "moon_phase": "Waning Crescent",
      "sunrise": "07:14 AM",
      "sunset": "06:34 PM"
     }
@@ -336,6 +345,7 @@
    "maxtempF": "71",
    "mintempC": "13",
    "mintempF": "55",
+   "uvIndex": "1",
    "hourly": [
     {
      "chanceofrain": "5",
