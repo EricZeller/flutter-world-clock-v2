@@ -7,6 +7,7 @@ import 'package:http/testing.dart';
 import 'package:world_clock_v2/services/weather_service.dart';
 
 /// Trimmed real response of `wttr.in/Berlin?format=j1&lang=de` for 2026-10-03.
+/// The UV indexes and moon phases were added later by hand and are made up.
 final wttrBerlinFixture =
     File('test/fixtures/wttr_berlin_de.json').readAsStringSync();
 
