@@ -1,0 +1,6 @@
+• Translated country names, search also works in other languages and without accents
+• Custom cities: the time zone now matches the country, with all its time zones
+• Up-to-date time zone data
+• More reliable widgets, weather and city list
+• New: clearer time zone choice without duplicate zones
+• Bug fixes

@@ -1,0 +1,6 @@
+• Nomes de países traduzidos, busca também em português e sem acentos
+• Cidades próprias: o fuso horário agora corresponde ao país, com todos os seus fusos
+• Dados de fusos horários atualizados
+• Widgets, clima e lista de cidades mais confiáveis
+• Novo: escolha de fuso horário mais clara, sem fusos duplicados
+• Correções
