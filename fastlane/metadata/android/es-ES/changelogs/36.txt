@@ -1,7 +1,7 @@
+• Nuevo: índice UV y fase lunar en el tiempo
 • Nombres de países traducidos, búsqueda también en español y sin acentos
 • Ciudades propias: la zona horaria ahora coincide con el país, con todas sus zonas
 • Datos de zonas horarias actualizados
 • Widgets, tiempo y lista de ciudades más fiables
 • Selección de zona horaria más clara, sin zonas duplicadas
-• Nuevo: índice UV y fase lunar en el tiempo
 • Correcciones
