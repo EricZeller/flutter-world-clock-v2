@@ -32,13 +32,16 @@ class InfoChip extends StatelessWidget {
           else
             Icon(icon, size: 15, color: colorScheme.primary),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-              color: colorScheme.onPrimaryContainer,
+          // Wraps long labels, e.g. moon phases with large fonts.
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                color: colorScheme.onPrimaryContainer,
+              ),
             ),
           ),
         ],
