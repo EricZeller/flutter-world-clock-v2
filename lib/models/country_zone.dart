@@ -8,6 +8,7 @@ class CountryZone {
     required this.latitude,
     required this.longitude,
     this.comment = '',
+    this.sameTime = const {},
   });
 
   /// The IANA id, such as `America/Vancouver`.
@@ -21,11 +22,18 @@ class CountryZone {
   /// `MST - BC (most areas)`; empty for a country with a single zone.
   final String comment;
 
+  /// The zones of the country that have shown the same time as this one for
+  /// decades and are offered as this one, by IANA id with their comment,
+  /// such as `Europe/Busingen` for `Europe/Berlin`. A custom city saved with
+  /// one of them still shows the right time.
+  final Map<String, String> sameTime;
+
   /// The ISO code that keys a country's zones: `de` for the flag `de.webp`.
   static String countryCode(String flag) => flag.split('.').first.toLowerCase();
 
   /// Parses the generated asset: ISO code to `[zone, latitude, longitude]`
-  /// lists, with the comment appended if there is one.
+  /// lists, with the comment appended if there is one, followed by the
+  /// [sameTime] zones if there are any.
   static Map<String, List<CountryZone>> parseAll(String source) {
     final data = jsonDecode(source) as Map<String, dynamic>;
     return {
@@ -37,6 +45,9 @@ class CountryZone {
               latitude: (zone[1] as num).toDouble(),
               longitude: (zone[2] as num).toDouble(),
               comment: (zone as List).length > 3 ? zone[3] as String : '',
+              sameTime: zone.length > 4
+                  ? (zone[4] as Map).cast<String, String>()
+                  : const {},
             ),
         ],
     };

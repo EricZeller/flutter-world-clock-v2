@@ -341,19 +341,33 @@ void main() {
       (tester) async {
     initializeAppTimeZones();
     SharedPreferences.setMockInitialValues({});
-    final repository = FakeCityRepository([City.berlin, tokyo], {
-      'de': const [
+    const madrid = City(
+      name: 'Madrid',
+      country: 'Spain',
+      timeZone: 'Europe/Madrid',
+      flag: 'es.webp',
+      utc: '+02:00',
+      weatherZone: 'Madrid',
+    );
+    final repository = FakeCityRepository([City.berlin, tokyo, madrid], {
+      'es': const [
         CountryZone(
-          timeZone: 'Europe/Berlin',
-          latitude: 52.5,
-          longitude: 13.3667,
-          comment: 'most of Germany',
+          timeZone: 'Europe/Madrid',
+          latitude: 40.4,
+          longitude: -3.6833,
+          comment: 'Spain (mainland)',
         ),
         CountryZone(
-          timeZone: 'Europe/Busingen',
-          latitude: 47.7,
-          longitude: 8.6833,
-          comment: 'Busingen',
+          timeZone: 'Africa/Ceuta',
+          latitude: 35.8833,
+          longitude: -5.3167,
+          comment: 'Ceuta, Melilla',
+        ),
+        CountryZone(
+          timeZone: 'Atlantic/Canary',
+          latitude: 28.1,
+          longitude: -15.4,
+          comment: 'Canary Islands',
         ),
       ],
     });
@@ -364,15 +378,15 @@ void main() {
     await tester.pumpAndSettle();
     await tester.enterText(
         find.widgetWithText(TextField, 'City name'), 'Zuhause');
-    await pickCountry(tester, 'germ', 'Germany');
-    await pickTimeZone(tester, 'busingen', 'Europe/Busingen');
+    await pickCountry(tester, 'spain', 'Spain');
+    await pickTimeZone(tester, 'canary', 'Atlantic/Canary');
     await tester.tap(find.text('Add'));
     await tester.pumpAndSettle();
 
     final custom = (await repository.loadCustomCities()).single;
-    expect(custom.timeZone, 'Europe/Busingen');
-    expect(custom.utc, '+02:00');
-    expect((custom.latitude, custom.longitude), (47.7, 8.6833));
+    expect(custom.timeZone, 'Atlantic/Canary');
+    expect(custom.utc, '+01:00');
+    expect((custom.latitude, custom.longitude), (28.1, -15.4));
   });
 
   testWidgets('editing a favorite custom city keeps its place',

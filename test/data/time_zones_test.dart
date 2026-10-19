@@ -117,6 +117,59 @@ void main() {
       );
     });
 
+    test('fold zones that have had the same time since 1981', () {
+      final germany = countryZones['de']!;
+      expect(germany.map((zone) => zone.timeZone), ['Europe/Berlin']);
+      expect(germany.single.comment, isEmpty,
+          reason: 'the only zone of a country needs no comment');
+      expect(germany.single.sameTime, {'Europe/Busingen': 'Busingen'});
+
+      final newYork = countryZones['us']!.singleWhere(
+        (zone) => zone.timeZone == 'America/New_York',
+      );
+      expect(newYork.comment, 'Eastern (most areas)');
+      expect(newYork.sameTime.keys,
+          containsAll(['America/Detroit', 'America/Kentucky/Louisville']));
+      expect(
+        countryZones['es']!.map((zone) => zone.timeZone),
+        ['Europe/Madrid', 'Africa/Ceuta', 'Atlantic/Canary'],
+        reason: 'Ceuta had other rules until the 1980s',
+      );
+    });
+
+    test('keep the folded zones in the shipped database', () {
+      // Custom cities may have been saved with them.
+      Duration offset(String zone, int at) =>
+          tz.getLocation(zone).timeZone(at).offset;
+      // The offsets only change at transitions, so comparing them at every
+      // transition of both zones in the shipped data covers all instants.
+      List<int> instants(String a, String b) => [
+        DateTime.utc(2000).millisecondsSinceEpoch,
+        ...tz.getLocation(a).transitionAt,
+        ...tz.getLocation(b).transitionAt,
+      ];
+      final offered = {
+        for (final zones in countryZones.values)
+          for (final zone in zones) zone.timeZone,
+      };
+      final wrong = <String>[];
+      for (final zones in countryZones.values) {
+        for (final zone in zones) {
+          for (final folded in zone.sameTime.keys) {
+            if (!tz.timeZoneDatabase.locations.containsKey(folded)) {
+              wrong.add('$folded is not shipped');
+            } else if (offered.contains(folded)) {
+              wrong.add('$folded is offered as well');
+            } else if (instants(folded, zone.timeZone).any((at) =>
+                offset(folded, at) != offset(zone.timeZone, at))) {
+              wrong.add('$folded differs from ${zone.timeZone}');
+            }
+          }
+        }
+      }
+      expect(wrong, isEmpty);
+    });
+
     test('have the coordinates of their principal location', () {
       for (final zones in countryZones.values) {
         for (final zone in zones) {
@@ -146,6 +199,26 @@ void main() {
     expect(offset('America/St_Lucia', winter), const Duration(hours: -4));
     expect(offset('America/New_York', summer), const Duration(hours: -4));
     expect(offset('Australia/Sydney', winter), const Duration(hours: 11));
+  });
+
+  test('a custom city saved with Europe/Busingen keeps its time', () {
+    for (final now in [
+      DateTime.utc(2026, 1, 15, 9),
+      DateTime.utc(2026, 7, 1, 9),
+    ]) {
+      expect(
+        formatTimeInZone('Europe/Busingen',
+            use24hr: true, showSeconds: false, now: now),
+        formatTimeInZone('Europe/Berlin',
+            use24hr: true, showSeconds: false, now: now),
+      );
+    }
+    expect(findLocation('Europe/Busingen').name, 'Europe/Busingen');
+    expect(
+      formatTimeInZone('Europe/Busingen',
+          use24hr: true, showSeconds: false, now: DateTime.utc(2026, 7, 1, 9)),
+      '11:00',
+    );
   });
 
   test('the shipped database has the 2026 rules of western Canada', () {
