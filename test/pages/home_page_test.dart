@@ -61,6 +61,26 @@ void main() {
 
     expect(find.text('07:11'), findsOneWidget);
     expect(find.text('18:39'), findsOneWidget);
+    expect(find.text('Last quarter · 53%'), findsOneWidget);
+    expect(find.text('🌗'), findsOneWidget);
+  });
+
+  testWidgets('shows the moon phase in the app language', (tester) async {
+    await pumpPage(tester, const HomePage(),
+        settings: await loadSettings(), locale: const Locale('de'));
+
+    expect(find.text('Letztes Viertel · 53%'), findsOneWidget);
+  });
+
+  testWidgets('hides the moon phase when wttr.in does not send it',
+      (tester) async {
+    await pumpPage(tester, const HomePage(),
+        settings: await loadSettings(),
+        weather: FakeWttr(body: wttrBerlinWithoutUvAndMoon).service);
+
+    expect(find.text('07:11'), findsOneWidget);
+    expect(find.textContaining('Last quarter'), findsNothing);
+    expect(find.text('🌗'), findsNothing);
   });
 
   testWidgets('hides extra info when disabled', (tester) async {
@@ -71,6 +91,7 @@ void main() {
     expect(find.text('Germany, UTC+02:00'), findsNothing);
     expect(find.byIcon(Icons.schedule_rounded), findsNothing);
     expect(find.text('07:11'), findsNothing);
+    expect(find.textContaining('Last quarter'), findsNothing);
   });
 
   testWidgets('uses Fahrenheit and 12h times when configured',
@@ -183,6 +204,43 @@ void main() {
     expect(find.text('3-day forecast'), findsOneWidget);
     expect(find.text('15° / 20°'), findsOneWidget);
     expect(find.text('13° / 22°'), findsOneWidget);
+  });
+
+  testWidgets('the forecast shows the UV index and the moon phase',
+      (tester) async {
+    await pumpPage(tester, const HomePage(), settings: await loadSettings());
+
+    await tester.tap(find.text('☁️ Cloudy +20°C'));
+    await tester.pumpAndSettle();
+
+    final sheet = find.byType(ForecastSheet);
+    expect(find.descendant(of: sheet, matching: find.text('UV 0 · low')),
+        findsOneWidget);
+    expect(
+        find.descendant(
+            of: sheet, matching: find.text('Last quarter · 53%')),
+        findsOneWidget);
+    expect(find.descendant(of: sheet, matching: find.text('UV 2')),
+        findsNWidgets(2));
+    expect(find.descendant(of: sheet, matching: find.text('UV 1')),
+        findsOneWidget);
+  });
+
+  testWidgets('the forecast hides the UV index and moon phase without data',
+      (tester) async {
+    await pumpPage(tester, const HomePage(),
+        settings: await loadSettings(),
+        weather: FakeWttr(body: wttrBerlinWithoutUvAndMoon).service);
+
+    await tester.tap(find.text('☁️ Cloudy +20°C'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ForecastSheet), findsOneWidget);
+    expect(find.text('60%'), findsOneWidget);
+    expect(find.text('15° / 20°'), findsOneWidget);
+    expect(find.textContaining('UV'), findsNothing);
+    expect(find.byIcon(Icons.wb_sunny_rounded), findsNothing);
+    expect(find.textContaining('quarter'), findsNothing);
   });
 
   testWidgets('weather is not tappable before it loaded', (tester) async {

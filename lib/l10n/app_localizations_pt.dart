@@ -263,6 +263,56 @@ class AppLocalizationsPt extends AppLocalizations {
   String get chanceOfRain => 'Chance de chuva';
 
   @override
+  String get uvIndex => 'Índice UV';
+
+  @override
+  String uvIndexValue(String index, String risk) {
+    return 'UV $index · $risk';
+  }
+
+  @override
+  String get uvRiskLow => 'baixo';
+
+  @override
+  String get uvRiskModerate => 'moderado';
+
+  @override
+  String get uvRiskHigh => 'alto';
+
+  @override
+  String get uvRiskVeryHigh => 'muito alto';
+
+  @override
+  String get uvRiskExtreme => 'extremo';
+
+  @override
+  String get moonPhase => 'Fase da lua';
+
+  @override
+  String get moonNew => 'Lua nova';
+
+  @override
+  String get moonWaxingCrescent => 'Lua crescente';
+
+  @override
+  String get moonFirstQuarter => 'Quarto crescente';
+
+  @override
+  String get moonWaxingGibbous => 'Crescente gibosa';
+
+  @override
+  String get moonFull => 'Lua cheia';
+
+  @override
+  String get moonWaningGibbous => 'Minguante gibosa';
+
+  @override
+  String get moonLastQuarter => 'Quarto minguante';
+
+  @override
+  String get moonWaningCrescent => 'Lua minguante';
+
+  @override
   String get showForecast => 'Mostrar previsão';
 
   @override

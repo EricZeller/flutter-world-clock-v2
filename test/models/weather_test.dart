@@ -71,6 +71,138 @@ void main() {
       expect(report.today!.hours, isEmpty);
       expect(report.today!.representative, isNull);
       expect(report.today!.chanceOfRain, 0);
+      expect(report.current.uvIndex, isNull);
+      expect(report.today!.uvIndex, isNull);
+      expect(report.today!.moonPhase, isNull);
+      expect(report.today!.moonIllumination, isNull);
+    });
+  });
+
+  group('UV index and moon phase', () {
+    WeatherReport parseWith({Object? uvIndex, Object? phase, Object? lit}) =>
+        WeatherReport.fromWttr({
+          'current_condition': [
+            {'uvIndex': uvIndex}
+          ],
+          'weather': [
+            {
+              'date': '2026-01-01',
+              'uvIndex': uvIndex,
+              'astronomy': [
+                {'moon_phase': phase, 'moon_illumination': lit}
+              ],
+            }
+          ],
+        }, fetchedAt: fetchedAt);
+
+    test('are parsed for now and each day', () {
+      final report = parse();
+
+      expect(report.current.uvIndex, 0);
+      expect([for (final day in report.days) day.uvIndex], [2, 2, 1]);
+      expect([for (final day in report.days) day.moonPhase], [
+        MoonPhase.lastQuarter,
+        MoonPhase.waningCrescent,
+        MoonPhase.waningCrescent,
+      ]);
+      expect([for (final day in report.days) day.moonIllumination],
+          [53, 42, 32]);
+    });
+
+    test('accept numbers, padded strings and any case', () {
+      final report =
+          parseWith(uvIndex: 7, phase: ' full MOON ', lit: ' 100 ');
+
+      expect(report.current.uvIndex, 7);
+      expect(report.today!.uvIndex, 7);
+      expect(report.today!.moonPhase, MoonPhase.fullMoon);
+      expect(report.today!.moonIllumination, 100);
+    });
+
+    test('stay unknown for garbage', () {
+      for (final garbage in ['', 'n/a', '4.5', '-1', 'Blue Moon', 'Fullmoon']) {
+        final report =
+            parseWith(uvIndex: garbage, phase: garbage, lit: garbage);
+
+        expect(report.current.uvIndex, isNull, reason: garbage);
+        expect(report.today!.uvIndex, isNull, reason: garbage);
+        expect(report.today!.moonPhase, isNull, reason: garbage);
+        expect(report.today!.moonIllumination, isNull, reason: garbage);
+      }
+    });
+
+    test('know all eight phases wttr.in sends', () {
+      expect(
+          [
+            for (final name in [
+              'New Moon',
+              'Waxing Crescent',
+              'First Quarter',
+              'Waxing Gibbous',
+              'Full Moon',
+              'Waning Gibbous',
+              'Last Quarter',
+              'Waning Crescent',
+            ])
+              MoonPhase.fromWttr(name)
+          ],
+          MoonPhase.values);
+      expect([for (final phase in MoonPhase.values) phase.symbol],
+          ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘']);
+    });
+
+    test('UV risk follows the WHO scale', () {
+      expect([for (var index = 0; index <= 12; index++) UvRisk.of(index)], [
+        UvRisk.low,
+        UvRisk.low,
+        UvRisk.low,
+        UvRisk.moderate,
+        UvRisk.moderate,
+        UvRisk.moderate,
+        UvRisk.high,
+        UvRisk.high,
+        UvRisk.veryHigh,
+        UvRisk.veryHigh,
+        UvRisk.veryHigh,
+        UvRisk.extreme,
+        UvRisk.extreme,
+      ]);
+    });
+
+    test('survive the cache', () {
+      final restored =
+          WeatherReport.fromJson(jsonDecode(jsonEncode(parse().toJson())));
+
+      expect(restored.current.uvIndex, 0);
+      expect(restored.today!.uvIndex, 2);
+      expect(restored.today!.moonPhase, MoonPhase.lastQuarter);
+      expect(restored.today!.moonIllumination, 53);
+    });
+
+    test('older caches without them still load', () {
+      final json = jsonDecode(jsonEncode(parse().toJson()));
+      (json['current'] as Map).remove('uvIndex');
+      for (final day in json['days'] as List) {
+        day
+          ..remove('uvIndex')
+          ..remove('moonPhase')
+          ..remove('moonIllumination');
+      }
+
+      final restored = WeatherReport.fromJson(json);
+
+      expect(restored.current.uvIndex, isNull);
+      expect(restored.today!.uvIndex, isNull);
+      expect(restored.today!.moonPhase, isNull);
+      expect(restored.today!.moonIllumination, isNull);
+      expect(restored.summary(fahrenheit: false), '☁️ Cloudy +20°C');
+    });
+
+    test('an unknown cached phase is dropped', () {
+      final json = jsonDecode(jsonEncode(parse().toJson()));
+      (json['days'] as List).first['moonPhase'] = 'blueMoon';
+
+      expect(WeatherReport.fromJson(json).today!.moonPhase, isNull);
     });
   });
 

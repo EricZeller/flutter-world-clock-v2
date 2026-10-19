@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 /// Small tinted pill with an icon, used for extra info on the home screen.
 class InfoChip extends StatelessWidget {
-  const InfoChip({super.key, required this.icon, required this.label});
+  const InfoChip({super.key, this.icon, this.symbol, required this.label})
+      : assert((icon == null) != (symbol == null));
 
-  final IconData icon;
+  final IconData? icon;
+
+  /// Emoji shown instead of an [icon].
+  final String? symbol;
   final String label;
 
   @override
@@ -23,15 +27,21 @@ class InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 15, color: colorScheme.primary),
+          if (symbol case final symbol?)
+            Text(symbol, style: const TextStyle(fontSize: 13))
+          else
+            Icon(icon, size: 15, color: colorScheme.primary),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-              color: colorScheme.onPrimaryContainer,
+          // Wraps long labels, e.g. moon phases with large fonts.
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                color: colorScheme.onPrimaryContainer,
+              ),
             ),
           ),
         ],

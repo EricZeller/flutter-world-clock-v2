@@ -7,6 +7,7 @@ import 'package:world_clock_v2/models/weather.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
 import 'package:world_clock_v2/utils/time_utils.dart';
+import 'package:world_clock_v2/utils/weather_labels.dart';
 import 'package:world_clock_v2/widgets/info_chip.dart';
 
 Future<void> showForecastSheet(
@@ -53,6 +54,8 @@ class ForecastSheet extends StatelessWidget {
     final sunset = today == null
         ? null
         : formatWttrTime(today.sunset, use24hr: settings.use24hr);
+    final uvIndex = current.uvIndex;
+    final moonPhase = today?.moonPhase;
     final cityNow = wallClockIn(city.timeZone);
     final hours = report.upcomingHours(cityNow);
     final wind = fahrenheit
@@ -108,10 +111,23 @@ class ForecastSheet extends StatelessWidget {
               _chip(Icons.water_drop_outlined, l10n.humidity,
                   '${current.humidity}%'),
               _chip(Icons.air_rounded, l10n.wind, wind),
+              if (uvIndex != null)
+                _chip(Icons.wb_sunny_rounded, l10n.uvIndex,
+                    uvIndexText(l10n, uvIndex)),
               if (sunrise != null)
                 _chip(Icons.wb_twilight_rounded, l10n.sunrise, sunrise),
               if (sunset != null)
                 _chip(Icons.nights_stay_rounded, l10n.sunset, sunset),
+              if (moonPhase != null)
+                Tooltip(
+                  triggerMode: TooltipTriggerMode.tap,
+                  message: l10n.moonPhase,
+                  child: InfoChip(
+                    symbol: moonPhase.symbol,
+                    label: moonPhaseText(l10n, moonPhase,
+                        illumination: today?.moonIllumination),
+                  ),
+                ),
             ],
           ),
           if (hours.isNotEmpty) ...[
@@ -261,7 +277,42 @@ class _DayTile extends StatelessWidget {
               color: colorScheme.onPrimaryContainer,
             ),
           ),
-          _RainChance(percent: day.chanceOfRain),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _RainChance(percent: day.chanceOfRain),
+              if (day.uvIndex case final uvIndex?) ...[
+                const SizedBox(width: 8),
+                _UvIndex(value: uvIndex),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UvIndex extends StatelessWidget {
+  const _UvIndex({required this.value});
+
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final color = Theme.of(context).colorScheme.primary;
+    return Semantics(
+      label: uvIndexText(l10n, value),
+      excludeSemantics: true,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.wb_sunny_rounded, size: 12, color: color),
+          const SizedBox(width: 2),
+          Text('UV $value',
+              style: TextStyle(
+                  fontSize: 12, color: color, fontWeight: FontWeight.w600)),
         ],
       ),
     );
