@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Keeps the pinned action SHAs and their version comments current.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      pub:
+        update-types: [minor, patch]
