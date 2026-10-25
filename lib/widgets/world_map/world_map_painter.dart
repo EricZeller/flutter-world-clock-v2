@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
-import 'package:world_clock_v2/widgets/world_map/world_map_data.dart';
 
 /// Draws the land dots, dimmed where it is night. Only repaints when the
 /// minute, size or colors change; zooming merely scales the cached layer.
@@ -49,12 +48,41 @@ class LandPainter extends CustomPainter {
       oldDelegate.sun != sun || oldDelegate.color != color;
 }
 
-/// Whether the name of [city] is drawn at the zoom level [scale].
+/// Whether the marker of [city] is drawn at the zoom level [scale]: those
+/// of smaller cities only once the map is zoomed in, so that 800 cities do
+/// not cover the continents. Selected and custom cities are always drawn.
+bool isMarkerVisible(
+  City city, {
+  required bool isSelected,
+  required double scale,
+}) => isSelected || city.isCustom || isBigCity(city) || scale >= 2;
+
+/// A city of at least [bigCityPopulation] inhabitants or a capital; also a
+/// city of an older version, whose population is unknown.
+bool isBigCity(City city) =>
+    city.isCapital ||
+    city.population == null ||
+    city.population! >= bigCityPopulation;
+
+/// Whether the name of [city] is drawn at the zoom level [scale]: the
+/// bigger the city, the sooner; capitals like big cities. Custom cities
+/// count as metropolises; a city of an older version without a population
+/// as a small one.
 bool isLabelVisible(City city, {required bool isSelected, required double scale}) {
   if (isSelected) return true;
-  if (majorMapCities.contains(city.name) || city.isCustom) return scale >= 1.6;
-  return scale >= 3;
+  if (city.isCustom) return scale >= 1.6;
+  final population = city.population ?? 0;
+  if (population >= metropolisPopulation) return scale >= 1.6;
+  if (population >= bigCityPopulation || city.isCapital) return scale >= 3;
+  return scale >= 5;
 }
+
+/// Cities of this size are labeled when the map is zoomed in a little.
+const metropolisPopulation = 5000000;
+
+/// Cities of this size are labeled at a medium zoom and have markers at
+/// every zoom; smaller ones are labeled only when zoomed in far.
+const bigCityPopulation = 1000000;
 
 /// Draws the city markers and their labels. Sizes are divided by [scale] so
 /// they keep their size on screen while zooming.
@@ -85,6 +113,9 @@ class MarkerPainter extends CustomPainter {
     ];
     for (final city in ordered) {
       final isSelected = selectedCities.contains(city);
+      if (!isMarkerVisible(city, isSelected: isSelected, scale: scale)) {
+        continue;
+      }
       final point = projection.project(cityPosition(city));
       _paintMarker(canvas, point, city, isSelected);
       if (isLabelVisible(city, isSelected: isSelected, scale: scale)) {
@@ -95,7 +126,14 @@ class MarkerPainter extends CustomPainter {
 
   void _paintMarker(Canvas canvas, Offset point, City city, bool isSelected) {
     final unit = 1 / scale;
-    final radius = (isSelected ? 6.0 : city.isCustom ? 5.0 : 3.5) * unit;
+    final radius = (isSelected
+            ? 6.0
+            : city.isCustom
+                ? 5.0
+                : isBigCity(city)
+                    ? 3.5
+                    : 2.5) *
+        unit;
     if (isSelected) {
       canvas.drawCircle(point, 14 * unit,
           Paint()..color = markerColor.withValues(alpha: 0.25));

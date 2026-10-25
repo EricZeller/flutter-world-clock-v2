@@ -7,6 +7,13 @@ class City {
   final String weatherZone;
   final double? latitude;
   final double? longitude;
+
+  /// Inhabitants of a bundled city (GeoNames), which decides how far the
+  /// map has to be zoomed in for its name; `null` for a custom city.
+  final int? population;
+
+  /// Whether a bundled city is the capital of its country.
+  final bool isCapital;
   final bool isCustom;
 
   const City({
@@ -18,6 +25,8 @@ class City {
     required this.weatherZone,
     this.latitude,
     this.longitude,
+    this.population,
+    this.isCapital = false,
     this.isCustom = false,
   });
 
@@ -41,6 +50,8 @@ class City {
       'weatherZone': weatherZone,
       'latitude': latitude,
       'longitude': longitude,
+      if (population != null) 'population': population,
+      if (isCapital) 'capital': true,
       'isCustom': isCustom,
     };
   }
@@ -55,6 +66,8 @@ class City {
       weatherZone: json['weatherZone'],
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
+      population: (json['population'] as num?)?.toInt(),
+      isCapital: json['capital'] == true,
       isCustom: json['isCustom'] == true,
     );
   }

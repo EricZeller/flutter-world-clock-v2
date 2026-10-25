@@ -88,4 +88,14 @@ void main() {
     expect(cityExonyms['de']!['Moscow'], ['Moskau']);
     expect(cityExonyms['fr']!['London'], ['Londres']);
   });
+
+  test('name the cities of GeoNames in the other languages', () {
+    expect(cityExonyms['de']!['Cologne'], ['Köln']);
+    expect(cityExonyms['es']!['Cologne'], ['Colonia']);
+    expect(cityExonyms['pt']!['Munich'], ['Munique']);
+    expect(cityExonyms['fr']!['Hamburg'], ['Hambourg']);
+    expect(cityExonyms['de']!['Hamburg'], isNull,
+        reason: 'Hamburg is Hamburg in German');
+    expect(cityExonyms['de']!['Kyiv'], containsAll(['Kiew', 'Kyjiw']));
+  });
 }

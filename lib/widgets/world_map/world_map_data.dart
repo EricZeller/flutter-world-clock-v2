@@ -8,15 +8,9 @@
   return (0, 0);
 }
 
-/// Hauptstädte/Metropolen, die auch uneingezoomt sichtbar bleiben
-const Set<String> majorMapCities = {
-  'Berlin', 'London', 'Paris', 'New York', 'Tokyo', 'Sydney', 'Cairo',
-  'Beijing', 'Moscow', 'Rio de Janeiro', 'Buenos Aires', 'Los Angeles',
-  'Chicago', 'Delhi', 'New Delhi', 'Bangkok', 'Singapore', 'Riyadh',
-  'Johannesburg', 'Mexico City', 'Toronto'
-};
-
-/// Exakte Koordinaten aller 180 Zeitzonen / Städte
+/// Coordinates of time zones, the position of a custom city saved by an
+/// older version without its own. Bundled cities bring their own
+/// coordinates from GeoNames (assets/data/cities.json).
 const Map<String, (double, double)> timeZoneCoordinates = {
   // Europa
   'Europe/Berlin': (52.52, 13.40),

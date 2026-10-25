@@ -150,6 +150,13 @@ class _WorldMapState extends State<WorldMap> {
     City? nearest;
     var distance = tapRadius / _scale;
     for (final city in widget.cities) {
+      if (!isMarkerVisible(
+        city,
+        isSelected: widget.selectedCities.contains(city),
+        scale: _scale,
+      )) {
+        continue;
+      }
       final current =
           (projection.project(cityPosition(city)) - position).distance;
       if (current < distance) {

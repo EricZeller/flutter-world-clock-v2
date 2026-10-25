@@ -28,6 +28,15 @@ void main() {
         'https://example.org/Washington%2C%20D.C.?format=j1',
       );
     });
+
+    test('passes the coordinates of a bundled city', () {
+      // wttr.in decodes the comma; the Hyderabads of India and Pakistan
+      // cannot be mixed up this way.
+      expect(
+        WeatherService.buildUri(server, '17.38,78.46').toString(),
+        'https://wttr.in/17.38%2C78.46?format=j1',
+      );
+    });
   });
 
   group('refresh', () {

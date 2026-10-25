@@ -20,11 +20,15 @@ const outputPath = 'lib/widgets/world_map/land_mask.dart';
 
 void main(List<String> args) {
   if (args.length != 1) {
-    stderr.writeln('Usage: dart run tool/generate_land_mask.dart <land.geojson>');
+    stderr.writeln(
+      'Usage: dart run tool/generate_land_mask.dart <land.geojson>',
+    );
     exit(64);
   }
-  final features = (jsonDecode(File(args.single).readAsStringSync())
-      as Map<String, dynamic>)['features'] as List;
+  final features =
+      (jsonDecode(File(args.single).readAsStringSync())
+              as Map<String, dynamic>)['features']
+          as List;
   final rings = <List<List<double>>>[
     for (final feature in features)
       for (final polygon in _polygons(feature['geometry']))

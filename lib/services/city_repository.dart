@@ -30,7 +30,12 @@ class CityRepository {
   Future<List<City>> _loadBundledCities() async {
     try {
       // Cached here rather than in the bundle, which would keep the string.
-      final response = await _bundle.loadString(citiesAsset, cache: false);
+      // Decoded here rather than by loadString, which hands a file this
+      // big to an isolate; one that never finishes in widget tests.
+      final data = await _bundle.load(citiesAsset);
+      final response = utf8.decode(
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
+      );
       return [
         for (final city in json.decode(response) as List)
           City.fromJson(city as Map<String, dynamic>),
