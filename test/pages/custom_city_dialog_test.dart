@@ -185,16 +185,22 @@ void main() {
         reason: 'a third of the space above the keyboard, minus padding');
   });
 
-  testWidgets('countries can be found by name or city', (tester) async {
+  testWidgets('countries can be found by name or capital', (tester) async {
     await openDialog(tester);
 
     await tester.enterText(countryField, 'states');
     await tester.pumpAndSettle();
     expect(menuEntries(), ['United States']);
 
+    await tester.enterText(countryField, 'new york');
+    await tester.pumpAndSettle();
+    expect(menuEntries(), ['United States'],
+        reason: 'the first city stands in for a capital');
+
     await tester.enterText(countryField, 'seattle');
     await tester.pumpAndSettle();
-    expect(menuEntries(), ['United States']);
+    expect(menuEntries(), isEmpty,
+        reason: 'other cities do not list their country');
 
     await tester.enterText(countryField, 'china');
     await tester.pumpAndSettle();

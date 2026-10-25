@@ -50,7 +50,7 @@ class _Country {
   late final Map<String, _Zone> zones;
 
   /// Everything the country can be found by: its label, its English name
-  /// and its cities, see [PlaceNames.searchText].
+  /// and the names of its capital, see [PlaceNames.searchText].
   late final String searchText;
 
   /// The zone of [zones] that [timeZone] is or is offered as, such as
@@ -255,10 +255,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
                 timeZoneLabel(a.timeZone), timeZoneLabel(b.timeZone))))
             zone.timeZone: zone,
         }
+        // Found by its names and its capital's, not by every city: with
+        // 800 cities, "ab" would list India for Ahmedabad.
         ..searchText = searchTextOf([
           country.label,
           country.name,
-          for (final city in country.cities) ...namesOf(city),
+          ...namesOf(_mainCity(country.cities)),
         ]);
     }
     return byFlag.values.toList()
