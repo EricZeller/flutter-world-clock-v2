@@ -9,6 +9,7 @@ import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/pages/location/city_tile.dart';
 import 'package:world_clock_v2/pages/location/location_page.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
+import 'package:world_clock_v2/widgets/world_map/world_map.dart';
 
 import '../helpers/custom_city_dialog.dart';
 import '../helpers/test_app.dart';
@@ -68,6 +69,33 @@ void main() {
     expect(await repository.loadFavorites(), [tokyo]);
     expect(await repository.loadSelectedCity(), tokyo,
         reason: 'older versions read the first favorite');
+  });
+
+  testWidgets('a city tapped on the map is added on request only',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = FakeCityRepository();
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+    await tester.tap(find.byIcon(Icons.map_rounded));
+    await tester.pumpAndSettle();
+
+    tester.widget<WorldMap>(find.byType(WorldMap)).onCityTap(tokyo);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Tokyo · '), findsOneWidget);
+    expect(await repository.loadFavorites(), [City.berlin],
+        reason: 'the tap alone adds nothing');
+
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+    expect(await repository.loadFavorites(), [City.berlin, tokyo]);
+    expect(find.textContaining('Tokyo added'), findsOneWidget);
+
+    tester.widget<WorldMap>(find.byType(WorldMap)).onCityTap(tokyo);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Remove'));
+    await tester.pumpAndSettle();
+    expect(await repository.loadFavorites(), [City.berlin]);
   });
 
   testWidgets('the last city cannot be removed', (tester) async {

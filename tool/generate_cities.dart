@@ -100,6 +100,13 @@ const cityFeatureCodes = {
 /// million (Kowloon); only their capital is bundled, if it is big enough.
 const cityStates = {'hk', 'mo', 'sg'};
 
+/// GeoNames ids of cities bundled although they are smaller than
+/// [minPopulation]. A city of cities.json stays anyway; this is for the
+/// first run after adding one here.
+const includedIds = {
+  2885679, // Konstanz, Germany
+};
+
 /// GeoNames ids of places that qualify by their GeoNames population but are
 /// no cities of that size: towns and districts that got the population of
 /// their district or of a city of the same name.
@@ -180,8 +187,16 @@ Future<void> generate(
     }
     wanted[id] = place;
   }
-  // ... then the big cities of each country and the capital of each country
-  // that has a city, see the file comment.
+  // ... then [includedIds], the big cities of each country and the capital
+  // of each country that has a city, see the file comment.
+  for (final id in includedIds) {
+    final place = places[id];
+    if (place == null) {
+      stderr.writeln('$id of includedIds is no populated place of GeoNames');
+      exit(1);
+    }
+    wanted[id] = place;
+  }
   var skipped = 0;
   for (final MapEntry(key: country, value: places) in byCountry.entries) {
     final kept = [
@@ -229,7 +244,12 @@ Future<void> generate(
     }
     // A country without a city of its own is not bundled, nor its capital.
     if (kept.isEmpty && chosen.isEmpty) continue;
-    kept.addAll(chosen.take(maxPerCountry));
+    // The cities of cities.json that are big enough count against the
+    // limit, so running this again adds nothing.
+    final bigKept = kept
+        .where((place) => place.population >= minPopulation)
+        .length;
+    kept.addAll(chosen.take(max(0, maxPerCountry - bigKept)));
     if (capital == null) {
       print('Note: no capital of ${country.toUpperCase()} in GeoNames');
     } else if (!wanted.containsKey(capital.id) && !kept.contains(capital)) {

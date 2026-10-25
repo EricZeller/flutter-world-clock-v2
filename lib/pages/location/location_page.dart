@@ -87,20 +87,39 @@ class _LocationPageState extends State<LocationPage> {
     return !isFavorite;
   }
 
+  /// A tap on a city of the map shows its name and time with a button to
+  /// add or remove it, so a tap on the wrong one of two close markers does
+  /// not change the favorites.
   void _onMapTap(City city) {
+    final l10n = AppLocalizations.of(context)!;
+    final isFavorite = _favorites.contains(city);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(
+        content: Text('${city.name} · ${_timeIn(city)}'),
+        action: SnackBarAction(
+          label: isFavorite ? l10n.removeFromFavorites : l10n.add,
+          onPressed: () => _toggleFromMap(city),
+        ),
+      ));
+  }
+
+  void _toggleFromMap(City city) {
     final l10n = AppLocalizations.of(context)!;
     final wasFavorite = _favorites.contains(city);
     final isFavorite = _toggleFavorite(city);
     if (wasFavorite == isFavorite) return;
-    final time = formatTimeInZone(
-      city.timeZone,
-      use24hr: context.read<SettingsProvider>().use24hr,
-      showSeconds: false,
-    );
+    final time = _timeIn(city);
     _showMessage(isFavorite
         ? l10n.cityAddedAt(city.name, time)
         : l10n.cityRemovedAt(city.name, time));
   }
+
+  String _timeIn(City city) => formatTimeInZone(
+        city.timeZone,
+        use24hr: context.read<SettingsProvider>().use24hr,
+        showSeconds: false,
+      );
 
   void _reorder(int oldIndex, int newIndex) {
     setState(() {
