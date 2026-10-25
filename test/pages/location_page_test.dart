@@ -98,6 +98,24 @@ void main() {
     expect(await repository.loadFavorites(), [City.berlin]);
   });
 
+  testWidgets('the check button adds the city tapped on the map',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = FakeCityRepository();
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+    await tester.tap(find.byIcon(Icons.map_rounded));
+    await tester.pumpAndSettle();
+
+    tester.widget<WorldMap>(find.byType(WorldMap)).onCityTap(tokyo);
+    await tester.pumpAndSettle();
+    expect(tester.widget<WorldMap>(find.byType(WorldMap)).highlighted, tokyo);
+
+    await tester.tap(find.byIcon(Icons.check));
+    await tester.pumpAndSettle();
+    expect(await repository.loadFavorites(), [City.berlin, tokyo]);
+  });
+
   testWidgets('the last city cannot be removed', (tester) async {
     SharedPreferences.setMockInitialValues({});
     final repository = FakeCityRepository();

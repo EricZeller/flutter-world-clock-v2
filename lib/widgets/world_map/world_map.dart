@@ -15,6 +15,7 @@ class WorldMap extends StatefulWidget {
     super.key,
     required this.cities,
     required this.selectedCities,
+    this.highlighted,
     required this.onCityTap,
   });
 
@@ -22,6 +23,9 @@ class WorldMap extends StatefulWidget {
 
   /// Highlighted cities; the map opens centered on the first one.
   final List<City> selectedCities;
+
+  /// The city last tapped, highlighted as well.
+  final City? highlighted;
   final ValueChanged<City> onCityTap;
 
   @override
@@ -136,6 +140,7 @@ class _WorldMapState extends State<WorldMap> {
                     painter: MarkerPainter(
                       cities: widget.cities,
                       selectedCities: widget.selectedCities.toSet(),
+                      highlighted: widget.highlighted,
                       nameOf: PlaceNames.of(context).name,
                       language: Localizations.localeOf(context).languageCode,
                       scale: _scale,
