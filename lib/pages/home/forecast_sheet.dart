@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/models/weather.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
 import 'package:world_clock_v2/theme/app_theme.dart';
@@ -69,7 +70,7 @@ class ForecastSheet extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            city.name,
+            PlaceNames.of(context).name(city),
             style: TextStyle(
               fontFamily: AppTheme.accentFontFamily,
               fontSize: 28,

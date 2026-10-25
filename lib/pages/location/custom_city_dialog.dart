@@ -247,7 +247,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
       }
       country
         ..label = flagsPerName[country.localName]! > 1
-            ? '${country.localName} (${_mainCity(country.cities).name})'
+            ? '${country.localName} (${names.name(_mainCity(country.cities))})'
             : country.localName
         ..zones = {
           for (final zone in zones.values.toList()

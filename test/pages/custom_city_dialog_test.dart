@@ -237,12 +237,13 @@ void main() {
       await search(tester, 'frankreich');
       expect(menuEntries(), ['Frankreich']);
       await search(tester, 'china');
-      expect(menuEntries(), ['China (Beijing)', 'China (Hong Kong)']);
-      await search(tester, 'peking');
-      expect(menuEntries(), ['China (Beijing)'],
-          reason: 'cities are found by their German names');
+      expect(menuEntries(), ['China (Hongkong)', 'China (Peking)'],
+          reason: 'cities are labeled with their German names');
+      await search(tester, 'beijing');
+      expect(menuEntries(), ['China (Peking)'],
+          reason: 'cities are found by their English names as well');
       await search(tester, 'Hongkong');
-      expect(menuEntries(), ['China (Hong Kong)']);
+      expect(menuEntries(), ['China (Hongkong)']);
     });
 
     testWidgets('the cities keep the English country', (tester) async {
@@ -342,7 +343,7 @@ void main() {
         'chine',
       );
       await tester.pumpAndSettle();
-      expect(menuEntries(), ['Chine (Beijing)', 'Chine (Hong Kong)']);
+      expect(menuEntries(), ['Chine (Hong Kong)', 'Chine (Pékin)']);
     });
   });
 

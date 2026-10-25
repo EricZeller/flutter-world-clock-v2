@@ -96,7 +96,7 @@ class _LocationPageState extends State<LocationPage> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
-        content: Text('${city.name} · ${_timeIn(city)}'),
+        content: Text('${PlaceNames.of(context).name(city)} · ${_timeIn(city)}'),
         action: SnackBarAction(
           label: isFavorite ? l10n.removeFromFavorites : l10n.add,
           onPressed: () => _toggleFromMap(city),
@@ -110,9 +110,9 @@ class _LocationPageState extends State<LocationPage> {
     final isFavorite = _toggleFavorite(city);
     if (wasFavorite == isFavorite) return;
     final time = _timeIn(city);
-    _showMessage(isFavorite
-        ? l10n.cityAddedAt(city.name, time)
-        : l10n.cityRemovedAt(city.name, time));
+    final name = PlaceNames.of(context).name(city);
+    _showMessage(
+        isFavorite ? l10n.cityAddedAt(name, time) : l10n.cityRemovedAt(name, time));
   }
 
   String _timeIn(City city) => formatTimeInZone(

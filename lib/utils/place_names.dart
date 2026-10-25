@@ -4,9 +4,10 @@ import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/utils/search.dart';
 
-/// Countries and cities in an app language. Cities are stored with the
-/// English name of their country, which is translated when it is shown, and
-/// can be found by the names of [cityExonyms] besides their own.
+/// Countries and cities in an app language. Cities are stored with their
+/// English name and the English name of their country, which are translated
+/// when they are shown ([name], [country]), and can be found by the names of
+/// [cityExonyms] besides their own.
 @immutable
 class PlaceNames {
   const PlaceNames(this.languageCode);
@@ -30,6 +31,11 @@ class PlaceNames {
     if (countryNames['en']![code] != city.country) return city.country;
     return countryNames[languageCode]?[code] ?? city.country;
   }
+
+  /// The name [city] is shown with: München for Munich in German. A custom
+  /// city is shown as it was entered.
+  String name(City city) =>
+      city.isCustom ? city.name : cityNames[languageCode]?[city.name] ?? city.name;
 
   /// The country and offset shown below a city: `Deutschland, UTC+02:00`.
   String details(City city) {

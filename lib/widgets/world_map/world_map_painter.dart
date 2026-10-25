@@ -90,6 +90,7 @@ class MarkerPainter extends CustomPainter {
   MarkerPainter({
     required this.cities,
     required this.selectedCities,
+    required this.nameOf,
     required this.scale,
     required this.markerColor,
     required this.labelBackground,
@@ -98,6 +99,9 @@ class MarkerPainter extends CustomPainter {
 
   final List<City> cities;
   final Set<City> selectedCities;
+
+  /// The name a city is labeled with, in the app's language.
+  final String Function(City) nameOf;
   final double scale;
   final Color markerColor;
   final Color labelBackground;
@@ -119,7 +123,7 @@ class MarkerPainter extends CustomPainter {
       final point = projection.project(cityPosition(city));
       _paintMarker(canvas, point, city, isSelected);
       if (isLabelVisible(city, isSelected: isSelected, scale: scale)) {
-        _paintLabel(canvas, point, city.name, isSelected);
+        _paintLabel(canvas, point, nameOf(city), isSelected);
       }
     }
   }

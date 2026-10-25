@@ -6,6 +6,9 @@ import 'package:world_clock_v2/services/settings_provider.dart';
 typedef WidgetCity = ({
   int? widgetId,
   City city,
+
+  /// The name shown, in the app's language.
+  String name,
   String weather,
   String weatherIcon,
   String temperature,
@@ -40,8 +43,7 @@ class HomeWidgetService {
     return _enqueue(() async {
       for (final entry in cities) {
         final suffix = keySuffix(entry.widgetId);
-        await HomeWidget.saveWidgetData<String>(
-            'city$suffix', entry.city.name);
+        await HomeWidget.saveWidgetData<String>('city$suffix', entry.name);
         await HomeWidget.saveWidgetData<String>(
             'weather$suffix', entry.weather);
         await HomeWidget.saveWidgetData<String>(

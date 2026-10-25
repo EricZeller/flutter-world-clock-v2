@@ -57,6 +57,20 @@ void main() {
     });
   });
 
+  group('name', () {
+    test('is the one of the language', () {
+      expect(german.name(munich), 'München');
+      expect(const PlaceNames('pt').name(munich), 'Munique');
+      expect(const PlaceNames('fr').name(munich), 'Munich');
+      expect(PlaceNames.english.name(munich), 'Munich');
+    });
+
+    test('of a custom city is shown as entered', () {
+      final custom = _city('Munich', 'Germany', 'de.webp', custom: true);
+      expect(german.name(custom), 'Munich');
+    });
+  });
+
   test('details show the country and the offset', () {
     expect(german.details(City.berlin), 'Deutschland, UTC+02:00');
     expect(PlaceNames.english.details(City.berlin), 'Germany, UTC+02:00');

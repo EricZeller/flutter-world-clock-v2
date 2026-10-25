@@ -24,7 +24,7 @@ class CityClock extends StatelessWidget {
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
-              city.name,
+              PlaceNames.of(context).name(city),
               style: TextStyle(
                 fontSize: 55.0,
                 fontFamily: AppTheme.accentFontFamily,

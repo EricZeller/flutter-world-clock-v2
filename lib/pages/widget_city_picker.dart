@@ -101,7 +101,7 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
             : Image.asset('assets/flags/${city.flag}'),
       ),
       title: Text(
-        city.name,
+        PlaceNames.of(context).name(city),
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       subtitle: Text(PlaceNames.of(context).details(city)),

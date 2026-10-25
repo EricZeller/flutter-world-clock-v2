@@ -17,8 +17,9 @@
 // A new city is named by its preferred English name in GeoNames, else by
 // its GeoNames name. Two cities of a country with the same name are told
 // apart by their region: `Suzhou (Jiangsu)`. The names of the cities in
-// the other languages of the app go to tool/data/city_names.json, which
-// tool/generate_place_names.dart adds to the search.
+// the other languages of the app go to tool/data/city_names.json, the
+// preferred one first, which tool/generate_place_names.dart shows and adds
+// to the search.
 //
 // GeoNames assigns time zones by zone1970.tab, which groups countries
 // (Hanoi is Asia/Bangkok there); the app offers the zones of zone.tab, by
@@ -332,13 +333,21 @@ Future<void> generate(
       'population': place.population,
       if (place.isCapital) 'capital': true,
     });
+    // The preferred names first: the first one is the name shown.
     final translations = <String, List<String>>{};
     for (final language in languages) {
-      final found = {
+      final current = [
         for (final alt in names[place.id] ?? const <AlternateName>[])
-          if (alt.language == language && alt.isCurrent) alt.name,
+          if (alt.language == language && alt.isCurrent) alt,
+      ];
+      final found = {
+        for (final preferred in [true, false])
+          ...([
+            for (final alt in current)
+              if (alt.isPreferred == preferred) alt.name,
+          ]..sort()),
       };
-      if (found.isNotEmpty) translations[language] = found.toList()..sort();
+      if (found.isNotEmpty) translations[language] = found.toList();
     }
     if (translations.isNotEmpty) cityNames[place.id] = translations;
   }

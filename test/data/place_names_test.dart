@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:world_clock_v2/data/place_names.g.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/country_zone.dart';
+import 'package:world_clock_v2/utils/search.dart';
 
 // If one of these fails, run: dart run tool/generate_place_names.dart
 void main() {
@@ -87,6 +88,34 @@ void main() {
     expect(cityExonyms['de']!['Beijing'], ['Peking']);
     expect(cityExonyms['de']!['Moscow'], ['Moskau']);
     expect(cityExonyms['fr']!['London'], ['Londres']);
+  });
+
+  test('show the cities in the other languages', () {
+    final names = {for (final city in cities) city['name'] as String};
+    expect(cityNames.keys.toSet(), languages.difference({'en'}));
+    for (final MapEntry(key: language, value: shown) in cityNames.entries) {
+      expect(names.containsAll(shown.keys), isTrue, reason: language);
+      for (final MapEntry(key: city, value: name) in shown.entries) {
+        expect(name, isNot(city), reason: '$language: $city');
+        expect(name.trim(), isNotEmpty, reason: '$language: $city');
+        expect(
+          matchesSearch(
+            searchTextOf([city, ...?cityExonyms[language]![city]]),
+            name,
+          ),
+          isTrue,
+          reason: 'the shown name $name is found by the search',
+        );
+      }
+    }
+    expect(cityNames['de']!['Munich'], 'München');
+    expect(cityNames['de']!['Cologne'], 'Köln');
+    expect(cityNames['es']!['Cologne'], 'Colonia');
+    expect(cityNames['pt']!['Munich'], 'Munique');
+    expect(cityNames['de']!['Beijing'], 'Peking', reason: 'extraCityNames');
+    expect(cityNames['es']!['Berlin'], 'Berlín', reason: 'CLDR');
+    expect(cityNames['de']!['Berlin'], isNull);
+    expect(cityNames['de']!['Hamburg'], isNull);
   });
 
   test('name the cities of GeoNames in the other languages', () {

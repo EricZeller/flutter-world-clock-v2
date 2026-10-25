@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
 import 'package:world_clock_v2/widgets/world_map/world_map_painter.dart';
 
@@ -128,6 +129,7 @@ class _WorldMapState extends State<WorldMap> {
                     painter: MarkerPainter(
                       cities: widget.cities,
                       selectedCities: widget.selectedCities.toSet(),
+                      nameOf: PlaceNames.of(context).name,
                       scale: _scale,
                       markerColor: colorScheme.secondary,
                       labelBackground: colorScheme.inverseSurface,

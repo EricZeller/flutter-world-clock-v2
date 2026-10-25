@@ -312,6 +312,18 @@ void main() {
       expect(find.textContaining('Germany'), findsNothing);
     });
 
+    testWidgets('the cities are shown with their German names', (
+      tester,
+    ) async {
+      await pumpGerman(tester);
+
+      expect(find.text('München'), findsOneWidget);
+      expect(find.text('Munich'), findsNothing);
+      expect(find.text('Tokio'), findsOneWidget);
+      expect(find.text('Zuhause'), findsOneWidget,
+          reason: 'the custom city as entered');
+    });
+
     testWidgets('search finds German names', (tester) async {
       await pumpGerman(tester);
 
@@ -319,12 +331,17 @@ void main() {
       await tester.pump();
       expect(find.text('Stadt oder Land suchen (2 gefunden)'), findsOneWidget);
       expect(find.text('Berlin'), findsOneWidget);
-      expect(find.text('Munich'), findsOneWidget);
+      expect(find.text('München'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), 'Muenchen');
       await tester.pump();
       expect(find.text('Stadt oder Land suchen (1 gefunden)'), findsOneWidget);
-      expect(find.text('Munich'), findsOneWidget);
+      expect(find.text('München'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'munich');
+      await tester.pump();
+      expect(find.text('München'), findsOneWidget,
+          reason: 'found by its English name, shown with its German one');
 
       await tester.enterText(find.byType(TextField), 'germany');
       await tester.pump();

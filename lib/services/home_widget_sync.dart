@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/l10n/app_localizations.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/services/home_widget_service.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
@@ -32,6 +33,7 @@ class HomeWidgetSync {
     final language = Localizations.localeOf(context).languageCode;
     return _queue = _queue.then((_) => _sync(
           l10n: l10n,
+          names: PlaceNames(language),
           colorScheme: colorScheme,
           // wttr.in translates the descriptions; English is its default.
           lang: language == 'en' ? null : language,
@@ -42,6 +44,7 @@ class HomeWidgetSync {
 
   Future<void> _sync({
     required AppLocalizations l10n,
+    required PlaceNames names,
     required ColorScheme colorScheme,
     required String? lang,
     required SettingsProvider settings,
@@ -71,9 +74,9 @@ class HomeWidgetSync {
       final defaultCity = (await cities.loadFavorites()).first;
       // In parallel, so a slow network delays the widgets only once.
       final entries = await Future.wait([
-        _entry(null, defaultCity, l10n, lang, settings, download),
+        _entry(null, defaultCity, l10n, names, lang, settings, download),
         for (final MapEntry(:key, :value) in widgetCities.entries)
-          _entry(key, value, l10n, lang, settings, download),
+          _entry(key, value, l10n, names, lang, settings, download),
       ]);
       await HomeWidgetService.update(
         cities: entries,
@@ -87,7 +90,8 @@ class HomeWidgetSync {
   }
 
   Future<WidgetCity> _entry(int? widgetId, City city, AppLocalizations l10n,
-      String? lang, SettingsProvider settings, bool download) async {
+      PlaceNames names, String? lang, SettingsProvider settings,
+      bool download) async {
     final result = download
         ? await weather.current(
             server: settings.wttrServer,
@@ -106,6 +110,7 @@ class HomeWidgetSync {
     return (
       widgetId: widgetId,
       city: city,
+      name: names.name(city),
       // Without a report the widget shows the same status as the app.
       weather: report?.summary(fahrenheit: fahrenheit) ??
           weatherStatusText(l10n,

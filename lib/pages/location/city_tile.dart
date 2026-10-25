@@ -36,7 +36,7 @@ class CityTile extends StatelessWidget {
       value: isFavorite,
       onChanged: (_) => onToggleFavorite(),
       title: Text(
-        city.name,
+        PlaceNames.of(context).name(city),
         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
       ),
       subtitle: Text(
@@ -84,7 +84,7 @@ class FavoriteTile extends StatelessWidget {
       child: ListTile(
         leading: _flag(city),
         title: Text(
-          city.name,
+          PlaceNames.of(context).name(city),
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(PlaceNames.of(context).details(city)),
