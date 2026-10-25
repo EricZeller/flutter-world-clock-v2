@@ -1,0 +1,4 @@
+• Tous les pays du monde : la capitale de chaque État et territoire habité, du Groenland au Vanuatu
+• Carte : zoom jusqu’à 20x avec une grille de points plus fine ; touchez une ville, puis la coche l’ajoute
+• Ville personnalisée : la liste des pays ne cache plus votre saisie quand le clavier est ouvert et trouve les pays par nom et capitale
+• Corrections de bugs

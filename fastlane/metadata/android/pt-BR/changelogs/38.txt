@@ -1,0 +1,4 @@
+• Todos os países do mundo: a capital de cada estado e território habitado, da Groenlândia a Vanuatu
+• Mapa: amplie até 20 vezes com uma grade de pontos mais fina; toque em uma cidade e a marca de seleção a adiciona
+• Cidade própria: a lista de países não cobre mais o que você digita com o teclado aberto e encontra países por nome e capital
+• Correções de erros

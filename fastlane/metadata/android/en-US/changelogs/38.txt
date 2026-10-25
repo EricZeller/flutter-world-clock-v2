@@ -1,0 +1,4 @@
+• Every country of the world: the capital of every state and inhabited territory, from Greenland to Vanuatu
+• Map: zoom in up to 20x with a finer dot grid; tap a city, then the check mark adds it
+• Custom city: the country list no longer covers what you type when the keyboard is open, and finds countries by name and capital
+• Bug fixes
