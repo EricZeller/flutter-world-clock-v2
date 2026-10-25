@@ -109,6 +109,14 @@ const cityStates = {'hk', 'mo', 'sg'};
 /// first run after adding one here.
 const includedIds = {
   2885679, // Konstanz, Germany
+  // The capitals of the states that have no city over half a million, so
+  // every sovereign state is bundled.
+  2081986, // Palikir, Micronesia
+  2135171, // Port Vila, Vanuatu
+  3060972, // Bratislava, Slovakia
+  3196359, // Ljubljana, Slovenia
+  3576022, // Saint John's, Antigua and Barbuda
+  6691831, // Vatican City
 };
 
 /// GeoNames ids of places that qualify by their GeoNames population but are
@@ -133,7 +141,11 @@ const languages = ['de', 'es', 'fr', 'pt'];
 /// (Ivory Coast), or that are listed under another country's name: Macau
 /// as China, like Hong Kong. Other countries already in cities.json keep
 /// their names.
-const countryNames = {'ci': 'Côte d\'Ivoire', 'mo': 'China'};
+const countryNames = {
+  'ci': 'Côte d\'Ivoire',
+  'mo': 'China',
+  'va': 'Vatican City',
+};
 
 const geoNamesBase = 'https://download.geonames.org/export/dump';
 const flagBase = 'https://flagcdn.com/w80';
