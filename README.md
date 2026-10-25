@@ -23,7 +23,7 @@ World Clock is a Flutter app that displays the current time and weather for vari
 ## Features
 
 - Current time of your favorite cities, with the difference to your local time and upcoming time zone changes
-- 800 bundled cities with flags: the big cities of every country and every capital, shown and searchable in English, German, Spanish, French and Portuguese
+- 850 bundled cities with flags: the big cities of every country and the capital of every state and inhabited territory, shown and searchable in English, German, Spanish, French and Portuguese
 - Custom cities for any place, with the time zones of its country
 - Current weather and forecast for the next hours and days, including sunrise and sunset, UV index and moon phase, from a [wttr.in](https://wttr.in) server of your choice (also works offline with the last report)
 - World map with day and night, showing your cities

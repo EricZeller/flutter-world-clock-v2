@@ -9,7 +9,9 @@
 //   does needs [excludedIds].
 // - the [maxPerCountry] most populous cities with at least [minPopulation]
 //   inhabitants of each country,
-// - the capital of every country that has a city in the list.
+// - the capital of every country and territory that GeoNames knows one
+//   of, so every state is bundled and every inhabited territory with a
+//   time zone of its own (Greenland, Puerto Rico, Réunion).
 //
 // Only countries with a flag in assets/flags are bundled. A country that
 // lacks one gets it from flagcdn.com (the flags of flagpedia.net the other
@@ -109,14 +111,6 @@ const cityStates = {'hk', 'mo', 'sg'};
 /// first run after adding one here.
 const includedIds = {
   2885679, // Konstanz, Germany
-  // The capitals of the states that have no city over half a million, so
-  // every sovereign state is bundled.
-  2081986, // Palikir, Micronesia
-  2135171, // Port Vila, Vanuatu
-  3060972, // Bratislava, Slovakia
-  3196359, // Ljubljana, Slovenia
-  3576022, // Saint John's, Antigua and Barbuda
-  6691831, // Vatican City
 };
 
 /// GeoNames ids of places that qualify by their GeoNames population but are
@@ -142,9 +136,22 @@ const languages = ['de', 'es', 'fr', 'pt'];
 /// as China, like Hong Kong. Other countries already in cities.json keep
 /// their names.
 const countryNames = {
+  'ax': 'Åland Islands',
+  'bl': 'Saint Barthélemy',
+  'bq': 'Caribbean Netherlands',
   'ci': 'Côte d\'Ivoire',
+  'cw': 'Curaçao',
   'mo': 'China',
+  'pn': 'Pitcairn Islands',
+  're': 'Réunion',
   'va': 'Vatican City',
+};
+
+/// Territories without permanent inhabitants, whose only places are
+/// research stations: not bundled although GeoNames marks a capital.
+const excludedCountries = {
+  'gs', // South Georgia and the South Sandwich Islands
+  'tf', // French Southern Territories
 };
 
 const geoNamesBase = 'https://download.geonames.org/export/dump';
@@ -218,6 +225,7 @@ Future<void> generate(
   }
   var skipped = 0;
   for (final MapEntry(key: country, value: places) in byCountry.entries) {
+    if (excludedCountries.contains(country)) continue;
     final kept = [
       for (final place in places)
         if (wanted.containsKey(place.id)) place,
@@ -264,8 +272,10 @@ Future<void> generate(
       }
       chosen.sort((a, b) => b.population.compareTo(a.population));
     }
-    // A country without a city of its own is not bundled, nor its capital.
-    if (kept.isEmpty && chosen.isEmpty) continue;
+    // Every country and territory with a capital in GeoNames is bundled,
+    // if only with its capital; uninhabited islands and dissolved states
+    // have none.
+    if (kept.isEmpty && chosen.isEmpty && capital == null) continue;
     // The cities of cities.json that are big enough count against the
     // limit, so running this again adds nothing.
     final bigKept = kept
