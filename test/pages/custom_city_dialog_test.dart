@@ -166,6 +166,25 @@ void main() {
     await tester.pump();
   }
 
+  testWidgets('the country menu stays below its field with the keyboard up',
+      (tester) async {
+    // 1080 x 2400 at 2x: 1200 dp, of which a keyboard takes 500 dp.
+    tester.view.viewInsets = const FakeViewPadding(bottom: 1000);
+    await openDialog(tester);
+
+    await tester.tap(countryField);
+    await tester.pumpAndSettle();
+    final menu = tester.getRect(find
+        .ancestor(of: find.text('France'), matching: find.byType(Scrollable))
+        .first);
+    expect(menu.top, greaterThanOrEqualTo(tester.getRect(countryField).bottom),
+        reason: 'the menu opens below the field, not over it');
+    expect(menu.bottom, lessThanOrEqualTo(1200 - 500),
+        reason: 'and ends above the keyboard');
+    expect(menu.height, inInclusiveRange(150, (1200 - 500) * 0.3),
+        reason: 'a third of the space above the keyboard, minus padding');
+  });
+
   testWidgets('countries can be found by name or city', (tester) async {
     await openDialog(tester);
 
