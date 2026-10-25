@@ -377,7 +377,10 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final menuHeight = _menuHeight(MediaQuery.of(context));
+    final menuHeight = _menuHeight(
+      MediaQuery.sizeOf(context),
+      MediaQuery.viewInsetsOf(context),
+    );
     final country = _country;
     final appliesIn =
         _timeZoneFitsCountry ? country!.zones[_timeZone]!.comment : '';
@@ -513,12 +516,10 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   }
 }
 
-/// The height of the country and time zone menus: a third of the screen
-/// left above the keyboard, between 120 and 300. A menu that does not fit
-/// below its field is moved up over the fields, hiding what is typed.
-double _menuHeight(MediaQueryData mediaQuery) {
-  final free = mediaQuery.size.height -
-      mediaQuery.viewInsets.bottom -
-      mediaQuery.padding.vertical;
-  return (free * 0.3).clamp(120.0, 300.0);
-}
+/// The height of the country and time zone menus: 30% of the screen left
+/// above the keyboard ([insets]), between 120 and 300. A menu that does not
+/// fit below its field is moved up over the fields, hiding what is typed.
+/// The dialog's own route has removed the status bar from the screen
+/// already.
+double _menuHeight(Size screen, EdgeInsets insets) =>
+    ((screen.height - insets.bottom) * 0.3).clamp(120.0, 300.0);

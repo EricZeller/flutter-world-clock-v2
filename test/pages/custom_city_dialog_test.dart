@@ -168,9 +168,12 @@ void main() {
 
   testWidgets('the country menu stays below its field with the keyboard up',
       (tester) async {
-    // 1080 x 2400 at 2x: 1200 dp, of which a keyboard takes 500 dp.
-    tester.view.viewInsets = const FakeViewPadding(bottom: 1000);
-    await openDialog(tester);
+    // A 780 dp phone with a 32 dp status bar and a 320 dp keyboard, like
+    // the Pixel 10 the menu was seen covering the fields on: a 300 dp menu
+    // does not fit below the field and would be moved up over it.
+    tester.view.padding = const FakeViewPadding(top: 64);
+    tester.view.viewInsets = const FakeViewPadding(bottom: 640);
+    await openDialog(tester, physicalSize: const Size(1080, 1560));
 
     await tester.tap(countryField);
     await tester.pumpAndSettle();
@@ -179,10 +182,10 @@ void main() {
         .first);
     expect(menu.top, greaterThanOrEqualTo(tester.getRect(countryField).bottom),
         reason: 'the menu opens below the field, not over it');
-    expect(menu.bottom, lessThanOrEqualTo(1200 - 500),
+    expect(menu.bottom, lessThanOrEqualTo(780 - 320),
         reason: 'and ends above the keyboard');
-    expect(menu.height, inInclusiveRange(150, (1200 - 500) * 0.3),
-        reason: 'a third of the space above the keyboard, minus padding');
+    expect(menu.height, lessThanOrEqualTo((780 - 320) * 0.3),
+        reason: '30% of the space above the keyboard');
   });
 
   testWidgets('countries can be found by name or capital', (tester) async {
@@ -836,6 +839,30 @@ void main() {
       await pickCountry(tester, 'canada', 'Canada');
       expect(fieldText(tester, timeZoneField), '',
           reason: 'Detroit is no zone of Canada, whose cities are in several');
+    });
+
+    testWidgets('the time zone menu stays below its field with the keyboard up',
+        (tester) async {
+      tester.view.padding = const FakeViewPadding(top: 64);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 640);
+      await openBundled(tester, physicalSize: const Size(1080, 1560));
+      await pickCountry(tester, 'russia', 'Russia');
+      expect(fieldText(tester, countryField), 'Russia');
+
+      // The dialog scrolls above the keyboard; the field has to be on screen.
+      await tester.ensureVisible(timeZoneField);
+      await tester.pumpAndSettle();
+      await tester.tap(timeZoneField);
+      await tester.pumpAndSettle();
+      final entries = menuEntries();
+      expect(entries, isNotEmpty, reason: 'the zones of Russia');
+      final menu = tester.getRect(find
+          .ancestor(
+              of: find.text(entries.first), matching: find.byType(Scrollable))
+          .first);
+      expect(menu.top,
+          greaterThanOrEqualTo(tester.getRect(timeZoneField).bottom));
+      expect(menu.bottom, lessThanOrEqualTo(780 - 320));
     });
 
     testWidgets('long lists of zones fit on a small phone', (tester) async {
