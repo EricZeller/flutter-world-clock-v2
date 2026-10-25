@@ -362,7 +362,8 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
         timeZone: zone.timeZone,
         flag: country.flag,
         utc: template?.utc ?? listedUtcOffset(zone.timeZone),
-        weatherZone: name,
+        // With the country, so wttr.in does not pick a namesake elsewhere.
+        weatherZone: '$name, ${country.name}',
         latitude: zone.countryZone?.latitude ?? template?.latitude,
         longitude: zone.countryZone?.longitude ?? template?.longitude,
         isCustom: true,

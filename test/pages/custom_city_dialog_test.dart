@@ -200,7 +200,11 @@ void main() {
 
     await tester.enterText(countryField, 'china');
     await tester.pumpAndSettle();
-    expect(menuEntries(), ['China (Beijing)', 'China (Hong Kong)']);
+    expect(menuEntries(), [
+      'China (Beijing)',
+      'China (Hong Kong)',
+      'China (Macau)',
+    ]);
 
     await pickCountry(tester, 'united states', 'United States');
     await tester.tap(timeZoneField);
@@ -856,7 +860,8 @@ void main() {
       expect(city.utc, '-07:00', reason: 'as listed in summer, like Seattle');
       expect(city.latitude, closeTo(49.2667, 0.0001));
       expect(city.longitude, closeTo(-123.1167, 0.0001));
-      expect(city.weatherZone, 'Zuhause');
+      expect(city.weatherZone, 'Zuhause, Canada',
+          reason: 'with the country, for wttr.in');
       expect(city.isCustom, isTrue);
     });
 

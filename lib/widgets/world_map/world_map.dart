@@ -19,6 +19,7 @@ class WorldMap extends StatefulWidget {
   });
 
   final List<City> cities;
+
   /// Highlighted cities; the map opens centered on the first one.
   final List<City> selectedCities;
   final ValueChanged<City> onCityTap;
@@ -67,8 +68,9 @@ class _WorldMapState extends State<WorldMap> {
   }
 
   void _centerOnSelectedCity(Size viewport, Size mapSize) {
-    final point =
-        MapProjection(mapSize).project(cityPosition(widget.selectedCities.first));
+    final point = MapProjection(
+      mapSize,
+    ).project(cityPosition(widget.selectedCities.first));
     // math.min: rounding can make the map a hair narrower than the viewport,
     // and clamp() throws if its lower limit ends up above the upper one.
     final dx = (viewport.width / 2 - point.dx)
@@ -130,6 +132,7 @@ class _WorldMapState extends State<WorldMap> {
                       cities: widget.cities,
                       selectedCities: widget.selectedCities.toSet(),
                       nameOf: PlaceNames.of(context).name,
+                      language: Localizations.localeOf(context).languageCode,
                       scale: _scale,
                       markerColor: colorScheme.secondary,
                       labelBackground: colorScheme.inverseSurface,

@@ -42,7 +42,8 @@ struct City: Decodable, Hashable, Sendable {
         }
     }()
 
-    /// Names are unique in cities.json, so they identify a city.
+    /// The first city of the name; cities of different countries can share
+    /// one (Hyderabad), so prefer `labeled`.
     static func named(_ name: String) -> City? {
         all.first { $0.name == name }
     }
@@ -56,7 +57,12 @@ struct City: Decodable, Hashable, Sendable {
     /// with an older version may still hold an ID like "Berlin|Europe/Berlin".
     static func labeled(_ label: String) -> City? {
         if let city = all.first(where: { $0.label == label }) { return city }
-        let name = label.split(separator: "|", maxSplits: 1).first.map(String.init) ?? label
+        let parts = label.split(separator: "|", maxSplits: 1).map(String.init)
+        let name = parts.first ?? label
+        if parts.count == 2,
+           let city = all.first(where: { $0.name == name && $0.timeZone == parts[1] }) {
+            return city
+        }
         if let city = named(name) { return city }
         return all
             .filter { label.hasPrefix("\($0.name), ") }

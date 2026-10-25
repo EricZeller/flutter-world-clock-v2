@@ -80,6 +80,7 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'Asia/Bishkek': (42.87, 74.59),
   'Asia/Vientiane': (17.97, 102.63),
   'Asia/Beirut': (33.89, 35.50),
+  'Asia/Damascus': (33.51, 36.29),
   'Asia/Kuala_Lumpur': (3.14, 101.69),
   'Asia/Ulaanbaatar': (47.92, 106.92),
   'Asia/Yangon': (19.76, 96.08),

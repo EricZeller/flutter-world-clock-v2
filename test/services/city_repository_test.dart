@@ -71,7 +71,9 @@ void main() {
     final flags = {for (final city in cities) city.flag};
     final unused = [
       for (final file in Directory('assets/flags').listSync())
-        if (file is File && !flags.contains(file.uri.pathSegments.last))
+        if (file is File &&
+            file.path.endsWith('.webp') &&
+            !flags.contains(file.uri.pathSegments.last))
           file.uri.pathSegments.last,
     ]..sort();
     expect(unused, isEmpty);

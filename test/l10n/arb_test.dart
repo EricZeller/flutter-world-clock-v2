@@ -16,7 +16,8 @@ void main() {
   test('an ARB file exists for every supported language and vice versa', () {
     final files = {
       for (final file in Directory('lib/l10n').listSync())
-        if (RegExp(r'app_(\w+)\.arb$').firstMatch(file.path) case final match?)
+        if (RegExp(r'app_([a-z]+)\.arb$').firstMatch(file.path)
+            case final match?)
           match.group(1)!,
     };
     expect(files, languages);
@@ -30,11 +31,11 @@ void main() {
       for (final key in messages) {
         final message = arb[key] as String;
         expect(message.trim(), isNotEmpty, reason: key);
-        // Every placeholder of the template is used, also in plurals
-        // ({count, plural, ...}), hence no closing brace.
+        // Every placeholder of the template is used: `{time}`, or
+        // `{count, plural, ...}` for a plural.
         if (template['@$key'] case {'placeholders': final Map placeholders}) {
           for (final placeholder in placeholders.keys) {
-            expect(message, contains('{$placeholder'), reason: key);
+            expect(message, matches('\\{$placeholder[,}]'), reason: key);
           }
         }
       }

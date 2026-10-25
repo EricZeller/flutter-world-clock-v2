@@ -65,6 +65,7 @@ const cldrKeys = {
   'cd': 'CD-alt-variant', // Congo (DRC)
   'cg': 'CG-alt-variant', // Congo (Republic)
   'hk': 'CN', // China, like the rest of China
+  'mo': 'CN', // China, like Hong Kong
   'mm': 'MM-alt-short', // Myanmar
   'ps': 'PS-alt-short', // Palestine
 };
@@ -189,48 +190,53 @@ Future<void> generate(HttpClient client) async {
     };
 
     final zones = await exemplarCities(client, language);
+    // Both by the city's key: its name and country code (Hyderabad|in),
+    // since cities of different countries share names.
     final exonyms = <String, Set<String>>{};
     // The name shown: of extraCityNames, else CLDR's, else the preferred
     // one of GeoNames.
     final shown = <String, String>{};
     for (final city in cities) {
       final name = city['name'] as String;
+      final key = cityKey(city);
       final zone = city['timeZone'] as String;
       final exemplar = englishZones[zone] ?? zoneCity(zone);
       if (foldForSearch(exemplar) != foldForSearch(name)) continue;
       final local = zones[zone];
-      if (local != null) exonyms.putIfAbsent(name, () => {}).add(local);
+      if (local != null) exonyms.putIfAbsent(key, () => {}).add(local);
       // CLDR's name, which is the English one where the language has none
       // of its own (New York), not GeoNames' (New York City).
-      shown[name] = local ?? name;
-    }
-    for (final MapEntry(key: name, value: extra)
-        in (extraCityNames[language] ?? const {}).entries) {
-      exonyms.putIfAbsent(name, () => {}).addAll(extra);
-      shown[name] = extra.first;
+      shown[key] = local ?? name;
     }
     for (final city in cities) {
       final name = city['name'] as String;
+      final key = cityKey(city);
+      final extra = extraCityNames[language]?[name];
+      if (extra != null) {
+        exonyms.putIfAbsent(key, () => {}).addAll(extra);
+        shown[key] = extra.first;
+      }
       final names = geoNames['${city['id']}']?[language];
       if (names is List) {
-        exonyms.putIfAbsent(name, () => {}).addAll(names.cast<String>());
-        final preferred = names.cast<String>().where(
-          (shown) => isShownName(name, shown),
-        );
+        exonyms.putIfAbsent(key, () => {}).addAll(names.cast<String>());
+        // A name told apart by its region, Suzhou (Anhui), keeps it.
+        final preferred = name.contains(' (')
+            ? const <String>[]
+            : names.cast<String>().where((shown) => isShownName(name, shown));
         if (preferred.isNotEmpty) {
-          shown.putIfAbsent(name, () => preferred.first);
+          shown.putIfAbsent(key, () => preferred.first);
         }
       }
     }
     cityNames[language] = {
-      for (final name in shown.keys.toList()..sort())
-        if (shown[name] != name) name: shown[name]!,
+      for (final key in shown.keys.toList()..sort())
+        if (shown[key] != key.split('|').first) key: shown[key]!,
     };
     cityExonyms[language] = {
-      for (final name in exonyms.keys.toList()..sort())
-        if (neededExonyms(name, exonyms[name]!) case final found
+      for (final key in exonyms.keys.toList()..sort())
+        if (neededExonyms(key.split('|').first, exonyms[key]!) case final found
             when found.isNotEmpty)
-          name: found,
+          key: found,
     };
   }
 
@@ -274,18 +280,24 @@ List<String> neededExonyms(String name, Set<String> exonyms) {
 /// Whether a GeoNames name of the city [english] is worth showing instead
 /// of the English name: not a transliteration (Āgrā, Hamhŭng), which the
 /// search still finds; not the same name with other apostrophes (Ta’if);
-/// and not the English name without its accents (Torreon for Torreón).
+/// not the English name without its accents (Torreon for Torreón), and not
+/// the English name with the circumflexes of a transliteration (Karâchi).
 bool isShownName(String english, String shown) {
   String plain(String name) => name.replaceAll(RegExp("['’‘ʻ]"), '');
   int accents(String name) => name.runes.where((rune) => rune > 0x7f).length;
+  final sameLetters = foldForSearch(shown) == foldForSearch(english);
   return !RegExp('[āēīōūĀĒĪŌŪŭŬ\u1E00-\u1EFF]').hasMatch(shown) &&
       plain(shown) != plain(english) &&
-      !(foldForSearch(shown) == foldForSearch(english) &&
-          accents(shown) < accents(english));
+      !(sameLetters && accents(shown) < accents(english)) &&
+      !(sameLetters && RegExp('[âêîôûÂÊÎÔÛ]').hasMatch(shown));
 }
 
 /// `de` for the flag `de.webp`.
 String countryCode(String flag) => flag.split('.').first.toLowerCase();
+
+/// `Munich|de`, see PlaceNames.key.
+String cityKey(Map<String, dynamic> city) =>
+    '${city['name']}|${countryCode(city['flag'] as String)}';
 
 /// `New York` for `America/New_York`, the English exemplar city of a zone
 /// that CLDR does not list.
@@ -424,7 +436,11 @@ String dartSource(
       '/// The names bundled cities are shown with, by language and the '
       'name the',
     )
-    ..writeln('/// city is stored with, where they differ: München for Munich.')
+    ..writeln(
+      '/// city is stored with and the code of its flag '
+      '(Munich|de), where they',
+    )
+    ..writeln('/// differ: München for Munich.')
     ..writeln('const cityNames = <String, Map<String, String>>{');
   for (final MapEntry(key: language, value: cities) in cityNames.entries) {
     out.writeln('  ${literal(language)}: {');
@@ -440,7 +456,11 @@ String dartSource(
       '/// Other names of bundled cities by language and the name '
       'the city is',
     )
-    ..writeln('/// stored with, which the search finds the city by.')
+    ..writeln(
+      '/// stored with and the code of its flag (Munich|de), '
+      'which the search',
+    )
+    ..writeln('/// finds the city by.')
     ..writeln('const cityExonyms = <String, Map<String, List<String>>>{');
   for (final MapEntry(key: language, value: cities) in cityExonyms.entries) {
     out.writeln('  ${literal(language)}: {');

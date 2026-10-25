@@ -17,7 +17,7 @@ void main() {
   String describe(Map<String, dynamic> city) =>
       '${city['name']}, ${city['country']}';
 
-  test('are every city over half a million and every capital', () {
+  test('are hundreds of cities in nearly every country', () {
     expect(cities.length, greaterThan(700));
     final countries = {for (final city in cities) city['flag']};
     expect(countries.length, greaterThan(180));

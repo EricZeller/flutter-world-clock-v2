@@ -68,7 +68,11 @@ bool isBigCity(City city) =>
 /// bigger the city, the sooner; capitals like big cities. Custom cities
 /// count as metropolises; a city of an older version without a population
 /// as a small one.
-bool isLabelVisible(City city, {required bool isSelected, required double scale}) {
+bool isLabelVisible(
+  City city, {
+  required bool isSelected,
+  required double scale,
+}) {
   if (isSelected) return true;
   if (city.isCustom) return scale >= 1.6;
   final population = city.population ?? 0;
@@ -91,6 +95,7 @@ class MarkerPainter extends CustomPainter {
     required this.cities,
     required this.selectedCities,
     required this.nameOf,
+    required this.language,
     required this.scale,
     required this.markerColor,
     required this.labelBackground,
@@ -100,8 +105,9 @@ class MarkerPainter extends CustomPainter {
   final List<City> cities;
   final Set<City> selectedCities;
 
-  /// The name a city is labeled with, in the app's language.
+  /// The name a city is labeled with, in the app's language [language].
   final String Function(City) nameOf;
+  final String language;
   final double scale;
   final Color markerColor;
   final Color labelBackground;
@@ -130,20 +136,27 @@ class MarkerPainter extends CustomPainter {
 
   void _paintMarker(Canvas canvas, Offset point, City city, bool isSelected) {
     final unit = 1 / scale;
-    final radius = (isSelected
+    final radius =
+        (isSelected
             ? 6.0
             : city.isCustom
-                ? 5.0
-                : isBigCity(city)
-                    ? 3.5
-                    : 2.5) *
+            ? 5.0
+            : isBigCity(city)
+            ? 3.5
+            : 2.5) *
         unit;
     if (isSelected) {
-      canvas.drawCircle(point, 14 * unit,
-          Paint()..color = markerColor.withValues(alpha: 0.25));
+      canvas.drawCircle(
+        point,
+        14 * unit,
+        Paint()..color = markerColor.withValues(alpha: 0.25),
+      );
     }
     canvas.drawCircle(
-        point, radius + 1.5 * unit, Paint()..color = labelBackground);
+      point,
+      radius + 1.5 * unit,
+      Paint()..color = labelBackground,
+    );
     canvas.drawCircle(
       point,
       radius,
@@ -154,35 +167,53 @@ class MarkerPainter extends CustomPainter {
     );
   }
 
-  void _paintLabel(Canvas canvas, Offset point, String name, bool isSelected) {
-    final label = TextPainter(
-      text: TextSpan(
-        text: name,
-        style: TextStyle(
-          color: labelColor,
-          fontSize: (isSelected ? 13 : 11) / scale,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-      maxLines: 1,
-      ellipsis: '…',
-    )..layout(maxWidth: 140 / scale);
+  /// Laid-out labels by name, selection and color: laying out the names of
+  /// hundreds of cities on every zoom step would stutter. The labels are
+  /// laid out at screen size and drawn scaled, so the zoom level does not
+  /// matter.
+  static final _labels = <String, TextPainter>{};
 
-    final padding = EdgeInsets.symmetric(
-        horizontal: 5 / scale, vertical: 2 / scale);
-    final topLeft = point + Offset(8 / scale, -label.height / 2 - padding.top);
+  void _paintLabel(Canvas canvas, Offset point, String name, bool isSelected) {
+    if (_labels.length > 4000) _labels.clear();
+    final label = _labels.putIfAbsent(
+      '$isSelected|${labelColor.toARGB32()}|$name',
+      () => TextPainter(
+        text: TextSpan(
+          text: name,
+          style: TextStyle(
+            color: labelColor,
+            fontSize: isSelected ? 13 : 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+        maxLines: 1,
+        ellipsis: '…',
+      )..layout(maxWidth: 140),
+    );
+
+    const padding = EdgeInsets.symmetric(horizontal: 5, vertical: 2);
+    final topLeft = Offset(8, -label.height / 2 - padding.top);
     final bubble = RRect.fromRectAndRadius(
-      Rect.fromLTWH(topLeft.dx, topLeft.dy, label.width + padding.horizontal,
-          label.height + padding.vertical),
-      Radius.circular(6 / scale),
+      Rect.fromLTWH(
+        topLeft.dx,
+        topLeft.dy,
+        label.width + padding.horizontal,
+        label.height + padding.vertical,
+      ),
+      const Radius.circular(6),
     );
-    canvas.drawRRect(
-      bubble,
-      Paint()
-        ..color = labelBackground.withValues(alpha: isSelected ? 0.9 : 0.7),
-    );
+    canvas
+      ..save()
+      ..translate(point.dx, point.dy)
+      ..scale(1 / scale)
+      ..drawRRect(
+        bubble,
+        Paint()
+          ..color = labelBackground.withValues(alpha: isSelected ? 0.9 : 0.7),
+      );
     label.paint(canvas, topLeft + Offset(padding.left, padding.top));
+    canvas.restore();
   }
 
   @override
@@ -190,6 +221,7 @@ class MarkerPainter extends CustomPainter {
       oldDelegate.cities != cities ||
       !setEquals(oldDelegate.selectedCities, selectedCities) ||
       oldDelegate.scale != scale ||
+      oldDelegate.language != language ||
       oldDelegate.markerColor != markerColor ||
       oldDelegate.labelBackground != labelBackground ||
       oldDelegate.labelColor != labelColor;

@@ -5,7 +5,8 @@
 //   Its name, country and time zone are kept, so favorites and widget
 //   cities saved with it still match the bundled version (see
 //   CityRepository); its coordinates, offset and population are refreshed.
-//   Delete an entry to drop a city.
+//   Delete an entry to drop a city that no longer qualifies; one that still
+//   does needs [excludedIds].
 // - the [maxPerCountry] most populous cities with at least [minPopulation]
 //   inhabitants of each country,
 // - the capital of every country that has a city in the list.
@@ -76,10 +77,12 @@ const minPopulation = 500000;
 /// cities over half a million.
 const maxPerCountry = 50;
 
-/// Cities this close to a bigger city of their country (or to one that
-/// ranks higher, see [featureRank]) are left out: boroughs that GeoNames
-/// lists as places of their own (Brooklyn, Kowloon) and suburbs (Guarulhos
-/// next to São Paulo), which the clock of the big city serves.
+/// Cities this close to a bigger city of their country are left out:
+/// boroughs that GeoNames lists as places of their own (Brooklyn, Kowloon)
+/// and suburbs (Guarulhos next to São Paulo), which the clock of the big
+/// city serves. Cities are considered by their rank first (see
+/// [featureRank]), so a regional center keeps its name against a
+/// neighborhood with the same population.
 const suburbDistanceKm = 20.0;
 
 /// Places of these kinds are bundled; GeoNames feature codes. Left out are
@@ -118,6 +121,7 @@ const excludedIds = {
   1180942, // Chunian, Pakistan: a town of 70,000
   1184370, // Arifwala, Pakistan: a town of 100,000
   1194041, // Mohammadpur, Bangladesh: a town, population of the district
+  1258393, // Rasapūdipalem, India: a village, population of Visakhapatnam
   1723510, // Budta, Philippines: a village, population of the province
   6847550, // Kota Kuala Muda, Malaysia: a town, population of the district
 };
@@ -126,8 +130,10 @@ const excludedIds = {
 const languages = ['de', 'es', 'fr', 'pt'];
 
 /// English names of countries that are not called by their GeoNames name
-/// (Ivory Coast). The countries already in cities.json keep their names.
-const countryNames = {'ci': 'Côte d\'Ivoire'};
+/// (Ivory Coast), or that are listed under another country's name: Macau
+/// as China, like Hong Kong. Other countries already in cities.json keep
+/// their names.
+const countryNames = {'ci': 'Côte d\'Ivoire', 'mo': 'China'};
 
 const geoNamesBase = 'https://download.geonames.org/export/dump';
 const flagBase = 'https://flagcdn.com/w80';
@@ -226,8 +232,11 @@ Future<void> generate(
             });
       for (final place in candidates) {
         final near = [...kept, ?capital, ...chosen].where(
+          // A bigger city, or one as big: a small capital (New Delhi) does
+          // not stand in for the metropolis next to it (Delhi).
           (other) =>
               other.id != place.id &&
+              other.population >= place.population &&
               distanceKm(place, other) < suburbDistanceKm,
         );
         if (near.isNotEmpty) {
@@ -267,7 +276,7 @@ Future<void> generate(
   final countryName = <String, String>{};
   for (final city in existing) {
     final code = countryCode(city['flag'] as String);
-    final name = city['country'] as String;
+    final name = countryNames[code] ?? city['country'] as String;
     if (countryName.putIfAbsent(code, () => name) != name) {
       stderr.writeln('$code is both ${countryName[code]} and $name');
       exit(1);
@@ -372,8 +381,10 @@ Future<void> generate(
     '${cities.length - existing.length} new',
   );
 
-  // One city per line keeps the diffs readable.
-  final ids = cityNames.keys.toList()..sort();
+  // One city per line keeps the diffs readable. Only the cities that stayed
+  // after disambiguate.
+  final kept = {for (final city in cities) city['id'] as int};
+  final ids = cityNames.keys.where(kept.contains).toList()..sort();
   File(cityNamesPath)
     ..createSync(recursive: true)
     ..writeAsStringSync(
