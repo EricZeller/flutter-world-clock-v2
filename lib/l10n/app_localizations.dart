@@ -368,6 +368,60 @@ abstract class AppLocalizations {
   /// **'If you have any questions or suggestions, feel free to contact me over GitHub or open an Issue over the repository of this app.'**
   String get contactDescription;
 
+  /// No description provided for @dataSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sources'**
+  String get dataSources;
+
+  /// No description provided for @dataSourcesDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a source to open its website.'**
+  String get dataSourcesDescription;
+
+  /// No description provided for @geoNamesCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Cities with their coordinates, populations and names in other languages. CC BY 4.0'**
+  String get geoNamesCredit;
+
+  /// No description provided for @cldrCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Country and city names in other languages. Unicode License v3'**
+  String get cldrCredit;
+
+  /// No description provided for @timeZonesCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Time zones of the countries. Public domain'**
+  String get timeZonesCredit;
+
+  /// No description provided for @flagsCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Flags'**
+  String get flagsCredit;
+
+  /// No description provided for @weatherCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather, from the server chosen in the settings'**
+  String get weatherCredit;
+
+  /// No description provided for @fontsCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Fonts Red Hat Display and Pacifico. SIL Open Font License'**
+  String get fontsCredit;
+
+  /// No description provided for @openWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Open website'**
+  String get openWebsite;
+
   /// No description provided for @sortByCity.
   ///
   /// In en, this message translates to:

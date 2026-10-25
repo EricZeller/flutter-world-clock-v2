@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:world_clock_v2/pages/about.dart';
+
+import '../helpers/test_app.dart';
 
 void main() {
   group('parseAppVersion', () {
@@ -39,5 +43,33 @@ void main() {
       final expected = line.substring('version:'.length).trim().split('+').first;
       expect(parseAppVersion(pubspec), expected);
     });
+  });
+
+  testWidgets('credits the data sources with their licenses', (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    // The page reads pubspec.yaml for the version, which needs real I/O.
+    await tester.runAsync(
+      () async =>
+          pumpPage(tester, const AboutPage(), settings: await loadSettings()),
+    );
+
+    expect(find.text('Data sources', skipOffstage: false), findsOneWidget);
+    for (final source in [
+      'GeoNames',
+      'Unicode CLDR',
+      'IANA Time Zone Database',
+      'flagpedia.net',
+      'wttr.in',
+      'Google Fonts',
+    ]) {
+      expect(find.text(source, skipOffstage: false), findsOneWidget);
+    }
+    expect(find.textContaining('CC BY 4.0', skipOffstage: false),
+        findsOneWidget,
+        reason: 'the license of GeoNames');
+    expect(find.textContaining('SIL Open Font License', skipOffstage: false),
+        findsOneWidget);
+    expect(find.byIcon(Icons.open_in_new, skipOffstage: false),
+        findsNWidgets(6));
   });
 }
