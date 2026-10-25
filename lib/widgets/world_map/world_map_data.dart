@@ -45,6 +45,7 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'Europe/Budapest': (47.50, 19.04),
   'Europe/Dublin': (53.35, -6.26),
   'Europe/Belgrade': (44.79, 20.47),
+  'Europe/Sarajevo': (43.86, 18.41),
   'Europe/Riga': (56.95, 24.11),
   'Europe/Vaduz': (47.14, 9.52),
   'Europe/Vilnius': (54.69, 25.28),
@@ -93,6 +94,8 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'Asia/Muscat': (23.58, 58.41),
   'Asia/Karachi': (33.68, 73.04),
   'Asia/Manila': (14.60, 120.98),
+  'Asia/Brunei': (4.89, 114.94),
+  'Asia/Phnom_Penh': (11.56, 104.92),
   'Asia/Hebron': (31.90, 35.20),
   'Asia/Qatar': (25.28, 51.53),
   'Asia/Riyadh': (24.71, 46.67),
@@ -136,6 +139,11 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'America/St_Vincent': (13.16, -61.22),
   'America/Paramaribo': (5.85, -55.20),
   'America/Port_of_Spain': (10.65, -61.51),
+  'America/Barbados': (13.10, -59.62),
+  'America/La_Paz': (-16.50, -68.15),
+  'America/Nassau': (25.05, -77.34),
+  'America/Belize': (17.25, -88.77),
+  'America/Grenada': (12.06, -61.75),
   'America/Montevideo': (-34.90, -56.16),
 
   // Afrika
@@ -171,6 +179,7 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'Africa/Windhoek': (-22.56, 17.06),
   'Africa/Niamey': (13.51, 2.12),
   'Africa/Lagos': (9.07, 7.39),
+  'Africa/Porto-Novo': (6.50, 2.60),
   'Africa/Kigali': (-1.94, 30.06),
   'Africa/Sao_Tome': (0.33, 6.73),
   'Africa/Dakar': (14.71, -17.46),
@@ -204,5 +213,6 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'Pacific/Guadalcanal': (-9.44, 159.97),
   'Pacific/Tongatapu': (-21.13, -175.20),
   'Pacific/Funafuti': (-8.52, 179.19),
+  'Pacific/Fiji': (-18.14, 178.44),
   'Pacific/Honolulu': (21.30, -157.85),
 };
