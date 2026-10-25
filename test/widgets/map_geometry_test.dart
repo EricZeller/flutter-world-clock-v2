@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -49,6 +50,23 @@ void main() {
     });
   });
 
+  group('dotDiameter', () {
+    const projection = MapProjection(Size(3000, 1200));
+
+    test('is 62% of a cell at the zoom level the grid is drawn from', () {
+      expect(projection.dotDiameter(), closeTo(3000 / 300 * 0.62, 0.001));
+      expect(projection.dotDiameter(grid: LandGrid.fine, scale: fineLandFrom),
+          closeTo(3000 / 900 * 0.62, 0.001));
+    });
+
+    test('shrinks on the map as the zoom grows, growing on screen', () {
+      final at3 = projection.dotDiameter(grid: LandGrid.fine, scale: 3);
+      final at12 = projection.dotDiameter(grid: LandGrid.fine, scale: 12);
+      expect(at12, closeTo(at3 / 2, 0.001), reason: 'half on the map');
+      expect(at12 * 12, closeTo(at3 * 3 * 2, 0.01), reason: 'twice on screen');
+    });
+  });
+
   group('LandGrid', () {
     bool isLand(LandGrid grid, double latitude, double longitude) =>
         grid.cells.any(
@@ -67,6 +85,34 @@ void main() {
         closeTo(LandGrid.coarse.step, 0.001),
         reason: 'the fine dots are as big at 3x as the coarse ones at 1x',
       );
+    });
+
+    test('decodes the cells with their sines and cosines, in bands', () {
+      final cells = LandGrid.coarse.data;
+      expect(cells.length, landCells.length);
+      expect(cells.centers, landCells);
+      for (var i = 0; i < cells.length; i += 97) {
+        expect(cells.sinLatitudes[i],
+            closeTo(math.sin(cells.latitudes[i] * math.pi / 180), 1e-9));
+        expect(cells.cosLongitudes[i],
+            closeTo(math.cos(cells.longitudes[i] * math.pi / 180), 1e-9));
+      }
+      expect(cells.bandStarts.first, 0);
+      expect(cells.bandStarts.last, cells.length);
+      // Bands of whole rows: 8 rows of 1.2 degrees.
+      final rowsPerBand = (LandCells.bandDegrees / landMaskStep).round();
+      final bandHeight = rowsPerBand * landMaskStep;
+      expect(cells.bandStarts.length - 1, (landMaskRows / rowsPerBand).ceil());
+      for (var band = 0; band < cells.bandStarts.length - 1; band++) {
+        for (var i = cells.bandStarts[band]; i < cells.bandStarts[band + 1];
+            i++) {
+          expect(
+              cells.latitudes[i],
+              inInclusiveRange(landMaskNorth - (band + 1) * bandHeight,
+                  landMaskNorth - band * bandHeight),
+              reason: 'cell $i in band $band');
+        }
+      }
     });
 
     test('the fine grid shows the same continents, in more detail', () {

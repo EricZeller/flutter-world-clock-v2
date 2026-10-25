@@ -29,13 +29,14 @@ double sunElevation(LatLng point, LatLng sun) {
 
 enum Daylight { day, twilight, night }
 
-/// Civil twilight ends when the sun is 6° below the horizon.
-final _twilightLimit = -math.sin(6 * math.pi / 180);
+/// Civil twilight ends when the sun is 6° below the horizon: the sine of
+/// the elevation below which it is night.
+final twilightLimit = -math.sin(6 * math.pi / 180);
 
 Daylight daylightAt(LatLng point, LatLng sun) {
   final elevation = sunElevation(point, sun);
   if (elevation > 0) return Daylight.day;
-  if (elevation > _twilightLimit) return Daylight.twilight;
+  if (elevation > twilightLimit) return Daylight.twilight;
   return Daylight.night;
 }
 

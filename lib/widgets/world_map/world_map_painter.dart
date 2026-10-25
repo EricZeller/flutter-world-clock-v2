@@ -1,14 +1,19 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/widgets/world_map/land_mask.dart';
 import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
 
-/// Draws the land dots, dimmed where it is night. Only repaints when the
-/// minute, size, colors or the grid change; zooming merely scales the cached
-/// layer. Zoomed in past [fineLandFrom] the fine grid is drawn, so the dots
-/// stay dots instead of growing into blobs.
+/// Draws the land dots, dimmed where it is night. Repaints when the minute,
+/// size, colors or zoom level change; panning merely moves the cached
+/// layer. From [fineLandFrom] on the fine grid is drawn, so the dots stay
+/// dots instead of growing into blobs, see [MapProjection.dotDiameter].
+///
+/// The dots are drawn in bands of [LandCells.bandDegrees], so that the
+/// bands off screen are skipped when the map is zoomed in.
 class LandPainter extends CustomPainter {
   LandPainter({required this.sun, required this.color, required this.scale});
 
@@ -18,42 +23,85 @@ class LandPainter extends CustomPainter {
 
   LandGrid get grid => LandGrid.at(scale);
 
+  /// Coordinates of the dots of a band by daylight, reused between paints.
+  static final _buffers = <LandGrid, List<Float32List>>{};
+
   @override
   void paint(Canvas canvas, Size size) {
-    final projection = MapProjection(size);
     final grid = this.grid;
-    final points = {
-      for (final daylight in Daylight.values) daylight: <double>[],
-    };
-    for (final cell in grid.cells) {
-      final offset = projection.project(cell);
-      points[daylightAt(cell, sun)]!
-        ..add(offset.dx)
-        ..add(offset.dy);
-    }
-
-    const alphas = {
-      Daylight.day: 0.5,
-      Daylight.twilight: 0.3,
-      Daylight.night: 0.14,
-    };
-    for (final MapEntry(key: daylight, value: coordinates) in points.entries) {
-      canvas.drawRawPoints(
-        ui.PointMode.points,
-        Float32List.fromList(coordinates),
+    final cells = grid.data;
+    final buffers = _buffers.putIfAbsent(grid, () {
+      final longest = Iterable.generate(
+        cells.bandStarts.length - 1,
+        (i) => cells.bandStarts[i + 1] - cells.bandStarts[i],
+      ).fold(0, math.max);
+      return [for (final _ in Daylight.values) Float32List(2 * longest)];
+    });
+    final paints = [
+      for (final daylight in Daylight.values)
         Paint()
-          ..color = color.withValues(alpha: alphas[daylight])
-          ..strokeWidth = projection.dotDiameter(grid.columns)
+          ..color = color.withValues(alpha: _alphas[daylight]!)
+          ..strokeWidth = MapProjection(
+            size,
+          ).dotDiameter(grid: grid, scale: scale)
           ..strokeCap = StrokeCap.round,
-      );
+    ];
+
+    // The sun's elevation at a cell, like sunElevation, from the sines and
+    // cosines decoded with the cells.
+    final sinSun = math.sin(sun.latitude * math.pi / 180);
+    final cosSun = math.cos(sun.latitude * math.pi / 180);
+    final sinSunLon = math.sin(sun.longitude * math.pi / 180);
+    final cosSunLon = math.cos(sun.longitude * math.pi / 180);
+    final xPerDegree = size.width / 360;
+    final yPerDegree = size.height / (landMaskNorth - landMaskSouth);
+
+    for (var band = 0; band < cells.bandStarts.length - 1; band++) {
+      final lengths = List.filled(Daylight.values.length, 0);
+      for (var i = cells.bandStarts[band]; i < cells.bandStarts[band + 1]; i++) {
+        final elevation =
+            cells.sinLatitudes[i] * sinSun +
+            cells.cosLatitudes[i] *
+                cosSun *
+                (cells.cosLongitudes[i] * cosSunLon +
+                    cells.sinLongitudes[i] * sinSunLon);
+        final daylight = elevation > 0
+            ? Daylight.day
+            : elevation > twilightLimit
+                ? Daylight.twilight
+                : Daylight.night;
+        final buffer = buffers[daylight.index];
+        final at = lengths[daylight.index];
+        buffer[at] = (cells.longitudes[i] + 180) * xPerDegree;
+        buffer[at + 1] = (landMaskNorth - cells.latitudes[i]) * yPerDegree;
+        lengths[daylight.index] = at + 2;
+      }
+      for (final daylight in Daylight.values) {
+        if (lengths[daylight.index] == 0) continue;
+        canvas.drawRawPoints(
+          ui.PointMode.points,
+          Float32List.sublistView(
+            buffers[daylight.index],
+            0,
+            lengths[daylight.index],
+          ),
+          paints[daylight.index],
+        );
+      }
     }
   }
+
+  static const _alphas = {
+    Daylight.day: 0.5,
+    Daylight.twilight: 0.3,
+    Daylight.night: 0.14,
+  };
 
   @override
   bool shouldRepaint(covariant LandPainter oldDelegate) =>
       oldDelegate.sun != sun ||
       oldDelegate.color != color ||
-      oldDelegate.grid != grid;
+      oldDelegate.scale != scale;
 }
 
 /// Whether the marker of [city] is drawn at the zoom level [scale]: those
@@ -102,6 +150,7 @@ class MarkerPainter extends CustomPainter {
   MarkerPainter({
     required this.cities,
     required this.selectedCities,
+    this.highlighted,
     required this.nameOf,
     required this.language,
     required this.scale,
@@ -112,6 +161,9 @@ class MarkerPainter extends CustomPainter {
 
   final List<City> cities;
   final Set<City> selectedCities;
+
+  /// The city last tapped, drawn like a selected one until it is added.
+  final City? highlighted;
 
   /// The name a city is labeled with, in the app's language [language].
   final String Function(City) nameOf;
@@ -130,7 +182,7 @@ class MarkerPainter extends CustomPainter {
       ...cities.where(selectedCities.contains),
     ];
     for (final city in ordered) {
-      final isSelected = selectedCities.contains(city);
+      final isSelected = selectedCities.contains(city) || city == highlighted;
       if (!isMarkerVisible(city, isSelected: isSelected, scale: scale)) {
         continue;
       }
@@ -228,6 +280,7 @@ class MarkerPainter extends CustomPainter {
   bool shouldRepaint(covariant MarkerPainter oldDelegate) =>
       oldDelegate.cities != cities ||
       !setEquals(oldDelegate.selectedCities, selectedCities) ||
+      oldDelegate.highlighted != highlighted ||
       oldDelegate.scale != scale ||
       oldDelegate.language != language ||
       oldDelegate.markerColor != markerColor ||
