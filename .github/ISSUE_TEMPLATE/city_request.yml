@@ -1,0 +1,35 @@
+name: Request a city
+description: Ask for a city to be added to the list of bundled cities
+title: "Add city: "
+labels: ["request city"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping to complete the city list! Until the city is bundled, you can add it yourself with **Add custom city** in the city list.
+  - type: input
+    id: city
+    attributes:
+      label: City
+      description: The English name of the city
+      placeholder: Manila
+    validations:
+      required: true
+  - type: input
+    id: country
+    attributes:
+      label: Country
+      placeholder: Philippines
+    validations:
+      required: true
+  - type: input
+    id: time-zone
+    attributes:
+      label: Time zone (optional)
+      description: The IANA time zone, if you know it. See the [list of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
+      placeholder: Asia/Manila
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else?
+      description: For example several cities at once, or why this city matters to you.
