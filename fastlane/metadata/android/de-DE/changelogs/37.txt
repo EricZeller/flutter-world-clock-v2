@@ -1,0 +1,6 @@
+• Neu: 800 Städte, alle Großstädte und Hauptstädte weltweit, dazu Konstanz
+• Städtenamen in deiner Sprache: München, Köln, Kiew; die Suche findet beide Schreibweisen
+• Wetter nach Lage, Namensvettern wie Hyderabad bekommen ihr eigenes
+• Karte: Stadt antippen und mit einem weiteren Tipp hinzufügen; kleine Städte erscheinen beim Hineinzoomen
+• Datenquellen und Lizenzen auf der Über-Seite
+• Fehlerbehebungen
