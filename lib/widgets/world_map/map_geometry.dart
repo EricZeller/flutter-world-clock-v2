@@ -19,29 +19,66 @@ class MapProjection {
   final Size size;
 
   Offset project(LatLng point) => Offset(
-        (point.longitude + 180) / 360 * size.width,
-        (landMaskNorth - point.latitude) /
-            (landMaskNorth - landMaskSouth) *
-            size.height,
-      );
+    (point.longitude + 180) / 360 * size.width,
+    (landMaskNorth - point.latitude) /
+        (landMaskNorth - landMaskSouth) *
+        size.height,
+  );
 
-  /// Diameter of a land dot on this canvas.
-  double get dotDiameter => size.width / landMaskColumns * 0.62;
+  /// Diameter of a land dot of a grid of [columns] on this canvas.
+  double dotDiameter([int columns = landMaskColumns]) =>
+      size.width / columns * 0.62;
 }
 
-/// Centers of all land cells of the dot grid, decoded once.
-final List<LatLng> landCells = () {
-  final bits = base64Decode(landMaskBase64);
-  return [
-    for (var row = 0; row < landMaskRows; row++)
-      for (var column = 0; column < landMaskColumns; column++)
-        if (_isSet(bits, row * landMaskColumns + column))
-          (
-            latitude: landMaskNorth - (row + 0.5) * landMaskStep,
-            longitude: -180 + (column + 0.5) * landMaskStep,
-          ),
-  ];
-}();
+/// The dot grid of the map: the coarse one as a whole, the fine one from
+/// [fineLandFrom] on, where the coarse dots would have grown into blobs.
+class LandGrid {
+  const LandGrid._(this.step, this.columns, this.rows, this._base64);
+
+  static const coarse = LandGrid._(
+    landMaskStep,
+    landMaskColumns,
+    landMaskRows,
+    landMaskBase64,
+  );
+  static const fine = LandGrid._(
+    landMaskFineStep,
+    landMaskFineColumns,
+    landMaskFineRows,
+    landMaskFineBase64,
+  );
+
+  /// The grid drawn at the zoom level [scale].
+  static LandGrid at(double scale) => scale >= fineLandFrom ? fine : coarse;
+
+  final double step;
+  final int columns;
+  final int rows;
+  final String _base64;
+
+  static final _cells = <LandGrid, List<LatLng>>{};
+
+  /// Centers of all land cells, decoded once.
+  List<LatLng> get cells => _cells.putIfAbsent(this, () {
+    final bits = base64Decode(_base64);
+    return [
+      for (var row = 0; row < rows; row++)
+        for (var column = 0; column < columns; column++)
+          if (_isSet(bits, row * columns + column))
+            (
+              latitude: landMaskNorth - (row + 0.5) * step,
+              longitude: -180 + (column + 0.5) * step,
+            ),
+    ];
+  });
+}
+
+/// The zoom level from which the fine dot grid is drawn: its dots are then
+/// as big on screen as the coarse ones are without zoom.
+const fineLandFrom = 3.0;
+
+/// Centers of all land cells of the coarse dot grid.
+List<LatLng> get landCells => LandGrid.coarse.cells;
 
 bool _isSet(Uint8List bits, int index) =>
     bits[index >> 3] & (1 << (index & 7)) != 0;

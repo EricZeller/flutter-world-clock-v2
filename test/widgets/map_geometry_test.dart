@@ -10,10 +10,14 @@ void main() {
     const projection = MapProjection(Size(2500, 1000));
 
     test('maps the corners and the equator', () {
-      expect(projection.project((latitude: landMaskNorth, longitude: -180)),
-          Offset.zero);
-      expect(projection.project((latitude: landMaskSouth, longitude: 180)),
-          const Offset(2500, 1000));
+      expect(
+        projection.project((latitude: landMaskNorth, longitude: -180)),
+        Offset.zero,
+      );
+      expect(
+        projection.project((latitude: landMaskSouth, longitude: 180)),
+        const Offset(2500, 1000),
+      );
       final equator = projection.project((latitude: 0, longitude: 0));
       expect(equator.dx, 1250);
       expect(equator.dy, closeTo(1000 * 84 / 144, 0.001));
@@ -25,9 +29,11 @@ void main() {
   });
 
   group('landCells', () {
-    bool isLand(double latitude, double longitude) => landCells.any((cell) =>
-        (cell.latitude - latitude).abs() <= landMaskStep / 2 &&
-        (cell.longitude - longitude).abs() <= landMaskStep / 2);
+    bool isLand(double latitude, double longitude) => landCells.any(
+      (cell) =>
+          (cell.latitude - latitude).abs() <= landMaskStep / 2 &&
+          (cell.longitude - longitude).abs() <= landMaskStep / 2,
+    );
 
     test('contains continents but not oceans', () {
       expect(isLand(52.5, 13.4), isTrue, reason: 'Berlin');
@@ -40,6 +46,47 @@ void main() {
     test('covers about a third of the map', () {
       final share = landCells.length / (landMaskColumns * landMaskRows);
       expect(share, inInclusiveRange(0.25, 0.4));
+    });
+  });
+
+  group('LandGrid', () {
+    bool isLand(LandGrid grid, double latitude, double longitude) =>
+        grid.cells.any(
+          (cell) =>
+              (cell.latitude - latitude).abs() <= grid.step / 2 &&
+              (cell.longitude - longitude).abs() <= grid.step / 2,
+        );
+
+    test('is coarse for the whole map and fine when zoomed in', () {
+      expect(LandGrid.at(1), LandGrid.coarse);
+      expect(LandGrid.at(fineLandFrom - 0.1), LandGrid.coarse);
+      expect(LandGrid.at(fineLandFrom), LandGrid.fine);
+      expect(LandGrid.at(20), LandGrid.fine);
+      expect(
+        LandGrid.fine.step * 3,
+        closeTo(LandGrid.coarse.step, 0.001),
+        reason: 'the fine dots are as big at 3x as the coarse ones at 1x',
+      );
+    });
+
+    test('the fine grid shows the same continents, in more detail', () {
+      expect(isLand(LandGrid.fine, 52.5, 13.4), isTrue, reason: 'Berlin');
+      expect(isLand(LandGrid.fine, -25.0, 135.0), isTrue, reason: 'Australia');
+      expect(isLand(LandGrid.fine, 30.0, -40.0), isFalse, reason: 'Atlantic');
+      expect(isLand(LandGrid.fine, 47.66, 9.18), isTrue, reason: 'Konstanz');
+      expect(
+        isLand(LandGrid.fine, 54.0, 8.0),
+        isFalse,
+        reason: 'the North Sea off Germany, land in the coarse grid',
+      );
+      final share =
+          LandGrid.fine.cells.length /
+          (LandGrid.fine.columns * LandGrid.fine.rows);
+      expect(share, inInclusiveRange(0.25, 0.4));
+      expect(
+        LandGrid.fine.cells.length,
+        greaterThan(LandGrid.coarse.cells.length * 8),
+      );
     });
   });
 
@@ -84,12 +131,16 @@ void main() {
       // 2026-10-03 12:00 UTC: midday in Europe, night in the Pacific.
       final sun = subsolarPoint(DateTime.utc(2026, 10, 3, 12));
       expect(daylightAt((latitude: 52.5, longitude: 13.4), sun), Daylight.day);
-      expect(daylightAt((latitude: 35.7, longitude: 139.7), sun),
-          Daylight.night,
-          reason: 'Tokyo at 21:00');
+      expect(
+        daylightAt((latitude: 35.7, longitude: 139.7), sun),
+        Daylight.night,
+        reason: 'Tokyo at 21:00',
+      );
       // About 3° beyond the terminator along the equator.
-      expect(daylightAt((latitude: 0, longitude: sun.longitude + 93), sun),
-          Daylight.twilight);
+      expect(
+        daylightAt((latitude: 0, longitude: sun.longitude + 93), sun),
+        Daylight.twilight,
+      );
     });
   });
 }

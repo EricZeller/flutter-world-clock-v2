@@ -6,20 +6,26 @@ import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
 
 /// Draws the land dots, dimmed where it is night. Only repaints when the
-/// minute, size or colors change; zooming merely scales the cached layer.
+/// minute, size, colors or the grid change; zooming merely scales the cached
+/// layer. Zoomed in past [fineLandFrom] the fine grid is drawn, so the dots
+/// stay dots instead of growing into blobs.
 class LandPainter extends CustomPainter {
-  LandPainter({required this.sun, required this.color});
+  LandPainter({required this.sun, required this.color, required this.scale});
 
   final LatLng sun;
   final Color color;
+  final double scale;
+
+  LandGrid get grid => LandGrid.at(scale);
 
   @override
   void paint(Canvas canvas, Size size) {
     final projection = MapProjection(size);
+    final grid = this.grid;
     final points = {
       for (final daylight in Daylight.values) daylight: <double>[],
     };
-    for (final cell in landCells) {
+    for (final cell in grid.cells) {
       final offset = projection.project(cell);
       points[daylightAt(cell, sun)]!
         ..add(offset.dx)
@@ -37,7 +43,7 @@ class LandPainter extends CustomPainter {
         Float32List.fromList(coordinates),
         Paint()
           ..color = color.withValues(alpha: alphas[daylight])
-          ..strokeWidth = projection.dotDiameter
+          ..strokeWidth = projection.dotDiameter(grid.columns)
           ..strokeCap = StrokeCap.round,
       );
     }
@@ -45,7 +51,9 @@ class LandPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant LandPainter oldDelegate) =>
-      oldDelegate.sun != sun || oldDelegate.color != color;
+      oldDelegate.sun != sun ||
+      oldDelegate.color != color ||
+      oldDelegate.grid != grid;
 }
 
 /// Whether the marker of [city] is drawn at the zoom level [scale]: those
