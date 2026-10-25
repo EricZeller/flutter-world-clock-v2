@@ -41,8 +41,8 @@ class _Country {
   /// The name in the app's language, see [PlaceNames.country].
   late final String localName;
 
-  /// The [localName], followed by the cities if another flag has the same
-  /// name: China (Beijing) and China (Hong Kong).
+  /// The [localName], followed by its capital or biggest city if another
+  /// flag has the same name: China (Beijing) and China (Hong Kong).
   late final String label;
 
   /// The time zones of [cities] and of the tz database for this country,
@@ -63,6 +63,13 @@ class _Country {
           .firstOrNull
           ?.timeZone;
 }
+
+/// The capital among [cities], else the most populous, else the first.
+City _mainCity(List<City> cities) =>
+    cities.where((city) => city.isCapital).firstOrNull ??
+    cities.reduce(
+      (a, b) => (b.population ?? 0) > (a.population ?? 0) ? b : a,
+    );
 
 /// A time zone of a country: one of the tz database's zones of the country,
 /// one of its bundled cities, or usually both.
@@ -216,7 +223,6 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     // A city's own name and those of its language, such as München.
     List<String> namesOf(City city) => [city.name, ...names.otherNames(city)];
     for (final country in byFlag.values) {
-      final cityNames = country.cities.map((city) => city.name);
       final zones = <String, _Zone>{};
       // A country without zones in the tz database's list (Kosovo) still
       // has those of its cities.
@@ -241,7 +247,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
       }
       country
         ..label = flagsPerName[country.localName]! > 1
-            ? '${country.localName} (${cityNames.join(', ')})'
+            ? '${country.localName} (${names.name(_mainCity(country.cities))})'
             : country.localName
         ..zones = {
           for (final zone in zones.values.toList()
@@ -343,7 +349,10 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     final name = _nameController.text.trim();
     final country = _country!;
     final zone = country.zones[_timeZone]!;
-    // The data of a bundled city in the zone, else the zone's own location.
+    // The offset of a bundled city in the zone, else the zone's. The map
+    // shows the city at the zone's principal location (Berlin for
+    // Europe/Berlin), or at the first bundled city of a zone that zone.tab
+    // lacks.
     final template = zone.cities.firstOrNull;
     Navigator.pop(
       context,
@@ -353,13 +362,10 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
         timeZone: zone.timeZone,
         flag: country.flag,
         utc: template?.utc ?? listedUtcOffset(zone.timeZone),
-        weatherZone: name,
-        latitude: template == null
-            ? zone.countryZone?.latitude
-            : template.latitude,
-        longitude: template == null
-            ? zone.countryZone?.longitude
-            : template.longitude,
+        // With the country, so wttr.in does not pick a namesake elsewhere.
+        weatherZone: '$name, ${country.name}',
+        latitude: zone.countryZone?.latitude ?? template?.latitude,
+        longitude: zone.countryZone?.longitude ?? template?.longitude,
         isCustom: true,
       ),
     );

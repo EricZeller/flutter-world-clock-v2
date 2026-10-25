@@ -200,17 +200,21 @@ void main() {
 
     await tester.enterText(countryField, 'china');
     await tester.pumpAndSettle();
-    expect(menuEntries(), ['China (Beijing)', 'China (Hong Kong)']);
+    expect(menuEntries(), [
+      'China (Beijing)',
+      'China (Hong Kong)',
+      'China (Macau)',
+    ]);
 
     await pickCountry(tester, 'united states', 'United States');
     await tester.tap(timeZoneField);
     await tester.pumpAndSettle();
-    expect(menuEntries(), [
-      'America/Chicago',
-      'America/Los Angeles',
-      'America/New York',
-      'Pacific/Honolulu',
-    ]);
+    expect(
+      menuEntries(),
+      containsAll(['America/Chicago', 'America/Los Angeles', 'America/New York']),
+      reason: 'the zones of its bundled cities',
+    );
+    expect(menuEntries(), isNot(contains('America/Toronto')));
   });
 
   group('in German', () {
@@ -237,12 +241,13 @@ void main() {
       await search(tester, 'frankreich');
       expect(menuEntries(), ['Frankreich']);
       await search(tester, 'china');
-      expect(menuEntries(), ['China (Beijing)', 'China (Hong Kong)']);
-      await search(tester, 'peking');
-      expect(menuEntries(), ['China (Beijing)'],
-          reason: 'cities are found by their German names');
+      expect(menuEntries(), ['China (Hongkong)', 'China (Peking)'],
+          reason: 'cities are labeled with their German names');
+      await search(tester, 'beijing');
+      expect(menuEntries(), ['China (Peking)'],
+          reason: 'cities are found by their English names as well');
       await search(tester, 'Hongkong');
-      expect(menuEntries(), ['China (Hong Kong)']);
+      expect(menuEntries(), ['China (Hongkong)']);
     });
 
     testWidgets('the cities keep the English country', (tester) async {
@@ -342,7 +347,7 @@ void main() {
         'chine',
       );
       await tester.pumpAndSettle();
-      expect(menuEntries(), ['Chine (Beijing)', 'Chine (Hong Kong)']);
+      expect(menuEntries(), ['Chine (Hong Kong)', 'Chine (Pékin)']);
     });
   });
 
@@ -648,8 +653,8 @@ void main() {
       await openBundled(tester);
       await pickCountry(tester, 'canada', 'Canada');
 
-      expect(fieldText(tester, timeZoneField), 'America/Toronto',
-          reason: 'the zone of its bundled cities');
+      expect(fieldText(tester, timeZoneField), '',
+          reason: 'its bundled cities are in several zones');
       expect(await searchTimeZones(tester, 'vancouver'), ['America/Vancouver']);
       expect(find.text('MST - BC (most areas)'), findsOneWidget,
           reason: 'the zone tells where it applies');
@@ -804,8 +809,8 @@ void main() {
       expect(fieldText(tester, timeZoneField), 'America/New York');
 
       await pickCountry(tester, 'canada', 'Canada');
-      expect(fieldText(tester, timeZoneField), 'America/Toronto',
-          reason: 'Detroit is no zone of Canada');
+      expect(fieldText(tester, timeZoneField), '',
+          reason: 'Detroit is no zone of Canada, whose cities are in several');
     });
 
     testWidgets('long lists of zones fit on a small phone', (tester) async {
@@ -855,7 +860,8 @@ void main() {
       expect(city.utc, '-07:00', reason: 'as listed in summer, like Seattle');
       expect(city.latitude, closeTo(49.2667, 0.0001));
       expect(city.longitude, closeTo(-123.1167, 0.0001));
-      expect(city.weatherZone, 'Zuhause');
+      expect(city.weatherZone, 'Zuhause, Canada',
+          reason: 'with the country, for wttr.in');
       expect(city.isCustom, isTrue);
     });
 
@@ -885,7 +891,11 @@ void main() {
 
       expect(result.city!.timeZone, 'America/Toronto');
       expect(result.city!.utc, '-04:00');
-      expect(result.city!.latitude, isNull, reason: 'as Toronto has none');
+      expect(
+        (result.city!.latitude, result.city!.longitude),
+        (43.65, -79.3833),
+        reason: 'the location of the zone, Toronto, from zone.tab',
+      );
     });
 
     testWidgets('a city of an older version gets the zone of its country', (

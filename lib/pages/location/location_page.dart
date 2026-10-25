@@ -41,8 +41,14 @@ class _LocationPageState extends State<LocationPage> {
     _loadCities();
   }
 
+  /// The name and time of the city last tapped on the map, with its button.
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? _mapSnackBar;
+
   @override
   void dispose() {
+    // A SnackBar with an action stays until dismissed, also on the page
+    // this one returns to, where its button would act on a disposed state.
+    _mapSnackBar?.close();
     _scrollController.dispose();
     super.dispose();
   }
@@ -87,20 +93,53 @@ class _LocationPageState extends State<LocationPage> {
     return !isFavorite;
   }
 
+  /// A tap on a city of the map shows its name and time with a button to
+  /// add or remove it, so a tap on the wrong one of two close markers does
+  /// not change the favorites.
   void _onMapTap(City city) {
+    final l10n = AppLocalizations.of(context)!;
+    final isFavorite = _favorites.contains(city);
+    final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
+    final snackBar = messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          '${PlaceNames.of(context).name(city)} · ${_timeIn(city)}',
+        ),
+        action: SnackBarAction(
+          label: isFavorite ? l10n.removeFromFavorites : l10n.add,
+          onPressed: () => _toggleFromMap(city, add: !isFavorite),
+        ),
+      ),
+    );
+    _mapSnackBar = snackBar;
+    // Closing one that is gone already would be an error.
+    snackBar.closed.whenComplete(() {
+      if (identical(_mapSnackBar, snackBar)) _mapSnackBar = null;
+    });
+  }
+
+  /// Adds or removes [city] as its button said; nothing if the list did it
+  /// in the meantime.
+  void _toggleFromMap(City city, {required bool add}) {
+    if (!mounted || _favorites.contains(city) == add) return;
     final l10n = AppLocalizations.of(context)!;
     final wasFavorite = _favorites.contains(city);
     final isFavorite = _toggleFavorite(city);
     if (wasFavorite == isFavorite) return;
-    final time = formatTimeInZone(
-      city.timeZone,
-      use24hr: context.read<SettingsProvider>().use24hr,
-      showSeconds: false,
+    final time = _timeIn(city);
+    final name = PlaceNames.of(context).name(city);
+    _showMessage(
+      isFavorite
+          ? l10n.cityAddedAt(name, time)
+          : l10n.cityRemovedAt(name, time),
     );
-    _showMessage(isFavorite
-        ? l10n.cityAddedAt(city.name, time)
-        : l10n.cityRemovedAt(city.name, time));
   }
+
+  String _timeIn(City city) => formatTimeInZone(
+    city.timeZone,
+    use24hr: context.read<SettingsProvider>().use24hr,
+    showSeconds: false,
+  );
 
   void _reorder(int oldIndex, int newIndex) {
     setState(() {
@@ -135,10 +174,7 @@ class _LocationPageState extends State<LocationPage> {
       if (favoriteIndex >= 0) {
         _favorites = [
           for (final (index, item) in _favorites.indexed)
-            if (index == favoriteIndex)
-              city
-            else if (item != city)
-              item,
+            if (index == favoriteIndex) city else if (item != city) item,
         ];
       } else if (editing == null) {
         _favorites = [..._favorites.where((item) => item != city), city];
@@ -173,9 +209,9 @@ class _LocationPageState extends State<LocationPage> {
       child: Text(
         text,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -194,16 +230,17 @@ class _LocationPageState extends State<LocationPage> {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final names = PlaceNames.of(context);
-    final visibleCities =
-        sortCities(filterCities(_cities, _query, names), _sort, names);
+    final visibleCities = sortCities(
+      filterCities(_cities, _query, names),
+      _sort,
+      names,
+    );
     final showFavorites = _query.trim().isEmpty;
 
     return Scaffold(
       backgroundColor: colorScheme.surfaceContainer,
       appBar: AppBar(
-        actions: [
-          SortMenu(onSelected: (sort) => setState(() => _sort = sort)),
-        ],
+        actions: [SortMenu(onSelected: (sort) => setState(() => _sort = sort))],
         centerTitle: true,
         title: Text(
           l10n.manageCities,
@@ -234,8 +271,10 @@ class _LocationPageState extends State<LocationPage> {
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
                       labelText: l10n.searchHint(visibleCities.length),
-                      prefixIcon:
-                          Icon(Icons.search, semanticLabel: l10n.searchCity),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        semanticLabel: l10n.searchCity,
+                      ),
                     ),
                   ),
                 ),

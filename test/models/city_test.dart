@@ -25,6 +25,24 @@ void main() {
       expect(city.isCustom, isFalse);
     });
 
+    test('reads population and capital of a bundled city', () {
+      final city = City.fromJson({
+        ...City.berlin.toJson(),
+        'population': 3426354,
+        'capital': true,
+      });
+      expect(city.population, 3426354);
+      expect(city.isCapital, isTrue);
+      expect(city.toJson(), containsPair('population', 3426354));
+      expect(city.toJson(), containsPair('capital', true));
+
+      final older = City.fromJson(City.berlin.toJson());
+      expect(older.population, isNull);
+      expect(older.isCapital, isFalse);
+      expect(older.toJson().keys, isNot(contains('population')));
+      expect(older.toJson().keys, isNot(contains('capital')));
+    });
+
     test('maps flags of older versions to the bundled WebP files', () {
       expect(City.migrateFlag('de.png'), 'de.webp');
       expect(City.migrateFlag('de.webp'), 'de.webp');

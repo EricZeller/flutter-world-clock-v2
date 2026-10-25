@@ -4,9 +4,10 @@ import 'package:world_clock_v2/models/city.dart';
 import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/utils/search.dart';
 
-/// Countries and cities in an app language. Cities are stored with the
-/// English name of their country, which is translated when it is shown, and
-/// can be found by the names of [cityExonyms] besides their own.
+/// Countries and cities in an app language. Cities are stored with their
+/// English name and the English name of their country, which are translated
+/// when they are shown ([name], [country]), and can be found by the names of
+/// [cityExonyms] besides their own.
 @immutable
 class PlaceNames {
   const PlaceNames(this.languageCode);
@@ -31,6 +32,18 @@ class PlaceNames {
     return countryNames[languageCode]?[code] ?? city.country;
   }
 
+  /// The name [city] is shown with: München for Munich in German. A custom
+  /// city is shown as it was entered.
+  String name(City city) => city.isCustom
+      ? city.name
+      : cityNames[languageCode]?[key(city)] ?? city.name;
+
+  /// What [cityNames] and [cityExonyms] list a bundled city under: its name
+  /// and the ISO code of its flag, `Hyderabad|in`, since the Hyderabads of
+  /// India and Pakistan have names of their own in other languages.
+  static String key(City city) =>
+      '${city.name}|${CountryZone.countryCode(city.flag)}';
+
   /// The country and offset shown below a city: `Deutschland, UTC+02:00`.
   String details(City city) {
     final country = this.country(city);
@@ -41,18 +54,18 @@ class PlaceNames {
   /// Munich. A custom city is only found by its own name.
   List<String> otherNames(City city) => city.isCustom
       ? const []
-      : cityExonyms[languageCode]?[city.name] ?? const [];
+      : cityExonyms[languageCode]?[key(city)] ?? const [];
 
   /// Everything [city] is found by: its names, its country in English and
   /// in the language, its time zone and offset. See [matchesSearch].
   String searchText(City city) => searchTextOf([
-        city.name,
-        ...otherNames(city),
-        city.country,
-        country(city),
-        city.timeZone,
-        city.utc,
-      ]);
+    city.name,
+    ...otherNames(city),
+    city.country,
+    country(city),
+    city.timeZone,
+    city.utc,
+  ]);
 
   @override
   bool operator ==(Object other) =>

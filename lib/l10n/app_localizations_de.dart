@@ -150,6 +150,38 @@ class AppLocalizationsDe extends AppLocalizations {
       'Wenn du Fragen oder Vorschläge hast, kontaktiere mich gerne über GitHub oder öffne ein Issue im Repository dieser App.';
 
   @override
+  String get dataSources => 'Datenquellen';
+
+  @override
+  String get dataSourcesDescription =>
+      'Tippe auf eine Quelle, um ihre Website zu öffnen.';
+
+  @override
+  String get geoNamesCredit =>
+      'Städte mit Koordinaten, Einwohnerzahlen und Namen in anderen Sprachen. CC BY 4.0';
+
+  @override
+  String get cldrCredit =>
+      'Länder- und Städtenamen in anderen Sprachen. Unicode License v3';
+
+  @override
+  String get timeZonesCredit => 'Zeitzonen der Länder. Gemeinfrei';
+
+  @override
+  String get flagsCredit => 'Flaggen';
+
+  @override
+  String get weatherCredit =>
+      'Wetter, vom in den Einstellungen gewählten Server';
+
+  @override
+  String get fontsCredit =>
+      'Schriften Red Hat Display und Pacifico. SIL Open Font License';
+
+  @override
+  String get openWebsite => 'Website öffnen';
+
+  @override
   String get sortByCity => 'Nach Stadt sortieren';
 
   @override

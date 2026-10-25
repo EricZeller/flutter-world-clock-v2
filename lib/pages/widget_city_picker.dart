@@ -39,16 +39,24 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
   void initState() {
     super.initState();
     _repository = context.read<CityRepository>();
-    _load();
   }
 
-  Future<void> _load() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Once; the language, which the cities are sorted by, is known here.
+    _loading ??= _load(PlaceNames.of(context));
+  }
+
+  Future<void>? _loading;
+
+  Future<void> _load(PlaceNames names) async {
     final cities = await _repository.loadAllCities();
     final favorites = await _repository.loadFavorites();
     final widgetCities = await _repository.loadWidgetCities();
     if (!mounted) return;
     setState(() {
-      _cities = sortCities(cities, CitySort.city);
+      _cities = sortCities(cities, CitySort.city, names);
       _favorites = favorites;
       _current = widgetCities[widget.widgetId] ?? favorites.first;
     });
@@ -84,9 +92,9 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
       child: Text(
         text,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
-            ),
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -101,13 +109,15 @@ class _WidgetCityPickerPageState extends State<WidgetCityPickerPage> {
             : Image.asset('assets/flags/${city.flag}'),
       ),
       title: Text(
-        city.name,
+        PlaceNames.of(context).name(city),
         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       subtitle: Text(PlaceNames.of(context).details(city)),
       trailing: isCurrent
-          ? Icon(Icons.check_circle,
-              color: Theme.of(context).colorScheme.primary)
+          ? Icon(
+              Icons.check_circle,
+              color: Theme.of(context).colorScheme.primary,
+            )
           : null,
       selected: isCurrent,
       onTap: () => _choose(city),

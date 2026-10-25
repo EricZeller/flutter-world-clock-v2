@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
 import 'package:world_clock_v2/services/home_widget_service.dart';
 import 'package:world_clock_v2/services/settings_provider.dart';
@@ -195,7 +196,7 @@ class _WidgetMockup extends StatelessWidget {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
-                        child: Text(city.name,
+                        child: Text(PlaceNames.of(context).name(city),
                             style: cityStyle.copyWith(fontSize: 28)),
                       ),
                     ),
@@ -254,7 +255,7 @@ class _WidgetMockup extends StatelessWidget {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: Text(city.name,
+                    child: Text(PlaceNames.of(context).name(city),
                         style: cityStyle.copyWith(fontSize: 20)),
                   ),
                 ),

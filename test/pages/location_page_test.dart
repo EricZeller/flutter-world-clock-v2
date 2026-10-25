@@ -9,6 +9,7 @@ import 'package:world_clock_v2/models/country_zone.dart';
 import 'package:world_clock_v2/pages/location/city_tile.dart';
 import 'package:world_clock_v2/pages/location/location_page.dart';
 import 'package:world_clock_v2/services/city_repository.dart';
+import 'package:world_clock_v2/widgets/world_map/world_map.dart';
 
 import '../helpers/custom_city_dialog.dart';
 import '../helpers/test_app.dart';
@@ -68,6 +69,33 @@ void main() {
     expect(await repository.loadFavorites(), [tokyo]);
     expect(await repository.loadSelectedCity(), tokyo,
         reason: 'older versions read the first favorite');
+  });
+
+  testWidgets('a city tapped on the map is added on request only',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final repository = FakeCityRepository();
+    await pumpPage(tester, const LocationPage(),
+        settings: await loadSettings(), cities: repository);
+    await tester.tap(find.byIcon(Icons.map_rounded));
+    await tester.pumpAndSettle();
+
+    tester.widget<WorldMap>(find.byType(WorldMap)).onCityTap(tokyo);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Tokyo · '), findsOneWidget);
+    expect(await repository.loadFavorites(), [City.berlin],
+        reason: 'the tap alone adds nothing');
+
+    await tester.tap(find.text('Add'));
+    await tester.pumpAndSettle();
+    expect(await repository.loadFavorites(), [City.berlin, tokyo]);
+    expect(find.textContaining('Tokyo added'), findsOneWidget);
+
+    tester.widget<WorldMap>(find.byType(WorldMap)).onCityTap(tokyo);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Remove'));
+    await tester.pumpAndSettle();
+    expect(await repository.loadFavorites(), [City.berlin]);
   });
 
   testWidgets('the last city cannot be removed', (tester) async {
@@ -284,6 +312,18 @@ void main() {
       expect(find.textContaining('Germany'), findsNothing);
     });
 
+    testWidgets('the cities are shown with their German names', (
+      tester,
+    ) async {
+      await pumpGerman(tester);
+
+      expect(find.text('München'), findsOneWidget);
+      expect(find.text('Munich'), findsNothing);
+      expect(find.text('Tokio'), findsOneWidget);
+      expect(find.text('Zuhause'), findsOneWidget,
+          reason: 'the custom city as entered');
+    });
+
     testWidgets('search finds German names', (tester) async {
       await pumpGerman(tester);
 
@@ -291,12 +331,17 @@ void main() {
       await tester.pump();
       expect(find.text('Stadt oder Land suchen (2 gefunden)'), findsOneWidget);
       expect(find.text('Berlin'), findsOneWidget);
-      expect(find.text('Munich'), findsOneWidget);
+      expect(find.text('München'), findsOneWidget);
 
       await tester.enterText(find.byType(TextField), 'Muenchen');
       await tester.pump();
       expect(find.text('Stadt oder Land suchen (1 gefunden)'), findsOneWidget);
-      expect(find.text('Munich'), findsOneWidget);
+      expect(find.text('München'), findsOneWidget);
+
+      await tester.enterText(find.byType(TextField), 'munich');
+      await tester.pump();
+      expect(find.text('München'), findsOneWidget,
+          reason: 'found by its English name, shown with its German one');
 
       await tester.enterText(find.byType(TextField), 'germany');
       await tester.pump();

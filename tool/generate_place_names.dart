@@ -8,13 +8,19 @@
 //   name of the code, or of the CLDR key in [cldrKeys] where cities.json
 //   uses another form of the name (`Congo (DRC)`) or another country's name
 //   (Hong Kong as China).
+// - cityNames: the names the bundled cities are shown with by language and
+//   city name, where they differ from the English name (München for
+//   Munich): the CLDR exemplar city, else the preferred name of GeoNames,
+//   with [extraCityNames] first.
 // - cityExonyms: other names of the bundled cities by language and city
 //   name, which the search finds them by (the cities keep the names of
 //   cities.json). These are the CLDR exemplar cities of the time zones
-//   whose exemplar city is the bundled city (Moskau for Europe/Moscow), and
-//   [extraCityNames] for well-known cities that are no exemplar city.
-//   Names that are found anyway are left out: Berlín, since the search
-//   ignores diacritics, and Mexico, which is part of Mexico City.
+//   whose exemplar city is the bundled city (Moskau for Europe/Moscow), the
+//   names of GeoNames in tool/data/city_names.json, which
+//   tool/generate_cities.dart writes (München for Munich), and
+//   [extraCityNames] for cities that neither knows. Names that are found
+//   anyway are left out: Berlín, since the search ignores diacritics, and
+//   Mexico, which is part of Mexico City.
 //
 // It also writes the countryNames of the other languages to
 // macos/WorldClockWidget/CountryNames.swift, so the macOS widget shows the
@@ -43,6 +49,7 @@ import 'package:world_clock_v2/utils/search.dart';
 const cldrVersion = '48.2.3';
 
 const citiesPath = 'assets/data/cities.json';
+const cityNamesPath = 'tool/data/city_names.json';
 const outputPath = 'lib/data/place_names.g.dart';
 const swiftOutputPath = 'macos/WorldClockWidget/CountryNames.swift';
 
@@ -58,6 +65,7 @@ const cldrKeys = {
   'cd': 'CD-alt-variant', // Congo (DRC)
   'cg': 'CG-alt-variant', // Congo (Republic)
   'hk': 'CN', // China, like the rest of China
+  'mo': 'CN', // China, like Hong Kong
   'mm': 'MM-alt-short', // Myanmar
   'ps': 'PS-alt-short', // Palestine
 };
@@ -69,7 +77,9 @@ const languageKeys = {
 };
 
 /// Names of bundled cities that are no exemplar city of a CLDR time zone,
-/// by language and the city's name in cities.json.
+/// by language and the city's name in cities.json; the first one is shown.
+/// A city's own name keeps it from a misleading GeoNames name: Myrte, the
+/// plant, for Mersin in French.
 const extraCityNames = {
   'de': {
     'Beijing': ['Peking'],
@@ -83,6 +93,9 @@ const extraCityNames = {
     'Munich': ['Múnich'],
     'New Delhi': ['Nueva Delhi'],
     'Valletta': ['La Valeta'],
+    'Funafuti': ['Funafuti'],
+    'Puebla': ['Puebla'],
+    'Tuxtla': ['Tuxtla Gutiérrez'],
   },
   'fr': {
     'Abu Dhabi': ['Abou Dabi'],
@@ -90,12 +103,17 @@ const extraCityNames = {
     'Beijing': ['Pékin'],
     'Bern': ['Berne'],
     'Valletta': ['La Valette'],
+    'Mersin': ['Mersin'],
+    'Tripoli': ['Tripoli'],
   },
   'pt': {
     'Beijing': ['Pequim'],
     'Bern': ['Berna'],
     'Munich': ['Munique'],
     'New Delhi': ['Nova Délhi'],
+    'Benin City': ['Benin City'],
+    'Macau': ['Macau'],
+    "St. George's": ["Saint George's"],
   },
 };
 
@@ -144,55 +162,90 @@ Future<void> generate(HttpClient client) async {
     if (cldrName != english[code]) {
       // Typography (St. Kitts & Nevis) is fine; anything else may need an
       // entry in cldrKeys.
-      print('Note: $code is ${english[code]} in $citiesPath, $cldrName in '
-          'CLDR ($key)');
+      print(
+        'Note: $code is ${english[code]} in $citiesPath, $cldrName in '
+        'CLDR ($key)',
+      );
     }
   }
 
+  final geoNames =
+      jsonDecode(File(cityNamesPath).readAsStringSync())
+          as Map<String, dynamic>;
   final englishZones = await exemplarCities(client, 'en');
   final countryNames = <String, Map<String, String>>{
     'en': {for (final code in codes) code: english[code]!},
   };
   final cityExonyms = <String, Map<String, List<String>>>{};
+  final cityNames = <String, Map<String, String>>{};
   for (final language in languages) {
     final names = await territories(client, language);
     countryNames[language] = {
       for (final code in codes)
-        code: names[languageKeys[language]?[code] ??
+        code:
+            names[languageKeys[language]?[code] ??
                 cldrKeys[code] ??
                 code.toUpperCase()] ??
             names[code.toUpperCase()]!,
     };
 
     final zones = await exemplarCities(client, language);
+    // Both by the city's key: its name and country code (Hyderabad|in),
+    // since cities of different countries share names.
     final exonyms = <String, Set<String>>{};
+    // The name shown: of extraCityNames, else CLDR's, else the preferred
+    // one of GeoNames.
+    final shown = <String, String>{};
     for (final city in cities) {
       final name = city['name'] as String;
+      final key = cityKey(city);
       final zone = city['timeZone'] as String;
       final exemplar = englishZones[zone] ?? zoneCity(zone);
       if (foldForSearch(exemplar) != foldForSearch(name)) continue;
       final local = zones[zone];
-      if (local != null) exonyms.putIfAbsent(name, () => {}).add(local);
+      if (local != null) exonyms.putIfAbsent(key, () => {}).add(local);
+      // CLDR's name, which is the English one where the language has none
+      // of its own (New York), not GeoNames' (New York City).
+      shown[key] = local ?? name;
     }
-    for (final MapEntry(key: name, value: extra)
-        in (extraCityNames[language] ?? const {}).entries) {
-      exonyms.putIfAbsent(name, () => {}).addAll(extra);
+    for (final city in cities) {
+      final name = city['name'] as String;
+      final key = cityKey(city);
+      final extra = extraCityNames[language]?[name];
+      if (extra != null) {
+        exonyms.putIfAbsent(key, () => {}).addAll(extra);
+        shown[key] = extra.first;
+      }
+      final names = geoNames['${city['id']}']?[language];
+      if (names is List) {
+        exonyms.putIfAbsent(key, () => {}).addAll(names.cast<String>());
+        // A name told apart by its region, Suzhou (Anhui), keeps it.
+        final preferred = name.contains(' (')
+            ? const <String>[]
+            : names.cast<String>().where((shown) => isShownName(name, shown));
+        if (preferred.isNotEmpty) {
+          shown.putIfAbsent(key, () => preferred.first);
+        }
+      }
     }
+    cityNames[language] = {
+      for (final key in shown.keys.toList()..sort())
+        if (shown[key] != key.split('|').first) key: shown[key]!,
+    };
     cityExonyms[language] = {
-      for (final name in exonyms.keys.toList()..sort())
-        if (exonyms[name]!
-                .where((exonym) =>
-                    !foldForSearch(name).contains(foldForSearch(exonym)))
-                .toList()
-            case final found when found.isNotEmpty)
-          name: found,
+      for (final key in exonyms.keys.toList()..sort())
+        if (neededExonyms(key.split('|').first, exonyms[key]!) case final found
+            when found.isNotEmpty)
+          key: found,
     };
   }
 
   final license = await download(client, '$_base/LICENSE');
   File(outputPath)
     ..createSync(recursive: true)
-    ..writeAsStringSync(dartSource(countryNames, cityExonyms, license));
+    ..writeAsStringSync(
+      dartSource(countryNames, cityNames, cityExonyms, license),
+    );
   File(swiftOutputPath).writeAsStringSync(swiftSource(countryNames, license));
   print(
     'Wrote ${codes.length} countries and '
@@ -202,8 +255,49 @@ Future<void> generate(HttpClient client) async {
   );
 }
 
+/// The [exonyms] of the city [name] that the search does not find anyway:
+/// not Berlín for Berlin, which it finds without the accent, and not
+/// Muenchen besides München, which it finds spelled out, see
+/// [searchTextOf]. Spellings with accents come first, so they are the ones
+/// kept.
+List<String> neededExonyms(String name, Set<String> exonyms) {
+  final sorted = exonyms.toList()
+    ..sort((a, b) {
+      final byAccents = (foldForSearch(b) == b.toLowerCase() ? 0 : 1).compareTo(
+        foldForSearch(a) == a.toLowerCase() ? 0 : 1,
+      );
+      return byAccents != 0 ? byAccents : compareNames(a, b);
+    });
+  final kept = <String>[];
+  for (final exonym in sorted) {
+    if (!searchTextOf([name, ...kept]).contains(foldForSearch(exonym))) {
+      kept.add(exonym);
+    }
+  }
+  return kept;
+}
+
+/// Whether a GeoNames name of the city [english] is worth showing instead
+/// of the English name: not a transliteration (Āgrā, Hamhŭng), which the
+/// search still finds; not the same name with other apostrophes (Ta’if);
+/// not the English name without its accents (Torreon for Torreón), and not
+/// the English name with the circumflexes of a transliteration (Karâchi).
+bool isShownName(String english, String shown) {
+  String plain(String name) => name.replaceAll(RegExp("['’‘ʻ]"), '');
+  int accents(String name) => name.runes.where((rune) => rune > 0x7f).length;
+  final sameLetters = foldForSearch(shown) == foldForSearch(english);
+  return !RegExp('[āēīōūĀĒĪŌŪŭŬ\u1E00-\u1EFF]').hasMatch(shown) &&
+      plain(shown) != plain(english) &&
+      !(sameLetters && accents(shown) < accents(english)) &&
+      !(sameLetters && RegExp('[âêîôûÂÊÎÔÛ]').hasMatch(shown));
+}
+
 /// `de` for the flag `de.webp`.
 String countryCode(String flag) => flag.split('.').first.toLowerCase();
+
+/// `Munich|de`, see PlaceNames.key.
+String cityKey(Map<String, dynamic> city) =>
+    '${city['name']}|${countryCode(city['flag'] as String)}';
 
 /// `New York` for `America/New_York`, the English exemplar city of a zone
 /// that CLDR does not list.
@@ -228,12 +322,15 @@ Future<Map<String, String>> territories(
   HttpClient client,
   String language,
 ) async {
-  final json = jsonDecode(await download(
-    client,
-    '$_base/cldr-json/cldr-localenames-full/main/$language/territories.json',
-  ));
-  final names = json['main'][language]['localeDisplayNames']['territories']
-      as Map<String, dynamic>;
+  final json = jsonDecode(
+    await download(
+      client,
+      '$_base/cldr-json/cldr-localenames-full/main/$language/territories.json',
+    ),
+  );
+  final names =
+      json['main'][language]['localeDisplayNames']['territories']
+          as Map<String, dynamic>;
   return names.map((key, name) => MapEntry(key, clean(name as String)));
 }
 
@@ -242,10 +339,12 @@ Future<Map<String, String>> exemplarCities(
   HttpClient client,
   String language,
 ) async {
-  final json = jsonDecode(await download(
-    client,
-    '$_base/cldr-json/cldr-dates-full/main/$language/timeZoneNames.json',
-  ));
+  final json = jsonDecode(
+    await download(
+      client,
+      '$_base/cldr-json/cldr-dates-full/main/$language/timeZoneNames.json',
+    ),
+  );
   final result = <String, String>{};
   void visit(Map<String, dynamic> node, String path) {
     for (final MapEntry(:key, :value) in node.entries) {
@@ -281,10 +380,22 @@ String swiftLiteral(String text) =>
 /// The comment that starts both outputs, with the CLDR [license].
 String header(String license) {
   final out = StringBuffer()
-    ..writeln('// GENERATED by tool/generate_place_names.dart from the '
-        'Unicode CLDR')
+    ..writeln(
+      '// GENERATED by tool/generate_place_names.dart from the '
+      'Unicode CLDR',
+    )
     ..writeln('// $cldrVersion (https://cldr.unicode.org). Do not edit; run')
     ..writeln('// `dart run tool/generate_place_names.dart` instead.')
+    ..writeln('//')
+    ..writeln('// The names of the cities also come from GeoNames')
+    ..writeln(
+      '// (https://www.geonames.org), licensed under the Creative '
+      'Commons',
+    )
+    ..writeln(
+      '// Attribution 4.0 License '
+      '(https://creativecommons.org/licenses/by/4.0/).',
+    )
     ..writeln('//')
     ..writeln('// The CLDR data is distributed under the following license:')
     ..writeln('//');
@@ -296,6 +407,7 @@ String header(String license) {
 
 String dartSource(
   Map<String, Map<String, String>> countryNames,
+  Map<String, Map<String, String>> cityNames,
   Map<String, Map<String, List<String>>> cityExonyms,
   String license,
 ) {
@@ -304,8 +416,10 @@ String dartSource(
     ..writeln('/// The CLDR release of the names.')
     ..writeln("const cldrVersion = '$cldrVersion';")
     ..writeln()
-    ..writeln('/// The countries of the bundled cities by language and ISO '
-        'code of their')
+    ..writeln(
+      '/// The countries of the bundled cities by language and ISO '
+      'code of their',
+    )
     ..writeln('/// flag. English is the name the cities are stored with.')
     ..writeln('const countryNames = <String, Map<String, String>>{');
   for (final MapEntry(key: language, value: names) in countryNames.entries) {
@@ -318,16 +432,40 @@ String dartSource(
   out
     ..writeln('};')
     ..writeln()
-    ..writeln('/// Other names of bundled cities by language and the name '
-        'the city is')
-    ..writeln('/// stored with, which the search finds the city by.')
+    ..writeln(
+      '/// The names bundled cities are shown with, by language and the '
+      'name the',
+    )
+    ..writeln(
+      '/// city is stored with and the code of its flag '
+      '(Munich|de), where they',
+    )
+    ..writeln('/// differ: München for Munich.')
+    ..writeln('const cityNames = <String, Map<String, String>>{');
+  for (final MapEntry(key: language, value: cities) in cityNames.entries) {
+    out.writeln('  ${literal(language)}: {');
+    for (final MapEntry(key: city, value: name) in cities.entries) {
+      out.writeln('    ${literal(city)}: ${literal(name)},');
+    }
+    out.writeln('  },');
+  }
+  out
+    ..writeln('};')
+    ..writeln()
+    ..writeln(
+      '/// Other names of bundled cities by language and the name '
+      'the city is',
+    )
+    ..writeln(
+      '/// stored with and the code of its flag (Munich|de), '
+      'which the search',
+    )
+    ..writeln('/// finds the city by.')
     ..writeln('const cityExonyms = <String, Map<String, List<String>>>{');
   for (final MapEntry(key: language, value: cities) in cityExonyms.entries) {
     out.writeln('  ${literal(language)}: {');
     for (final MapEntry(key: city, value: names) in cities.entries) {
-      out.writeln(
-        '    ${literal(city)}: [${names.map(literal).join(', ')}],',
-      );
+      out.writeln('    ${literal(city)}: [${names.map(literal).join(', ')}],');
     }
     out.writeln('  },');
   }
@@ -343,10 +481,14 @@ String swiftSource(
 ) {
   final out = StringBuffer(header(license))
     ..writeln()
-    ..writeln('/// The countries of the bundled cities by language and ISO '
-        'code of their')
-    ..writeln('/// flag, as the app shows them (lib/data/place_names.g.dart). '
-        'English is')
+    ..writeln(
+      '/// The countries of the bundled cities by language and ISO '
+      'code of their',
+    )
+    ..writeln(
+      '/// flag, as the app shows them (lib/data/place_names.g.dart). '
+      'English is',
+    )
     ..writeln('/// the country of cities.json.')
     ..writeln('enum CountryNames {')
     ..writeln('    static let byLanguage: [String: [String: String]] = [');

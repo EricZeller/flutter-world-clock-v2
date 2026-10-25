@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:world_clock_v2/models/city.dart';
+import 'package:world_clock_v2/utils/place_names.dart';
 import 'package:world_clock_v2/widgets/world_map/map_geometry.dart';
 import 'package:world_clock_v2/widgets/world_map/world_map_painter.dart';
 
@@ -18,6 +19,7 @@ class WorldMap extends StatefulWidget {
   });
 
   final List<City> cities;
+
   /// Highlighted cities; the map opens centered on the first one.
   final List<City> selectedCities;
   final ValueChanged<City> onCityTap;
@@ -66,8 +68,9 @@ class _WorldMapState extends State<WorldMap> {
   }
 
   void _centerOnSelectedCity(Size viewport, Size mapSize) {
-    final point =
-        MapProjection(mapSize).project(cityPosition(widget.selectedCities.first));
+    final point = MapProjection(
+      mapSize,
+    ).project(cityPosition(widget.selectedCities.first));
     // math.min: rounding can make the map a hair narrower than the viewport,
     // and clamp() throws if its lower limit ends up above the upper one.
     final dx = (viewport.width / 2 - point.dx)
@@ -128,6 +131,8 @@ class _WorldMapState extends State<WorldMap> {
                     painter: MarkerPainter(
                       cities: widget.cities,
                       selectedCities: widget.selectedCities.toSet(),
+                      nameOf: PlaceNames.of(context).name,
+                      language: Localizations.localeOf(context).languageCode,
                       scale: _scale,
                       markerColor: colorScheme.secondary,
                       labelBackground: colorScheme.inverseSurface,
@@ -150,6 +155,13 @@ class _WorldMapState extends State<WorldMap> {
     City? nearest;
     var distance = tapRadius / _scale;
     for (final city in widget.cities) {
+      if (!isMarkerVisible(
+        city,
+        isSelected: widget.selectedCities.contains(city),
+        scale: _scale,
+      )) {
+        continue;
+      }
       final current =
           (projection.project(cityPosition(city)) - position).distance;
       if (current < distance) {

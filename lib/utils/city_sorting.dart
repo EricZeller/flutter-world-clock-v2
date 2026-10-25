@@ -6,17 +6,17 @@ import 'package:world_clock_v2/utils/time_utils.dart';
 enum CitySort { city, country, utc, continent }
 
 /// Sorts cities with custom cities always listed first. Names are compared
-/// ignoring case and diacritics, countries as [names] shows them.
+/// ignoring case and diacritics, cities and countries as [names] shows them.
 List<City> sortCities(
   Iterable<City> cities,
   CitySort sort, [
   PlaceNames names = PlaceNames.english,
 ]) {
   int compare(City a, City b) => switch (sort) {
-        CitySort.city => compareNames(a.name, b.name),
+        CitySort.city => compareNames(names.name(a), names.name(b)),
         CitySort.country => switch (
               compareNames(names.country(a), names.country(b))) {
-            0 => compareNames(a.name, b.name),
+            0 => compareNames(names.name(a), names.name(b)),
             final result => result,
           },
         CitySort.utc => compareUtc(a.utc, b.utc),
