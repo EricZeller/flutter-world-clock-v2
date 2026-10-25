@@ -65,6 +65,22 @@ void main() {
         closeTo(viewport.width - mapWidth, 0.01));
   });
 
+  testWidgets('draws the fine land grid once zoomed in', (tester) async {
+    await pumpMap(tester, tokyo);
+    LandPainter painter() =>
+        tester.widget<CustomPaint>(_land).painter as LandPainter;
+    expect(painter().grid, LandGrid.coarse);
+
+    tester
+        .widget<InteractiveViewer>(find.byType(InteractiveViewer))
+        .transformationController!
+        .value = Matrix4.diagonal3Values(4, 4, 1);
+    await tester.pump();
+    expect(painter().grid, LandGrid.fine);
+    expect(painter().shouldRepaint(LandPainter(
+        sun: painter().sun, color: painter().color, scale: 2)), isTrue);
+  });
+
   testWidgets('tapping a marker selects its city', (tester) async {
     final tapped = await pumpMap(tester, tokyo);
 

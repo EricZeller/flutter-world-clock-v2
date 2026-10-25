@@ -15,6 +15,7 @@ class WorldMap extends StatefulWidget {
     super.key,
     required this.cities,
     required this.selectedCities,
+    this.highlighted,
     required this.onCityTap,
   });
 
@@ -22,6 +23,9 @@ class WorldMap extends StatefulWidget {
 
   /// Highlighted cities; the map opens centered on the first one.
   final List<City> selectedCities;
+
+  /// The city last tapped, highlighted as well.
+  final City? highlighted;
   final ValueChanged<City> onCityTap;
 
   @override
@@ -34,6 +38,10 @@ class _WorldMapState extends State<WorldMap> {
 
   final _controller = TransformationController();
   double _scale = 1.0;
+
+  /// How far the map zooms in: enough to tell cities 20 km apart on a
+  /// phone, with the fine dot grid from [fineLandFrom] on.
+  static const maxMapScale = 20.0;
   Size? _viewport;
   late LatLng _sun;
   late final Timer _sunTimer;
@@ -106,7 +114,7 @@ class _WorldMapState extends State<WorldMap> {
           transformationController: _controller,
           constrained: false,
           minScale: 1.0,
-          maxScale: 8.0,
+          maxScale: maxMapScale,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapUp: (details) {
@@ -123,6 +131,7 @@ class _WorldMapState extends State<WorldMap> {
                       painter: LandPainter(
                         sun: _sun,
                         color: colorScheme.primary,
+                        scale: _scale,
                       ),
                     ),
                   ),
@@ -131,6 +140,7 @@ class _WorldMapState extends State<WorldMap> {
                     painter: MarkerPainter(
                       cities: widget.cities,
                       selectedCities: widget.selectedCities.toSet(),
+                      highlighted: widget.highlighted,
                       nameOf: PlaceNames.of(context).name,
                       language: Localizations.localeOf(context).languageCode,
                       scale: _scale,

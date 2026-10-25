@@ -44,6 +44,9 @@ class _LocationPageState extends State<LocationPage> {
   /// The name and time of the city last tapped on the map, with its button.
   ScaffoldFeatureController<SnackBar, SnackBarClosedReason>? _mapSnackBar;
 
+  /// The city last tapped on the map, which the check button adds as well.
+  City? _mapTapped;
+
   @override
   void dispose() {
     // A SnackBar with an action stays until dismissed, also on the page
@@ -99,6 +102,7 @@ class _LocationPageState extends State<LocationPage> {
   void _onMapTap(City city) {
     final l10n = AppLocalizations.of(context)!;
     final isFavorite = _favorites.contains(city);
+    setState(() => _mapTapped = city);
     final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
     final snackBar = messenger.showSnackBar(
       SnackBar(
@@ -122,6 +126,7 @@ class _LocationPageState extends State<LocationPage> {
   /// in the meantime.
   void _toggleFromMap(City city, {required bool add}) {
     if (!mounted || _favorites.contains(city) == add) return;
+    setState(() => _mapTapped = null);
     final l10n = AppLocalizations.of(context)!;
     final wasFavorite = _favorites.contains(city);
     final isFavorite = _toggleFavorite(city);
@@ -198,7 +203,13 @@ class _LocationPageState extends State<LocationPage> {
     await _repository.replaceWidgetCity(city, null);
   }
 
+  /// Leaves the page; with the map showing a tapped city that is no
+  /// favorite yet, that city is added first, as the check mark suggests.
   void _close() {
+    final tapped = _mapTapped;
+    if (_showMap && tapped != null && !_favorites.contains(tapped)) {
+      _toggleFavorite(tapped);
+    }
     HapticFeedback.lightImpact();
     Navigator.pop(context);
   }
@@ -260,6 +271,7 @@ class _LocationPageState extends State<LocationPage> {
           ? WorldMap(
               cities: _cities,
               selectedCities: _favorites,
+              highlighted: _mapTapped,
               onCityTap: _onMapTap,
             )
           : Column(
@@ -338,7 +350,13 @@ class _LocationPageState extends State<LocationPage> {
             tooltip: _showMap ? l10n.showList : l10n.showMap,
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,
-            onPressed: () => setState(() => _showMap = !_showMap),
+            onPressed: () {
+              _mapSnackBar?.close();
+              setState(() {
+                _showMap = !_showMap;
+                _mapTapped = null;
+              });
+            },
             child: Icon(_showMap ? Icons.list_rounded : Icons.map_rounded),
           ),
           const SizedBox(height: 12),

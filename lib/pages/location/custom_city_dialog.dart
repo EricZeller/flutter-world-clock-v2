@@ -50,7 +50,7 @@ class _Country {
   late final Map<String, _Zone> zones;
 
   /// Everything the country can be found by: its label, its English name
-  /// and its cities, see [PlaceNames.searchText].
+  /// and the names of its capital, see [PlaceNames.searchText].
   late final String searchText;
 
   /// The zone of [zones] that [timeZone] is or is offered as, such as
@@ -255,10 +255,12 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
                 timeZoneLabel(a.timeZone), timeZoneLabel(b.timeZone))))
             zone.timeZone: zone,
         }
+        // Found by its names and its capital's, not by every city: with
+        // 800 cities, "ab" would list India for Ahmedabad.
         ..searchText = searchTextOf([
           country.label,
           country.name,
-          for (final city in country.cities) ...namesOf(city),
+          ...namesOf(_mainCity(country.cities)),
         ]);
     }
     return byFlag.values.toList()
@@ -375,6 +377,10 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final menuHeight = _menuHeight(
+      MediaQuery.sizeOf(context),
+      MediaQuery.viewInsetsOf(context),
+    );
     final country = _country;
     final appliesIn =
         _timeZoneFitsCountry ? country!.zones[_timeZone]!.comment : '';
@@ -408,7 +414,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
               controller: _countryController,
               initialSelection: country?.flag,
               expandedInsets: EdgeInsets.zero,
-              menuHeight: 300,
+              menuHeight: menuHeight,
               enableFilter: true,
               requestFocusOnTap: true,
               inputDecorationTheme: _fieldStyle,
@@ -448,7 +454,7 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
               initialSelection: _timeZone,
               enabled: country != null,
               expandedInsets: EdgeInsets.zero,
-              menuHeight: 300,
+              menuHeight: menuHeight,
               enableFilter: true,
               requestFocusOnTap: true,
               inputDecorationTheme: _fieldStyle,
@@ -509,3 +515,11 @@ class _CustomCityDialogState extends State<CustomCityDialog> {
     );
   }
 }
+
+/// The height of the country and time zone menus: 30% of the screen left
+/// above the keyboard ([insets]), between 120 and 300. A menu that does not
+/// fit below its field is moved up over the fields, hiding what is typed.
+/// The dialog's own route has removed the status bar from the screen
+/// already.
+double _menuHeight(Size screen, EdgeInsets insets) =>
+    ((screen.height - insets.bottom) * 0.3).clamp(120.0, 300.0);
