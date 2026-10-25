@@ -92,6 +92,7 @@ const Map<String, (double, double)> timeZoneCoordinates = {
   'Asia/Pyongyang': (39.03, 125.76),
   'Asia/Muscat': (23.58, 58.41),
   'Asia/Karachi': (33.68, 73.04),
+  'Asia/Manila': (14.60, 120.98),
   'Asia/Hebron': (31.90, 35.20),
   'Asia/Qatar': (25.28, 51.53),
   'Asia/Riyadh': (24.71, 46.67),

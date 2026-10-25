@@ -286,7 +286,7 @@
         "utc": "-05:00",
         "flag": "us.webp",
         "weatherZone": "Dallas"
-    },    
+    },
     {
         "name": "Dubai",
         "country": "United Arab Emirates",
@@ -318,6 +318,14 @@
         "utc": "-05:00",
         "flag": "pe.webp",
         "weatherZone": "Lima"
+    },
+    {
+        "name": "Manila",
+        "country": "Philippines",
+        "timeZone": "Asia/Manila",
+        "utc": "+08:00",
+        "flag": "ph.webp",
+        "weatherZone": "Manila"
     },
     {
         "name": "Lisbon",
