@@ -1,7 +1,6 @@
-• New: UV index and moon phase in the weather
-• Translated country names, search also works in other languages and without accents
-• Custom cities: the time zone now matches the country, with all its time zones
-• Up-to-date time zone data
-• More reliable widgets, weather and city list
-• Clearer time zone choice without duplicate zones
+• New: 800 cities, every big city and capital worldwide, plus Konstanz
+• City names in your language: München, Köln, Kiew; search finds both spellings
+• Weather by location, so namesakes like Hyderabad get their own
+• Map: tap a city, then add it with one more tap; small cities appear when zooming in
+• Data sources and licenses on the About page
 • Bug fixes

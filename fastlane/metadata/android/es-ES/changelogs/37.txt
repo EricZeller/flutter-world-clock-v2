@@ -1,0 +1,6 @@
+• Nuevo: 800 ciudades, todas las grandes ciudades y capitales del mundo, además de Konstanz
+• Nombres de ciudades en tu idioma: Múnich, Colonia, Kiev; la búsqueda encuentra ambas grafías
+• El tiempo según la ubicación, así homónimas como Hyderabad tienen el suyo
+• Mapa: toca una ciudad y añádela con otro toque; las ciudades pequeñas aparecen al acercar
+• Fuentes de datos y licencias en la página Acerca de
+• Corrección de errores

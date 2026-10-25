@@ -1,0 +1,6 @@
+• Nouveau : 800 villes, toutes les grandes villes et capitales du monde, plus Constance
+• Noms des villes dans votre langue : Munich, Cologne, Kiev ; la recherche trouve les deux graphies
+• Météo selon la position, les homonymes comme Hyderabad ont chacune la leur
+• Carte : touchez une ville, puis ajoutez-la d’une autre touche ; les petites villes apparaissent en zoomant
+• Sources des données et licences dans la page À propos
+• Corrections de bugs
