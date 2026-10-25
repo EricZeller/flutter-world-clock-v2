@@ -64,6 +64,19 @@ void main() {
     expect(missing, isEmpty);
   });
 
+  test('every bundled flag image belongs to a bundled city', () async {
+    // A flag without a city is a country the app lacks, like the
+    // Philippines of issue #61 were.
+    final cities = await repository.loadAllCities();
+    final flags = {for (final city in cities) city.flag};
+    final unused = [
+      for (final file in Directory('assets/flags').listSync())
+        if (file is File && !flags.contains(file.uri.pathSegments.last))
+          file.uri.pathSegments.last,
+    ]..sort();
+    expect(unused, isEmpty);
+  });
+
   test('maps PNG flags stored by older versions to the bundled WebP', () async {
     // Cities saved before the flags were converted to WebP reference the
     // former PNG files.
@@ -88,21 +101,27 @@ void main() {
     // Saving them again stores the new file names.
     await repository.saveFavorites(favorites);
     final prefs = await SharedPreferences.getInstance();
-    expect(prefs.getString(CityRepository.favoritesKey), isNot(contains('.png')));
+    expect(
+      prefs.getString(CityRepository.favoritesKey),
+      isNot(contains('.png')),
+    );
   });
 
   test('loads stored bundled cities with the current bundled data', () async {
     // Versions before the fix of the offsets stored Chicago at UTC-06:00.
-    final chicago = (await repository.loadBundledCities())
-        .singleWhere((city) => city.name == 'Chicago');
+    final chicago = (await repository.loadBundledCities()).singleWhere(
+      (city) => city.name == 'Chicago',
+    );
     expect(chicago.utc, '-05:00');
     final stale = {...chicago.toJson(), 'utc': '-06:00', 'flag': 'us.png'};
     final staleCustom = {...custom.toJson(), 'utc': '+05:00'};
     SharedPreferences.setMockInitialValues({
       CityRepository.favoritesKey: jsonEncode([stale, staleCustom]),
       CityRepository.selectedCityKey: jsonEncode(stale),
-      CityRepository.widgetCitiesKey:
-          jsonEncode({'3': stale, '4': staleCustom}),
+      CityRepository.widgetCitiesKey: jsonEncode({
+        '3': stale,
+        '4': staleCustom,
+      }),
     });
 
     final favorites = await repository.loadFavorites();
@@ -180,8 +199,11 @@ void main() {
 
     test('ignore duplicates and fall back on broken data', () async {
       SharedPreferences.setMockInitialValues({
-        CityRepository.favoritesKey: jsonEncode(
-            [City.berlin.toJson(), custom.toJson(), City.berlin.toJson()]),
+        CityRepository.favoritesKey: jsonEncode([
+          City.berlin.toJson(),
+          custom.toJson(),
+          City.berlin.toJson(),
+        ]),
       });
       expect(await repository.loadFavorites(), [City.berlin, custom]);
 
@@ -206,8 +228,10 @@ void main() {
       await repository.saveWidgetCity(7, custom);
       await repository.saveWidgetCity(9, City.berlin);
       await repository.saveWidgetCity(7, City.berlin);
-      expect(await repository.loadWidgetCities(),
-          {7: City.berlin, 9: City.berlin});
+      expect(await repository.loadWidgetCities(), {
+        7: City.berlin,
+        9: City.berlin,
+      });
 
       await repository.removeWidgetCities([9, 42]);
       expect(await repository.loadWidgetCities(), {7: City.berlin});
@@ -228,8 +252,11 @@ void main() {
       await repository.saveWidgetCity(9, City.berlin);
 
       await repository.replaceWidgetCity(custom, renamed);
-      expect(await repository.loadWidgetCities(),
-          {7: renamed, 8: renamed, 9: City.berlin});
+      expect(await repository.loadWidgetCities(), {
+        7: renamed,
+        8: renamed,
+        9: City.berlin,
+      });
 
       await repository.replaceWidgetCity(renamed, null);
       expect(await repository.loadWidgetCities(), {9: City.berlin});
@@ -245,13 +272,16 @@ void main() {
         repository.replaceWidgetCity(custom, City.berlin),
       ]);
 
-      expect(await repository.loadWidgetCities(),
-          {7: City.berlin, 8: City.berlin});
+      expect(await repository.loadWidgetCities(), {
+        7: City.berlin,
+        8: City.berlin,
+      });
     });
 
     test('ignore broken data', () async {
-      SharedPreferences.setMockInitialValues(
-          {CityRepository.widgetCitiesKey: '{"x": 1}'});
+      SharedPreferences.setMockInitialValues({
+        CityRepository.widgetCitiesKey: '{"x": 1}',
+      });
 
       expect(await repository.loadWidgetCities(), isEmpty);
     });
@@ -262,9 +292,10 @@ void main() {
       // Android runs the widget configuration in a second instance, which
       // writes to the platform behind this instance's cache.
       await SharedPreferencesStorePlatform.instance.setValue(
-          'String',
-          'flutter.${CityRepository.widgetCitiesKey}',
-          jsonEncode({'5': custom.toJson()}));
+        'String',
+        'flutter.${CityRepository.widgetCitiesKey}',
+        jsonEncode({'5': custom.toJson()}),
+      );
 
       expect(await repository.loadWidgetCities(), {5: custom});
     });

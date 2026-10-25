@@ -56,6 +56,22 @@
         "weatherZone": "Vienna"
     },
     {
+        "name": "Nassau",
+        "country": "Bahamas",
+        "timeZone": "America/Nassau",
+        "utc": "-04:00",
+        "flag": "bs.webp",
+        "weatherZone": "Nassau"
+    },
+    {
+        "name": "Bridgetown",
+        "country": "Barbados",
+        "timeZone": "America/Barbados",
+        "utc": "-04:00",
+        "flag": "bb.webp",
+        "weatherZone": "Bridgetown"
+    },
+    {
         "name": "Brussels",
         "country": "Belgium",
         "timeZone": "Europe/Brussels",
@@ -64,12 +80,60 @@
         "weatherZone": "Brussels"
     },
     {
+        "name": "Belmopan",
+        "country": "Belize",
+        "timeZone": "America/Belize",
+        "utc": "-06:00",
+        "flag": "bz.webp",
+        "weatherZone": "Belmopan"
+    },
+    {
+        "name": "Porto-Novo",
+        "country": "Benin",
+        "timeZone": "Africa/Porto-Novo",
+        "utc": "+01:00",
+        "flag": "bj.webp",
+        "weatherZone": "Porto-Novo"
+    },
+    {
+        "name": "La Paz",
+        "country": "Bolivia",
+        "timeZone": "America/La_Paz",
+        "utc": "-04:00",
+        "flag": "bo.webp",
+        "weatherZone": "La Paz"
+    },
+    {
+        "name": "Sarajevo",
+        "country": "Bosnia and Herzegovina",
+        "timeZone": "Europe/Sarajevo",
+        "utc": "+02:00",
+        "flag": "ba.webp",
+        "weatherZone": "Sarajevo"
+    },
+    {
         "name": "Brasilia",
         "country": "Brazil",
         "timeZone": "America/Sao_Paulo",
         "utc": "-03:00",
         "flag": "br.webp",
         "weatherZone": "Brasilia"
+    },
+    {
+        "name": "Bandar Seri Begawan",
+        "country": "Brunei",
+        "timeZone": "Asia/Brunei",
+        "utc": "+08:00",
+        "flag": "bn.webp",
+        "weatherZone": "Bandar Seri Begawan"
+    },
+    {
+        "name": "Phnom Penh",
+        "country": "Cambodia",
+        "timeZone": "Asia/Phnom_Penh",
+        "utc": "+07:00",
+        "flag": "kh.webp",
+        "weatherZone": "Phnom Penh"
     },
     {
         "name": "Ottawa",
@@ -104,6 +168,14 @@
         "weatherZone": "Cairo"
     },
     {
+        "name": "Suva",
+        "country": "Fiji",
+        "timeZone": "Pacific/Fiji",
+        "utc": "+12:00",
+        "flag": "fj.webp",
+        "weatherZone": "Suva"
+    },
+    {
         "name": "Paris",
         "country": "France",
         "timeZone": "Europe/Paris",
@@ -126,6 +198,14 @@
         "utc": "+03:00",
         "flag": "gr.webp",
         "weatherZone": "Athens"
+    },
+    {
+        "name": "St. George's",
+        "country": "Grenada",
+        "timeZone": "America/Grenada",
+        "utc": "-04:00",
+        "flag": "gd.webp",
+        "weatherZone": "St. George's"
     },
     {
         "name": "New Delhi",
